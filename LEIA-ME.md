@@ -74,6 +74,14 @@ Se o projetor não estiver reto com a parede, a imagem sai em forma de trapézio
 3. Para o ajuste fino, clique num canto e use as **setas** (com `Shift`, o passo é maior).
 4. Clique em **Done**: a grade some e o ajuste fica salvo. **↺ Reset corners** volta ao normal.
 
+## Formas abstratas no lugar da webcam
+
+Em *Video & performance*, troque **Source** para **Abstract shapes**. Em vez da câmera, entram formas geométricas desenhadas só com as arestas (quadrados, losangos, triângulos, hexágonos, círculos, estrelas ou wireframes 3D), e qualquer estilo é aplicado sobre elas. A webcam é desligada enquanto isso.
+
+- **Shapes**: o tipo de forma (*Mix* mistura todas).
+- **Count**, **Speed** e **Line**: quantidade, velocidade e espessura da linha (mapeáveis em knobs MIDI).
+- Metade das formas forma um túnel de contornos saindo do centro, e o resto flutua pela tela. Tudo cresce na batida e acelera com o grave.
+
 ## Imagem / logo por cima
 
 No painel **Image / logo**, clique em **📁 Load…** (ou arraste o arquivo para a janela) e escolha um PNG, JPG, GIF ou WebP. A imagem fica salva para as próximas vezes.

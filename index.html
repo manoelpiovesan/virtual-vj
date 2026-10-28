@@ -17,6 +17,7 @@
 html,body{margin:0;height:100%;background:var(--desk);color:var(--tx);font:13px/1.35 Tahoma,Verdana,"Segoe UI",sans-serif;overflow:hidden}
 button,select,input{font:inherit;color:inherit}
 ::selection{background:var(--p);color:#000}
+[hidden]{display:none !important}
 ::-webkit-scrollbar{width:16px;height:16px}
 ::-webkit-scrollbar-track{background:repeating-conic-gradient(var(--face) 0 25%,var(--lo) 0 50%) 0 0/4px 4px}
 ::-webkit-scrollbar-thumb{background:var(--face);border:2px solid;border-color:var(--hi) var(--lo) var(--lo) var(--hi);outline:1px solid #000}
@@ -273,7 +274,13 @@ body.out:fullscreen,body.out :fullscreen{cursor:none}
         <div class="meters"><div><span>LOW</span><i id="mB"></i></div><div><span>MID</span><i id="mM"></i></div><div><span>HIGH</span><i id="mH"></i></div></div>
       </fieldset>
       <fieldset><legend>Video &amp; performance</legend>
-        <div class="f sel"><label for="cam">Webcam</label><select id="cam"></select></div>
+        <div class="f sel"><label for="source">Source</label><select id="source"><option value="cam">Webcam</option><option value="shapes">Abstract shapes</option></select></div>
+        <div class="f sel src-cam"><label for="cam">Webcam</label><select id="cam"></select></div>
+        <div class="f sel src-shapes" hidden><label for="shapeSet">Shapes</label>
+          <select id="shapeSet"><option value="mix">Mix</option><option value="squares">Squares</option><option value="diamonds">Diamonds</option><option value="triangles">Triangles</option><option value="hexagons">Hexagons</option><option value="circles">Circles</option><option value="stars">Stars</option><option value="wire3d">3D wireframes</option></select></div>
+        <div class="f src-shapes" hidden><label for="shapeCount">Count</label><input type="range" id="shapeCount" min="2" max="30" step="1" data-midi="shapeCount" data-label="Shape count"><output id="shapeCountV"></output></div>
+        <div class="f src-shapes" hidden><label for="shapeSpeed">Speed</label><input type="range" id="shapeSpeed" min="0" max="1" step=".01" data-midi="shapeSpeed" data-label="Shape speed"><output id="shapeSpeedV"></output></div>
+        <div class="f src-shapes" hidden><label for="shapeLine">Line</label><input type="range" id="shapeLine" min="1" max="8" step=".5" data-midi="shapeLine" data-label="Shape line width"><output id="shapeLineV"></output></div>
         <div class="f sel"><label for="quality">Resolution</label>
           <select id="quality"><option value="640">Light (640)</option><option value="960">Medium (960)</option><option value="1280">High (1280)</option><option value="1920">Full HD (1920)</option><option value="0">Native</option></select></div>
         <div class="f sel"><label for="fpsCap">FPS limit</label>
@@ -350,7 +357,8 @@ if (isOut) document.body.classList.add('out');
 const DEF = { style: 0, intensity: .7, detail: .5, hue: 0, palette: 1, drift: true, mirror: true, strobe: false,
   blackout: false, auto: false, autoSec: 20, cam: '', mic: '', gain: 1.2, bpm: 124, audioMode: 'mic', quality: 1280,
   fpsCap: 60, preview: true, corners: null, calib: false, strobeRate: 0, strobeSync: true,
-  ovlOn: true, ovlMode: 'top', ovlBlend: 'normal', ovlScale: .3, ovlX: .5, ovlY: .5, ovlAlpha: 1, ovlPulse: true };
+  ovlOn: true, ovlMode: 'top', ovlBlend: 'normal', ovlScale: .3, ovlX: .5, ovlY: .5, ovlAlpha: 1, ovlPulse: true,
+  source: 'cam', shapeSet: 'mix', shapeCount: 12, shapeSpeed: .4, shapeLine: 3 };
 const FLAT = () => [[0, 0], [1, 0], [1, 1], [0, 1]];   // cantos: sup-esq, sup-dir, inf-dir, inf-esq (0..1)
 const state = { ...DEF, corners: FLAT() };
 if (!isOut) { try { Object.assign(state, JSON.parse(localStorage.getItem('visualdj') || '{}'), { blackout: false, calib: false, strobeRate: 0 }); } catch (e) {} }
@@ -461,9 +469,73 @@ function hookVfc() {
   video.requestVideoFrameCallback(cb);
 }
 function getSource(t) {
+  if (state.source === 'shapes') { frameId++; return shp; }   // desenhado no loop por drawShapes()
   if (camLive && video.readyState >= 2 && video.videoWidth) { if (!vfc) frameId++; return video; }
   drawDemo(t); frameId++; return demo;
 }
+
+/* ---------- fonte "Abstract shapes": formas geométricas só com as arestas ---------- */
+const shp = document.createElement('canvas'); shp.width = 640; shp.height = 360;
+const sctx = shp.getContext('2d');
+const SHAPE_SETS = {
+  mix: ['square', 'diamond', 'triangle', 'hexagon', 'circle', 'star', 'cube', 'octa'],
+  squares: ['square'], diamonds: ['diamond'], triangles: ['triangle'], hexagons: ['hexagon'],
+  circles: ['circle'], stars: ['star'], wire3d: ['cube', 'octa'],
+};
+const hh = n => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };   // aleatório fixo por índice
+const CUBE = [[[-1, -1, -1], [1, -1, -1], [1, 1, -1], [-1, 1, -1], [-1, -1, 1], [1, -1, 1], [1, 1, 1], [-1, 1, 1]],
+  [[0, 1], [1, 2], [2, 3], [3, 0], [4, 5], [5, 6], [6, 7], [7, 4], [0, 4], [1, 5], [2, 6], [3, 7]]];
+const OCTA = [[[1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0], [0, 0, 1], [0, 0, -1]],
+  [[0, 2], [0, 3], [0, 4], [0, 5], [1, 2], [1, 3], [1, 4], [1, 5], [2, 4], [4, 3], [3, 5], [5, 2]]];
+function poly(c, n, r, rot, sy = 1) {
+  c.beginPath();
+  for (let k = 0; k < n; k++) { const a = rot + k * 2 * Math.PI / n; c[k ? 'lineTo' : 'moveTo'](Math.cos(a) * r, Math.sin(a) * r * sy); }
+  c.closePath(); c.stroke();
+}
+function wire(c, [V, E], r, ax, ay) {   // wireframe 3D com perspectiva simples
+  const P = V.map(([x, y, z]) => {
+    const X = x * Math.cos(ay) - z * Math.sin(ay); let Z = x * Math.sin(ay) + z * Math.cos(ay);
+    const Y = y * Math.cos(ax) - Z * Math.sin(ax); Z = y * Math.sin(ax) + Z * Math.cos(ax);
+    const p = 3 / (3 + Z); return [X * r * p, Y * r * p];
+  });
+  c.beginPath(); for (const [a, b] of E) { c.moveTo(...P[a]); c.lineTo(...P[b]); } c.stroke();
+}
+function drawShape(c, type, r, t) {
+  switch (type) {
+    case 'square': poly(c, 4, r, Math.PI / 4); break;
+    case 'diamond': poly(c, 4, r * .8, 0, 1.45); break;
+    case 'triangle': poly(c, 3, r, -Math.PI / 2); break;
+    case 'hexagon': poly(c, 6, r, 0); break;
+    case 'circle': c.beginPath(); c.arc(0, 0, r, 0, 6.2832); c.stroke(); break;
+    case 'star': c.beginPath(); for (let k = 0; k < 10; k++) { const a = -Math.PI / 2 + k * Math.PI / 5, q = k % 2 ? r * .45 : r; c[k ? 'lineTo' : 'moveTo'](Math.cos(a) * q, Math.sin(a) * q); } c.closePath(); c.stroke(); break;
+    case 'cube': wire(c, CUBE, r * .62, t * .7, t); break;
+    case 'octa': wire(c, OCTA, r, t * .5, t * .8); break;
+  }
+}
+let shpT = 0;
+function drawShapes(dt, a) {
+  const c = sctx, W = shp.width, H = shp.height, set = SHAPE_SETS[state.shapeSet] || SHAPE_SETS.mix;
+  const n = Math.round(state.shapeCount), tun = Math.ceil(n / 2), k = 1 + a.pulse * .22 * (.5 + state.intensity), R = Math.hypot(W, H) / 2;
+  shpT += dt * (.25 + state.shapeSpeed * 2.4) * (1 + a.bass * .8);
+  c.globalAlpha = 1; c.fillStyle = '#000'; c.fillRect(0, 0, W, H);
+  c.strokeStyle = '#fff'; c.lineJoin = 'round'; c.lineWidth = state.shapeLine * (1 + a.pulse * .8);
+  for (let i = 0; i < n; i++) {
+    c.save();
+    if (i < tun) {   // túnel: contornos aninhados saindo do centro
+      const s = (shpT * .12 + i / tun) % 1;
+      c.translate(W / 2, H / 2); c.globalAlpha = Math.min(1, s * 3);
+      c.rotate((i % 2 ? 1 : -1) * shpT * .35 + i * .3);
+      drawShape(c, set[i % set.length], s * s * R * 1.1 * k, shpT + i);
+    } else {         // formas flutuando pela tela
+      const j = i - tun;
+      c.translate(W * (.5 + .42 * Math.sin(shpT * (.13 + hh(j + 7) * .2) + hh(j + 3) * 6.28)), H * (.5 + .38 * Math.cos(shpT * (.11 + hh(j + 9) * .2) + hh(j + 5) * 6.28)));
+      c.rotate(shpT * (hh(j + 13) - .5) * 2);
+      drawShape(c, set[Math.floor(hh(j + 1) * set.length)], (18 + hh(j + 11) * 55) * k, shpT * (.5 + hh(j)) + j);
+    }
+    c.restore();
+  }
+}
+function stopCam() { camToken++; if (camStream) camStream.getTracks().forEach(t => t.stop()); camStream = null; camLive = false; }
 function dims(s) { return s === video ? [video.videoWidth, video.videoHeight] : [s.width, s.height]; }
 
 let camStream = null, camToken = 0;
@@ -1226,6 +1298,7 @@ function loop(now) {
   buildLut(t);
   if (isOut) {
     if (now - lastAudioMsg > 1500) { audio.pulse *= Math.exp(-dt * 5); clockAudio(dt); }
+    if (state.source === 'shapes') drawShapes(dt, audio);
     outEng.render(getSource(t), t, dt);
     fpsN++;
     if (now - fpsT > 1000) { if (window.opener) window.opener.postMessage({ t: 'fps', fps: fpsN }, '*'); fpsN = 0; fpsT = now; }
@@ -1233,6 +1306,7 @@ function loop(now) {
     updateAudio(dt, now);
     strobeOn = strobeTick(dt, now);
     send({ t: 'a', a: audio, s: strobeOn });
+    if (state.source === 'shapes' && !thumbsBusy) drawShapes(dt, audio);
     if (state.auto && now - lastAuto > state.autoSec * 1000) setStyle((state.style + 1) % EFFECTS.length);
     // a prévia roda a meia taxa: é só para conferir
     if (pvEng && state.preview && !thumbsBusy && (pvTick++ & 1) === 0) pvEng.render(getSource(t), t, dt * 2);
@@ -1274,6 +1348,7 @@ async function genThumbs() {
       te.setStyle(i);
       for (let f = 0; f < 40; f++) {
         const t = t0 + f / 30; buildLut(t);
+        if (state.source === 'shapes') drawShapes(1 / 30, fake);
         if (f % 10 === 5) fake.beatId++;
         if (f === 30) fake.beatId++;
         te.render(getSource(t), t, 1 / 30, fake);
@@ -1330,7 +1405,11 @@ function initPanel() {
   showPal();
   const am = $('#audioMode'); am.value = state.audioMode; am.onchange = () => { state.audioMode = am.value; commit(); startMic(); };
   $('#mic').onchange = e => { state.mic = e.target.value; commit(); startMic(); };
-  $('#cam').onchange = e => { state.cam = e.target.value; commit(); startCam(state.cam).then(ok => setChip('chCam', ok ? 'camera: active' : 'camera: unavailable (demo)', ok ? 'ok' : 'bad')); };
+  $('#cam').onchange = e => { state.cam = e.target.value; commit(); applySource(); };
+  const src = $('#source'); src.value = state.source;
+  src.onchange = () => { state.source = src.value; commit(); applySource(); scheduleThumbs(); };
+  const ss = $('#shapeSet'); ss.value = state.shapeSet; ss.onchange = () => { state.shapeSet = ss.value; commit(); scheduleThumbs(); };
+  range('shapeCount', 'shapeCount', v => Math.round(v)); range('shapeSpeed', 'shapeSpeed', v => Math.round(v * 100)); range('shapeLine', 'shapeLine', v => v + 'px');
   const q = $('#quality'); q.value = state.quality; q.onchange = () => { state.quality = +q.value; commit(); };
   const fc = $('#fpsCap'); fc.value = state.fpsCap; fc.onchange = () => { state.fpsCap = +fc.value; commit(); };
 
@@ -1483,6 +1562,16 @@ function initMidi() {
   renderMidi(); startMidi();
 }
 
+// troca entre webcam e formas abstratas (painel); mostra só os controles da fonte escolhida
+async function applySource() {
+  const shapes = state.source === 'shapes';
+  document.querySelectorAll('.src-cam').forEach(el => el.hidden = shapes);
+  document.querySelectorAll('.src-shapes').forEach(el => el.hidden = !shapes);
+  if (shapes) { stopCam(); setChip('chCam', 'source: abstract shapes', 'ok'); return; }
+  const ok = await startCam(state.cam);
+  if (state.source === 'cam') setChip('chCam', ok ? 'camera: active' : 'camera: unavailable (demo mode)', ok ? 'ok' : 'bad');
+}
+
 function gpuName() {
   try {
     const c = document.createElement('canvas').getContext('webgl2'), e = c && c.getExtension('WEBGL_debug_renderer_info');
@@ -1512,7 +1601,8 @@ async function init() {
       const m = e.data || {};
       if (m.t === 'state') {
         Object.assign(state, m.s); outEng.setStyle(state.style); fit();
-        if (state.cam !== lastCam) { lastCam = state.cam; startCam(state.cam); }
+        const src = state.source === 'shapes' ? 'shapes' : 'cam:' + state.cam;   // formas abstratas desligam a câmera
+        if (src !== lastCam) { lastCam = src; if (state.source === 'shapes') stopCam(); else startCam(state.cam); }
       } else if (m.t === 'a') { Object.assign(audio, m.a); strobeOn = !!m.s; lastAudioMsg = performance.now(); }
       else if (m.t === 'flash') outEng.kick();
       else if (m.t === 'ovlimg') setOverlay(m.blob || null);
@@ -1532,7 +1622,7 @@ async function init() {
   initPanel(); initMidi(); initOverlay(); setStyle(state.style);
   requestAnimationFrame(loop);
   // nada aqui espera pelo outro: uma permissão pendente não pode travar as miniaturas
-  const camP = startCam(state.cam).then(ok => { setChip('chCam', ok ? 'camera: active' : 'camera: unavailable (demo mode)', ok ? 'ok' : 'bad'); listDevices(); });
+  const camP = applySource().then(() => listDevices());
   startMic().then(listDevices);
   Promise.race([camP, new Promise(r => setTimeout(r, 4000))]).then(() => setTimeout(genThumbs, 1200));
 }

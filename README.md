@@ -13,6 +13,7 @@ Live DJ visuals in the browser: your webcam + the music become real-time visuals
 - **Strobe knob**: off → 1 bar → 1/32, locked to the beat
 - **MIDI Learn**: map any pad, knob or fader
 - **Keystone**: drag 4 corners to fit a tilted projector
+- **Abstract shapes source**: no webcam? Feed the effects with wireframe squares, diamonds, hexagons, stars or 3D cubes
 - **Logo overlay**: drop a PNG on top of the visuals, or mix it into the camera so it gets the effect too
 - **Light**: one HTML file, WebGL2 shaders, ~0.1 ms CPU per frame
 
