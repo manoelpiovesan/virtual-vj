@@ -8,7 +8,7 @@ Visuais ao vivo para DJ, gerados a partir da webcam e reagindo ao som. Não prec
 
 1. Conecte o projetor como **tela estendida** (Win + P → *Estender*) e ligue a webcam externa.
 2. Dê dois cliques em **`Iniciar Virtual VJ.bat`**. O painel de controle abre no notebook.
-3. Clique em **▶ Open output** (na barra de título). A janela de saída tenta ir sozinha para a segunda tela. Se não for, arraste-a para o projetor.
+3. Clique em **▶ Open output** (no canto direito da barra de ferramentas). A janela de saída tenta ir sozinha para a segunda tela. Se não for, arraste-a para o projetor.
 4. **Clique uma vez na janela do projetor** (ou aperte `F`) para deixá-la em tela cheia.
 5. Em *Video & performance*, escolha a webcam externa. Em *Audio*, escolha o microfone ou a entrada de linha (line-in) que capta o som.
 
@@ -18,7 +18,7 @@ Visuais ao vivo para DJ, gerados a partir da webcam e reagindo ao som. Não prec
 - **Centro**: a prévia do que está no projetor.
 - **Direita**: os ajustes *Visual*, *MIDI*, *Audio*, *Video & performance* e *Image / logo*.
 - **Embaixo**: a caixa de cores com as paletas, o controle *Hue* e a barra de status (camera, audio, output, gpu, midi).
-- O botão **?** na barra de título mostra os atalhos.
+- O botão **?** (ao lado do Open output) mostra os atalhos.
 
 ## Atalhos (no painel)
 

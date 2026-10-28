@@ -55,9 +55,8 @@ input[type=range]::-moz-range-thumb{width:10px;height:20px;background:var(--y);b
 .ov.flash{background:#fff}.ov.dark{background:#000}
 
 /* ===== janela ===== */
-#app{height:100%;padding:10px 14px 14px 10px}
-.window{height:100%;display:flex;flex-direction:column;background:var(--face);border:2px solid;border-color:var(--hi) var(--lo) var(--lo) var(--hi);
-  outline:3px solid #000;box-shadow:8px 8px 0 #000}
+#app{height:100%}
+.window{height:100%;display:flex;flex-direction:column;background:var(--face)}
 .title{display:flex;align-items:center;gap:8px;padding:4px 5px 4px 8px;background:linear-gradient(90deg,#0a0a86,#6a1fd6 60%,#ff4fd8);color:#fff;
   font-family:var(--px);font-size:13px;border-bottom:2px solid #000}
 .title .ic{width:18px;height:18px;flex:none;background:conic-gradient(var(--y) 0 25%,var(--p) 0 50%,var(--c) 0 75%,var(--g) 0);border:2px solid #000}
@@ -69,6 +68,7 @@ input[type=range]::-moz-range-thumb{width:10px;height:20px;background:var(--y);b
 .sep{width:4px;align-self:stretch;border-left:2px solid var(--lo);border-right:2px solid var(--hi)}
 .toolbar label{display:flex;align-items:center;gap:6px;cursor:pointer;white-space:nowrap}
 .toolbar input[type=number]{width:52px}
+.toolbar .q{font-family:var(--px);padding:5px 11px}
 
 .body{flex:1;display:grid;grid-template-columns:236px minmax(0,1fr) 300px;min-height:0}
 .pane{display:flex;flex-direction:column;min-height:0;padding:10px}
@@ -192,7 +192,7 @@ body.dropping .window{outline-color:var(--y);outline-style:dashed}
   .props{grid-column:1/-1;border-left:0;border-top:2px solid var(--lo);display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));align-items:start}
 }
 @media(max-width:760px){
-  #app{padding:6px 10px 10px 6px}
+  #app{padding:0}
   .body{grid-template-columns:1fr}
   .toolbox{border-right:0} #grid{grid-template-columns:repeat(auto-fill,minmax(120px,1fr));max-height:300px}
   .toolbox{order:2}
@@ -219,12 +219,6 @@ body.out:fullscreen,body.out :fullscreen{cursor:none}
 <body>
 
 <div id="app"><div class="window">
-  <div class="title">
-    <span class="ic"></span><span class="name">Virtual VJ - untitled_show.vvj</span>
-    <button id="btnOut" class="primary">▶ Open output</button>
-    <button id="btnHelp" class="q" title="Shortcuts">?</button>
-  </div>
-
   <div class="toolbar">
     <button id="btnFlash" data-midi="flash" data-label="Flash">⚡ Flash<kbd>Space</kbd></button>
     <button id="btnBlack" data-midi="blackout" data-label="Blackout">⏻ Blackout<kbd>B</kbd></button>
@@ -241,6 +235,8 @@ body.out:fullscreen,body.out :fullscreen{cursor:none}
     <span class="sep"></span>
     <label><input type="checkbox" id="auto" data-midi="auto" data-label="Auto switch"> Switch every</label><input type="number" id="autoSec" min="3" max="300"> s
     <button id="btnLearn" class="learn-btn" title="Toggle MIDI Learn">🎹 MIDI Learn</button>
+    <button id="btnHelp" class="q" title="Shortcuts">?</button>
+    <button id="btnOut" class="primary">▶ Open output</button>
   </div>
 
   <div class="body">
