@@ -1331,10 +1331,10 @@ async function init() {
   if (!(state.style < EFFECTS.length)) state.style = 0;
   initPanel(); initMidi(); setStyle(state.style);
   requestAnimationFrame(loop);
-  const ok = await startCam(state.cam);
-  setChip('chCam', ok ? 'câmera: ativa' : 'câmera: indisponível (modo demo)', ok ? 'ok' : 'bad');
-  await startMic(); await listDevices();
-  setTimeout(genThumbs, 1200);
+  // nada aqui espera pelo outro: uma permissão pendente não pode travar as miniaturas
+  const camP = startCam(state.cam).then(ok => { setChip('chCam', ok ? 'câmera: ativa' : 'câmera: indisponível (modo demo)', ok ? 'ok' : 'bad'); listDevices(); });
+  startMic().then(listDevices);
+  Promise.race([camP, new Promise(r => setTimeout(r, 4000))]).then(() => setTimeout(genThumbs, 1200));
 }
 init();
 </script>
