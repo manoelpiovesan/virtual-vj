@@ -29,7 +29,7 @@ Visuais ao vivo para DJ, gerados a partir da webcam e reagindo ao som. Não prec
 | `Espaço` | Flash |
 | `B` | Blackout |
 | `T` | Tap tempo (BPM) |
-| `G` | Grade de perspectiva |
+| `G` | Grade de perspectiva (o botão ⬚ Perspectiva abre a janela de ajuste) |
 
 ## Estilos
 
@@ -56,7 +56,7 @@ Dá para controlar o Virtual VJ com qualquer controlador MIDI USB (pads, knobs, 
 4. Repita para outros controles e aperte `Esc` ou clique de novo em **MIDI Learn** para sair.
 
 O que dá para mapear:
-- **Knobs e faders**: Intensidade, Detalhe, Matiz, Sensibilidade.
+- **Knobs e faders**: Intensidade, Detalhe, Strobo, Matiz, Sensibilidade e, da imagem, Tamanho, Posição X/Y e Opacidade.
 - **Pads e botões**: cada um dos 27 estilos, ◀ e ▶ da barra de ferramentas (estilo anterior / próximo — ótimo em dois pads), cada paleta, Flash, Blackout, Grade, TAP, Strobe, Espelhar, Troca automática, Cores animadas e Prévia.
 
 Os mapeamentos ficam salvos e aparecem no painel **MIDI**, com ✕ para remover. O monitor mostra o último sinal recebido, o que ajuda a descobrir se o controlador está mandando algo.
@@ -67,10 +67,21 @@ Os mapeamentos ficam salvos e aparecem no painel **MIDI**, com ✕ para remover.
 
 Se o projetor não estiver reto com a parede, a imagem sai em forma de trapézio. Para corrigir:
 
-1. Clique em **▦ Grade** na barra de ferramentas (ou tecle `G`). Aparece uma grade no projetor.
-2. Arraste as 4 bolinhas dos cantos, no painel ou direto na tela do projetor com o mouse, até a grade ficar retangular na parede.
+1. Clique no botão **⬚ Perspectiva** na barra de ferramentas. Abre uma janela, e a grade aparece no projetor.
+2. Arraste as 4 bolinhas dos cantos, na janela ou direto na tela do projetor com o mouse, até a grade ficar retangular na parede.
 3. Para o ajuste fino, clique num canto e use as **setas** (com `Shift`, o passo é maior).
-4. Desligue a grade. O ajuste fica salvo, e **↺ Resetar cantos** volta ao normal.
+4. Clique em **Pronto**: a grade some e o ajuste fica salvo. **↺ Resetar cantos** volta ao normal.
+
+## Imagem / logo por cima
+
+No painel **Imagem / logo**, clique em **📁 Carregar…** (ou arraste o arquivo para a janela) e escolha um PNG, JPG, GIF ou WebP. A imagem fica salva para as próximas vezes.
+
+- **Por cima dos efeitos**: a imagem aparece nítida sobre o visual. Com **Pulsar na batida**, ela cresce um pouco em cada batida.
+- **Junto da câmera (recebe o efeito)**: a imagem é misturada à câmera *antes* do efeito, então o logo também vira ASCII, glitch, feedback…
+- **Mistura**: *Normal*, *Tela* (o preto da imagem some, ótimo para logos em fundo preto) ou *Diferença*.
+- **Tamanho**, **Posição X/Y** e **Opacidade** podem ir para knobs do MIDI, e **Mostrar** pode ir para um pad.
+
+Um PNG com fundo transparente dá o melhor resultado.
 
 ## Desempenho (para rodar junto com o rekordbox)
 

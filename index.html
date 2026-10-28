@@ -168,6 +168,21 @@ dialog::backdrop{background:#0008}
 dialog .in{padding:14px 16px;display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:center}
 dialog .in kbd{margin:0;font-size:10px;justify-self:start}
 dialog .ft{padding:0 16px 16px;display:flex;justify-content:flex-end}
+dialog.warp{width:min(92vw,620px);max-width:none}
+.warp-in{padding:12px 16px 16px;display:flex;flex-direction:column;gap:12px}
+.warp-in .kz{margin:10px 12px}
+button.small{padding:3px 9px;font-size:12px;box-shadow:2px 2px 0 #000}
+
+/* imagem sobreposta (logo) */
+img.ovl{position:absolute;left:50%;top:50%;width:30%;transform:translate(-50%,-50%);pointer-events:none;display:none;max-width:none}
+.ovl-row{display:grid;grid-template-columns:110px 1fr;gap:10px;align-items:center}
+.ovl-thumb{position:relative;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;overflow:hidden;
+  background:repeating-conic-gradient(#1c1c22 0 25%,#26262e 0 50%) 0 0/12px 12px}
+.ovl-thumb img{max-width:100%;max-height:100%;display:none}
+.ovl-thumb.has img{display:block}.ovl-thumb.has span{display:none}
+.ovl-thumb span{color:var(--mut);font-size:11px}
+.ovl-btns{display:flex;flex-direction:column;gap:8px}
+body.dropping .window{outline-color:var(--y);outline-style:dashed}
 
 @media(max-width:1180px){
   .window{overflow:auto}
@@ -213,7 +228,7 @@ body.out:fullscreen,body.out :fullscreen{cursor:none}
   <div class="toolbar">
     <button id="btnFlash" data-midi="flash" data-label="Flash">⚡ Flash<kbd>Espaço</kbd></button>
     <button id="btnBlack" data-midi="blackout" data-label="Blackout">⏻ Blackout<kbd>B</kbd></button>
-    <button id="btnCalib" data-midi="grid" data-label="Grade">▦ Grade<kbd>G</kbd></button>
+    <button id="btnWarp" class="small" title="Ajustar perspectiva do projetor">⬚ Perspectiva</button>
     <span class="sep"></span>
     <div class="stylenav">
       <button id="btnPrev" class="nav" data-midi="prev" data-label="Estilo anterior" title="Estilo anterior (←)">◀</button>
@@ -236,7 +251,7 @@ body.out:fullscreen,body.out :fullscreen{cursor:none}
 
     <section class="pane">
       <div class="workspace">
-        <div class="pv"><canvas id="pv" width="480" height="270"></canvas><div class="ov flash"></div><div class="ov dark"></div><div class="off">prévia desligada</div><i class="hdl r"></i><i class="hdl b"></i><i class="hdl rb"></i></div>
+        <div class="pv"><canvas id="pv" width="480" height="270"></canvas><img class="ovl" alt=""><div class="ov flash"></div><div class="ov dark"></div><div class="off">prévia desligada</div><i class="hdl r"></i><i class="hdl b"></i><i class="hdl rb"></i></div>
         <div class="ws-info"><span><kbd>1</kbd>–<kbd>0</kbd>, <kbd>⇧</kbd>+número e <kbd>Alt</kbd>+número escolhem · <kbd>←</kbd><kbd>→</kbd> passam</span></div>
       </div>
     </section>
@@ -269,10 +284,23 @@ body.out:fullscreen,body.out :fullscreen{cursor:none}
           <select id="fpsCap"><option value="30">30 fps (mais leve)</option><option value="60">60 fps</option><option value="0">Sem limite</option></select></div>
         <div class="chk"><label><input type="checkbox" id="preview" data-midi="preview" data-label="Prévia no painel"> Prévia no painel</label></div>
       </fieldset>
-      <fieldset><legend>Perspectiva</legend>
-        <div class="kz" id="kz"><svg viewBox="0 0 100 100" preserveAspectRatio="none"><polygon id="kzPoly" fill="#ffd60a22" stroke="#ffd60a" stroke-width="2" vector-effect="non-scaling-stroke"/></svg></div>
-        <div class="btns"><button id="btnWarpReset">↺ Resetar cantos</button></div>
-        <div class="hint2">Ligue a <b>Grade</b> e arraste os cantos (aqui ou no projetor) até encaixar na parede. Setas = ajuste fino, Shift = mais rápido.</div>
+      <fieldset><legend>Imagem / logo</legend>
+        <div class="ovl-row">
+          <div class="well ovl-thumb"><img id="ovlThumb" alt=""><span id="ovlNone">sem imagem</span></div>
+          <div class="ovl-btns"><button id="btnOvlLoad">📁 Carregar…</button><button id="btnOvlDel">✕ Remover</button></div>
+          <input type="file" id="ovlFile" accept="image/*" hidden>
+        </div>
+        <div class="chk">
+          <label><input type="checkbox" id="ovlOn" data-midi="ovlOn" data-label="Mostrar imagem"> Mostrar</label>
+          <label><input type="checkbox" id="ovlPulse" data-midi="ovlPulse" data-label="Imagem pulsa na batida"> Pulsar na batida</label>
+        </div>
+        <div class="f sel"><label for="ovlMode">Modo</label><select id="ovlMode"><option value="top">Por cima dos efeitos</option><option value="cam">Junto da câmera (recebe o efeito)</option></select></div>
+        <div class="f sel"><label for="ovlBlend">Mistura</label><select id="ovlBlend"><option value="normal">Normal</option><option value="screen">Tela (preto some)</option><option value="difference">Diferença</option></select></div>
+        <div class="f"><label for="ovlScale">Tamanho</label><input type="range" id="ovlScale" min=".05" max="1" step=".01" data-midi="ovlScale" data-label="Tamanho da imagem"><output id="ovlScaleV"></output></div>
+        <div class="f"><label for="ovlX">Posição X</label><input type="range" id="ovlX" min="0" max="1" step=".005" data-midi="ovlX" data-label="Posição X da imagem"><output id="ovlXV"></output></div>
+        <div class="f"><label for="ovlY">Posição Y</label><input type="range" id="ovlY" min="0" max="1" step=".005" data-midi="ovlY" data-label="Posição Y da imagem"><output id="ovlYV"></output></div>
+        <div class="f"><label for="ovlAlpha">Opacidade</label><input type="range" id="ovlAlpha" min="0" max="1" step=".01" data-midi="ovlAlpha" data-label="Opacidade da imagem"><output id="ovlAlphaV"></output></div>
+        <div class="hint2">PNG com fundo transparente fica melhor. Também dá para arrastar o arquivo para a janela.</div>
       </fieldset>
     </aside>
   </div>
@@ -303,7 +331,17 @@ body.out:fullscreen,body.out :fullscreen{cursor:none}
   <div class="ft"><button id="helpOk" class="primary">OK</button></div>
 </dialog>
 
-<div id="outwrap"><div id="stage"><canvas id="out"></canvas><div class="ov flash"></div><div class="ov dark"></div><div id="grid2"></div></div><div id="hint">Clique aqui ou pressione F para tela cheia</div></div>
+<dialog id="warpDlg" class="warp">
+  <div class="title"><span class="ic"></span><span class="name">Perspectiva do projetor</span><button id="warpX">✕</button></div>
+  <div class="warp-in">
+    <div class="kz" id="kz"><svg viewBox="0 0 100 100" preserveAspectRatio="none"><polygon id="kzPoly" fill="#ffd60a22" stroke="#ffd60a" stroke-width="2" vector-effect="non-scaling-stroke"/></svg></div>
+    <div class="btns"><button id="btnCalib" data-midi="grid" data-label="Grade">▦ Grade no projetor<kbd>G</kbd></button><button id="btnWarpReset">↺ Resetar cantos</button></div>
+    <div class="hint2">A grade aparece no projetor enquanto esta janela está aberta. Arraste os cantos (aqui ou direto no projetor) até a grade encaixar na parede. Clique num canto e use as setas para o ajuste fino (Shift = mais rápido).</div>
+  </div>
+  <div class="ft"><button id="warpOk" class="primary">Pronto</button></div>
+</dialog>
+
+<div id="outwrap"><div id="stage"><canvas id="out"></canvas><img class="ovl" alt=""><div class="ov flash"></div><div class="ov dark"></div><div id="grid2"></div></div><div id="hint">Clique aqui ou pressione F para tela cheia</div></div>
 
 <script>
 'use strict';
@@ -315,7 +353,8 @@ if (isOut) document.body.classList.add('out');
 /* ---------- estado ---------- */
 const DEF = { style: 0, intensity: .7, detail: .5, hue: 0, palette: 1, drift: true, mirror: true, strobe: false,
   blackout: false, auto: false, autoSec: 20, cam: '', mic: '', gain: 1.2, bpm: 124, audioMode: 'mic', quality: 1280,
-  fpsCap: 60, preview: true, corners: null, calib: false, strobeRate: 0, strobeSync: true };
+  fpsCap: 60, preview: true, corners: null, calib: false, strobeRate: 0, strobeSync: true,
+  ovlOn: true, ovlMode: 'top', ovlBlend: 'normal', ovlScale: .3, ovlX: .5, ovlY: .5, ovlAlpha: 1, ovlPulse: true };
 const FLAT = () => [[0, 0], [1, 0], [1, 1], [0, 1]];   // cantos: sup-esq, sup-dir, inf-dir, inf-esq (0..1)
 const state = { ...DEF, corners: FLAT() };
 if (!isOut) { try { Object.assign(state, JSON.parse(localStorage.getItem('visualdj') || '{}'), { blackout: false, calib: false, strobeRate: 0 }); } catch (e) {} }
@@ -461,8 +500,20 @@ void main(){ vUv = p * .5 + .5; gl_Position = vec4(p, 0, 1); }`;
 const CAM_FS = `#version 300 es
 precision highp float;
 in vec2 vUv; out vec4 o;
-uniform sampler2D uVid; uniform vec4 uCrop; uniform float uMirror;
-void main(){ vec2 uv = vUv; if (uMirror > .5) uv.x = 1. - uv.x; o = vec4(texture(uVid, uCrop.xy + uv * uCrop.zw).rgb, 1); }`;
+uniform sampler2D uVid, uOvl; uniform vec4 uCrop, uOvlR; uniform float uMirror, uOvlA, uOvlB;
+void main(){
+  vec2 uv = vUv; if (uMirror > .5) uv.x = 1. - uv.x;
+  vec3 c = texture(uVid, uCrop.xy + uv * uCrop.zw).rgb;
+  if (uOvlA > 0.) {                       // imagem "junto da câmera": entra antes do efeito (sem espelhar)
+    vec2 q = (vUv - uOvlR.xy) / uOvlR.zw;
+    if (q.x >= 0. && q.y >= 0. && q.x <= 1. && q.y <= 1.) {
+      vec4 t = texture(uOvl, q);
+      vec3 m = uOvlB < .5 ? t.rgb : uOvlB < 1.5 ? 1. - (1. - c) * (1. - t.rgb) : abs(c - t.rgb);
+      c = mix(c, m, t.a * uOvlA);
+    }
+  }
+  o = vec4(c, 1);
+}`;
 
 const COPY_FS = `#version 300 es
 precision highp float;
@@ -871,7 +922,7 @@ function createEngine(canvas, wrap, opt = {}) {
   const gl = canvas.getContext('webgl2', { alpha: false, antialias: false, depth: false, stencil: false,
     preserveDrawingBuffer: !!opt.keep, powerPreference: 'high-performance' });
   if (!gl) return null;
-  const fl = wrap && wrap.querySelector('.flash'), dk = wrap && wrap.querySelector('.dark');
+  const fl = wrap && wrap.querySelector('.flash'), dk = wrap && wrap.querySelector('.dark'), ovEl = wrap && wrap.querySelector('img.ovl');
   const FB = gl.FRAMEBUFFER, T2 = gl.TEXTURE_2D;
   gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true); gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
 
@@ -889,7 +940,7 @@ function createEngine(canvas, wrap, opt = {}) {
     if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(p));
     const locs = {}, P = { p, loc: n => n in locs ? locs[n] : (locs[n] = gl.getUniformLocation(p, n)) };
     gl.useProgram(p);
-    [['uCam', 0], ['uPrevCam', 1], ['uLut', 2], ['uPrev', 3], ['uFont', 4], ['uVid', 5]].forEach(([n, u]) => { const l = P.loc(n); if (l) gl.uniform1i(l, u); });
+    [['uCam', 0], ['uPrevCam', 1], ['uLut', 2], ['uPrev', 3], ['uFont', 4], ['uVid', 5], ['uOvl', 6]].forEach(([n, u]) => { const l = P.loc(n); if (l) gl.uniform1i(l, u); });
     return progs[key] = P;
   }
   const U = (P, n, v) => {
@@ -924,6 +975,8 @@ function createEngine(canvas, wrap, opt = {}) {
   const vidTex = tex(false);
   const lutTex = tex(false); gl.texImage2D(T2, 0, gl.RGB, 256, 1, 0, gl.RGB, gl.UNSIGNED_BYTE, lut);
   const fontTex = tex(true); gl.texImage2D(T2, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, fontAtlas()); gl.generateMipmap(T2);
+  const ovlTex = tex(false); let ovlW = 0, ovlH = 0;   // imagem sobreposta (modo "junto da câmera")
+  gl.texImage2D(T2, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(4));
 
   let W = 0, H = 0, camA, camB, fbA, fbB, style = -1, flash = 0, fade = 0, lastBeat = -1, beatT = -99, seed = 0, flow = 0, lastFrame = -1, sliceN = 0;
   const slices = new Float32Array(24);
@@ -949,6 +1002,13 @@ function createEngine(canvas, wrap, opt = {}) {
     kick() { flash = 1; },
     resize(w, h) { if (W !== w || H !== h) { alloc(w, h); const s = style; style = -1; setStyle(s < 0 ? 0 : s); } },
     destroy() { const e = gl.getExtension('WEBGL_lose_context'); if (e) e.loseContext(); },
+    setOverlay(img) {
+      ovlW = img ? img.naturalWidth || img.width : 0; ovlH = img ? img.naturalHeight || img.height : 0;
+      bind(6, ovlTex);
+      if (img) gl.texImage2D(T2, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+      else gl.texImage2D(T2, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(4));
+      lastFrame = -1;
+    },
     render(src, t, dt, aud = audio) {
       if (style < 0) setStyle(state.style);
       gl.bindVertexArray(tri);
@@ -959,6 +1019,13 @@ function createEngine(canvas, wrap, opt = {}) {
         [camA, camB] = [camB, camA];
         const [sw, sh] = dims(src), sa = sw / sh, ta = W / H, crop = sa > ta ? [(1 - ta / sa) / 2, 0, ta / sa, 1] : [0, (1 - sa / ta) / 2, 1, sa / ta];
         const P = prog('cam', CAM_FS); gl.useProgram(P.p); U(P, 'uCrop', crop); U(P, 'uMirror', state.mirror ? 1 : 0);
+        const ovOn = state.ovlOn && ovlW && state.ovlMode === 'cam';
+        U(P, 'uOvlA', ovOn ? state.ovlAlpha : 0); bind(6, ovlTex);
+        if (ovOn) {
+          const w = state.ovlScale, h = w * ovlH / ovlW * W / H;   // mesma proporção do modo "por cima"
+          U(P, 'uOvlR', [state.ovlX - w / 2, 1 - state.ovlY - h / 2, w, h]);
+          U(P, 'uOvlB', { normal: 0, screen: 1, difference: 2 }[state.ovlBlend] || 0);
+        }
         gl.bindFramebuffer(FB, camA.f); gl.viewport(0, 0, camA.w, camA.h); gl.drawArrays(gl.TRIANGLES, 0, 3);
         bind(0, camA.t); gl.generateMipmap(T2);
       }
@@ -1004,6 +1071,15 @@ function createEngine(canvas, wrap, opt = {}) {
       }
 
       // 4) flash / fade / blackout em camadas HTML (custo zero)
+      if (ovEl) {   // imagem "por cima dos efeitos": camada HTML, custo zero na GPU
+        const on = state.ovlOn && !!ovlURL && state.ovlMode === 'top';
+        ovEl.style.display = on ? 'block' : 'none';
+        if (on) {
+          const s = 1 + (state.ovlPulse ? aud.pulse * .15 : 0);
+          ovEl.style.left = state.ovlX * 100 + '%'; ovEl.style.top = state.ovlY * 100 + '%'; ovEl.style.width = state.ovlScale * 100 + '%';
+          ovEl.style.transform = `translate(-50%,-50%) scale(${s.toFixed(3)})`; ovEl.style.opacity = state.ovlAlpha; ovEl.style.mixBlendMode = state.ovlBlend;
+        }
+      }
       if (fl) { fl.style.opacity = strobeOn ? 1 : flash > .01 ? flash : 0; flash *= Math.exp(-dt * 8); }
       if (dk) dk.style.opacity = state.blackout ? 1 : Math.max(0, fade);
       fade -= dt * 3;
@@ -1081,6 +1157,55 @@ function strobeTick(dt, now) {
   return now - stbFire < Math.min(45, periodMs * .5);       // flash curto e duro
 }
 
+/* ---------- imagem sobreposta (PNG / logo) ---------- */
+// guardada no IndexedDB (localStorage é pequeno demais) e enviada à janela do projetor como Blob
+let ovlBlob = null, ovlURL = '', ovlImg = null;
+function idb(mode, fn) {
+  return new Promise((res, rej) => {
+    const r = indexedDB.open('virtualvj', 1);
+    r.onupgradeneeded = () => r.result.createObjectStore('files');
+    r.onerror = () => rej(r.error);
+    r.onsuccess = () => {
+      const tx = r.result.transaction('files', mode), q = fn(tx.objectStore('files'));
+      tx.oncomplete = () => res(q && q.result); tx.onerror = () => rej(tx.error);
+    };
+  });
+}
+async function setOverlay(blob, { persist = true } = {}) {
+  if (blob && !/^image\//.test(blob.type)) return false;
+  let img = null, url = '';
+  if (blob) {
+    url = URL.createObjectURL(blob); img = new Image(); img.src = url;
+    try { await img.decode(); } catch (e) { URL.revokeObjectURL(url); return false; }
+  }
+  if (ovlURL) URL.revokeObjectURL(ovlURL);
+  ovlBlob = blob; ovlURL = url; ovlImg = img;
+  document.querySelectorAll('img.ovl').forEach(el => { if (url) el.src = url; else el.removeAttribute('src'); });
+  [pvEng, outEng].forEach(e => e && e.setOverlay(img));
+  if (!isOut) {
+    const th = $('#ovlThumb'); if (url) th.src = url; else th.removeAttribute('src');
+    th.parentNode.classList.toggle('has', !!url);
+    send({ t: 'ovlimg', blob });
+    if (persist) { try { await idb('readwrite', s => blob ? s.put(blob, 'overlay') : s.delete('overlay')); } catch (e) {} }
+  }
+  return true;
+}
+function initOverlay() {
+  const file = $('#ovlFile');
+  $('#btnOvlLoad').onclick = () => file.click();
+  file.onchange = () => { if (file.files[0]) setOverlay(file.files[0]).then(ok => { if (ok && !state.ovlOn) $('#ovlOn').click(); }); file.value = ''; };
+  $('#btnOvlDel').onclick = () => setOverlay(null);
+  // arrastar e soltar um arquivo de imagem em qualquer lugar do painel
+  addEventListener('dragover', e => { if ([...e.dataTransfer.items].some(i => i.kind === 'file')) { e.preventDefault(); document.body.classList.add('dropping'); } });
+  addEventListener('dragleave', e => { if (!e.relatedTarget) document.body.classList.remove('dropping'); });
+  addEventListener('drop', e => {
+    e.preventDefault(); document.body.classList.remove('dropping');
+    const f = [...e.dataTransfer.files].find(x => /^image\//.test(x.type));
+    if (f) setOverlay(f).then(ok => { if (ok && !state.ovlOn) $('#ovlOn').click(); });
+  });
+  idb('readonly', s => s.get('overlay')).then(b => b && setOverlay(b, { persist: false })).catch(() => {});
+}
+
 /* ---------- loop principal ---------- */
 let outEng, pvEng, outWin = null, lastAudioMsg = 0, lastAuto = 0, fpsN = 0, fpsT = 0, thumbsBusy = false, pvTick = 0;
 
@@ -1144,6 +1269,7 @@ async function genThumbs() {
   if (thumbsBusy) return; thumbsBusy = true;
   const cv = document.createElement('canvas'); cv.width = 320; cv.height = 180;
   const te = createEngine(cv, null, { keep: true });
+  if (te && ovlImg) te.setOverlay(ovlImg);
   if (!te) { thumbsBusy = false; return; }
   const fake = { bass: .35, mid: .3, high: .2, pulse: .35, beatId: 0 };
   const imgs = document.querySelectorAll('.card img'), t0 = performance.now() / 1000;
@@ -1183,7 +1309,10 @@ function initPanel() {
   range('intensity', 'intensity', v => Math.round(v * 100)); range('detail', 'detail', v => Math.round(v * 100));
   range('hue', 'hue', v => v + '°'); range('gain', 'gain', v => v.toFixed(1) + '×');
   range('strobeRate', 'strobeRate', strobeLabel);
-  ['drift', 'mirror', 'strobe', 'auto', 'strobeSync'].forEach(k => check(k, k));
+  ['drift', 'mirror', 'strobe', 'auto', 'strobeSync', 'ovlOn', 'ovlPulse'].forEach(k => check(k, k));
+  const pct = v => Math.round(v * 100);
+  range('ovlScale', 'ovlScale', pct); range('ovlX', 'ovlX', pct); range('ovlY', 'ovlY', pct); range('ovlAlpha', 'ovlAlpha', pct);
+  ['ovlMode', 'ovlBlend'].forEach(k => { const el = $('#' + k); el.value = state[k]; el.onchange = () => { state[k] = el.value; commit(); }; });
   $('#strobeSync').addEventListener('change', () => { $('#strobeRateV').textContent = strobeLabel(state.strobeRate); });
   const pv = $('#preview'); pv.checked = state.preview;
   const pvShow = () => $('.pv').classList.toggle('paused', !state.preview);
@@ -1235,9 +1364,14 @@ function initPanel() {
   const poly = $('#kzPoly');
   const drawKz0 = cornerEditor($('#kz'), (i, p) => { state.corners[i] = p; drawKz(); commit(); });
   const drawKz = () => { drawKz0(); poly.setAttribute('points', state.corners.map(([x, y]) => `${x * 100},${y * 100}`).join(' ')); };
-  const calib = () => { state.calib = !state.calib; $('#btnCalib').classList.toggle('on', state.calib); commit(); };
-  $('#btnCalib').onclick = calib;
+  const calib = (on = !state.calib) => { state.calib = on; $('#btnCalib').classList.toggle('on', on); commit(); };
+  $('#btnCalib').onclick = () => calib();
   $('#btnWarpReset').onclick = () => { state.corners = FLAT(); drawKz(); commit(); };
+  // perspectiva num modal: abre com a grade ligada no projetor e desliga ao fechar
+  const warp = $('#warpDlg');
+  $('#btnWarp').onclick = () => { warp.showModal(); calib(true); drawKz(); };
+  $('#warpX').onclick = $('#warpOk').onclick = () => warp.close();
+  warp.addEventListener('close', () => calib(false));
   drawKz();
 
   addEventListener('keydown', e => {
@@ -1259,7 +1393,7 @@ function initPanel() {
   addEventListener('click', () => actx && actx.state === 'suspended' && actx.resume());
   addEventListener('message', e => {
     const m = e.data || {};
-    if (m.t === 'hello') { pushState(); setChip('chOut', 'saída: conectada', 'ok'); }
+    if (m.t === 'hello') { pushState(); if (ovlBlob) send({ t: 'ovlimg', blob: ovlBlob }); setChip('chOut', 'saída: conectada', 'ok'); }
     else if (m.t === 'fps') setChip('chOut', `saída: ${m.fps} fps`, m.fps >= Math.min(24, (+state.fpsCap || 60) * .8) ? 'ok' : 'bad');
     else if (m.t === 'corners') { state.corners = m.c; selCorner = m.sel; drawKz(); save(); }
   });
@@ -1385,6 +1519,7 @@ async function init() {
         if (state.cam !== lastCam) { lastCam = state.cam; startCam(state.cam); }
       } else if (m.t === 'a') { Object.assign(audio, m.a); strobeOn = !!m.s; lastAudioMsg = performance.now(); }
       else if (m.t === 'flash') outEng.kick();
+      else if (m.t === 'ovlimg') setOverlay(m.blob || null);
     });
     const fs = () => document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen().catch(() => {});
     addEventListener('click', fs);
@@ -1398,7 +1533,7 @@ async function init() {
   const g = gpuName();
   setChip('chGpu', pvEng ? 'gpu: ' + (g || 'WebGL2 ok') : 'gpu: WebGL2 indisponível', pvEng && !/intel/i.test(g) ? 'ok' : 'bad');
   if (!(state.style < EFFECTS.length)) state.style = 0;
-  initPanel(); initMidi(); setStyle(state.style);
+  initPanel(); initMidi(); initOverlay(); setStyle(state.style);
   requestAnimationFrame(loop);
   // nada aqui espera pelo outro: uma permissão pendente não pode travar as miniaturas
   const camP = startCam(state.cam).then(ok => { setChip('chCam', ok ? 'câmera: ativa' : 'câmera: indisponível (modo demo)', ok ? 'ok' : 'bad'); listDevices(); });
