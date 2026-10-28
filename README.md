@@ -2,7 +2,7 @@
 
 # Virtual VJ
 
-**Virtual VJ** turns your webcam and the music into live DJ visuals on a projector — 27 GPU styles, BPM-synced strobe, MIDI Learn. No install.
+**Virtual VJ** turns your webcam and the music into live DJ visuals on a projector — 37 GPU styles, BPM-synced strobe, MIDI Learn. No install.
 
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-online-ffd60a?style=for-the-badge&logo=githubpages&logoColor=black)](https://manoelpiovesan.github.io/virtual-vj/)
 [![Pages](https://img.shields.io/github/deployments/manoelpiovesan/virtual-vj/github-pages?style=for-the-badge&label=pages&logo=github)](https://github.com/manoelpiovesan/virtual-vj/actions)
@@ -27,7 +27,8 @@
 
 ## Features
 
-- **27 styles**: ASCII, digital rain, neon edges, glitch, tunnel, VHS, pop art, terminal, hex dump, ANSI, infinite feedback, datamosh…
+- **37 styles**: ASCII, digital rain, neon edges, glitch, tunnel, VHS, pop art, terminal, hex dump, ANSI, infinite feedback, datamosh, terrain, contour map, hex mosaic, stained glass…
+- **Your own rotation**: switch any style off (✓ on its card) to skip it in auto switch and ◀ ▶
 - **Audio-reactive**: mic/line-in beat detection, or manual BPM with tap tempo
 - **Strobe knob**: off → 1 bar → 1/32, locked to the beat
 - **MIDI Learn**: map any pad, knob or fader

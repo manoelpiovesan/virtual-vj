@@ -84,6 +84,14 @@ input[type=range]::-moz-range-thumb{width:10px;height:20px;background:var(--y);b
 .card .num{position:absolute;top:3px;left:3px;background:var(--y);color:#000;border:2px solid #000;font-family:var(--px);font-size:9px;padding:0 3px;line-height:1.3}
 .card.sel{background:var(--p);color:#000}
 .card.sel img{filter:none}
+/* estilo desligado: fora da troca automática e das setas ◀ ▶ */
+.card .tg{position:absolute;top:3px;right:3px;width:17px;height:17px;display:flex;align-items:center;justify-content:center;
+  background:var(--g);color:#000;border:2px solid #000;font-size:10px;line-height:1;cursor:pointer}
+.card .tg::before{content:'✓'}
+.card.dis .tg{background:var(--face);color:var(--mut)}.card.dis .tg::before{content:'✕'}
+.card.dis img{opacity:.3;filter:grayscale(1)}.card.dis .nm{color:var(--mut);text-decoration:line-through}
+.pane-row{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.pane-row .mini{font-family:var(--px);font-size:9px;padding:2px 6px;box-shadow:2px 2px 0 #000}
 
 /* área de trabalho = prévia */
 .workspace{background:var(--ws);background-image:radial-gradient(#ffffff10 1px,transparent 1px);background-size:12px 12px;
@@ -242,7 +250,7 @@ body.out:fullscreen,body.out :fullscreen{cursor:none}
 
   <div class="body">
     <section class="pane toolbox">
-      <div class="pane-h">Styles</div>
+      <div class="pane-row"><div class="pane-h">Styles</div><button id="btnAllOn" class="mini" title="Turn every style back on">all on</button></div>
       <div id="grid"></div>
     </section>
 
@@ -323,8 +331,8 @@ body.out:fullscreen,body.out :fullscreen{cursor:none}
   <div class="in">
     <kbd>1 … 0</kbd><span>Styles 1 to 10</span>
     <kbd>⇧ + 1 … 0</kbd><span>Styles 11 to 20</span>
-    <kbd>Alt + 1 … 7</kbd><span>Styles 21 to 27</span>
-    <kbd>← →</kbd><span>Previous / next style (or ◀ ▶ on the toolbar, MIDI-mappable)</span>
+    <kbd>Alt + 1 … 0</kbd><span>Styles 21 to 30</span>
+    <kbd>← →</kbd><span>Previous / next style (or ◀ ▶ on the toolbar, MIDI-mappable). Styles switched off with ✓ on their card are skipped</span>
     <kbd>Space</kbd><span>Flash</span>
     <kbd>B</kbd><span>Blackout</span>
     <kbd>T</kbd><span>Tap tempo (BPM)</span>
@@ -358,7 +366,7 @@ const DEF = { style: 0, intensity: .7, detail: .5, hue: 0, palette: 1, drift: tr
   blackout: false, auto: false, autoSec: 20, cam: '', mic: '', gain: 1.2, bpm: 124, audioMode: 'mic', quality: 1280,
   fpsCap: 60, preview: true, corners: null, calib: false, strobeRate: 0, strobeSync: true,
   ovlOn: true, ovlMode: 'top', ovlBlend: 'normal', ovlScale: .3, ovlX: .5, ovlY: .5, ovlAlpha: 1, ovlPulse: true,
-  source: 'cam', shapeSet: 'mix', shapeCount: 12, shapeSpeed: .4, shapeLine: 3 };
+  source: 'cam', shapeSet: 'mix', shapeCount: 12, shapeSpeed: .4, shapeLine: 3, off: [] };
 const FLAT = () => [[0, 0], [1, 0], [1, 1], [0, 1]];   // cantos: sup-esq, sup-dir, inf-dir, inf-esq (0..1)
 const state = { ...DEF, corners: FLAT() };
 if (!isOut) { try { Object.assign(state, JSON.parse(localStorage.getItem('visualdj') || '{}'), { blackout: false, calib: false, strobeRate: 0 }); } catch (e) {} }
@@ -972,6 +980,146 @@ void main(){
   vec3 stamp = (uCamCol > .5 ? c : pal(.35 + .6 * fract(uSeed * .137))) * m * exp(-uBeatAge * 14.);   // carimbo a cada batida
   o = vec4(max(prev, stamp) + pal(.5) * m * .06, 1);
 }` },
+
+/* --- família linhas (parentes do Ridgelines) --- */
+{ name: 'Contour Map', fs: `
+void main(){
+  vec3 c = camL(vUv, mix(3., 1.5, uD)); float l = expo(luma(c), meanL());
+  float n = 6. + uK * 10., v = l * n - uT * .4 - uFlow * .004;                    // curvas de nível que "sobem"
+  float r = floor(v + .5), dd = abs(v - r), w = max(fwidth(v), 1e-4), maj = step(mod(r, 4.), .5);
+  float th = (.7 + maj * .9) * (1. + uPulse * uK);
+  float m = 1. - smoothstep(th * w, (th + 1.2) * w, dd);
+  vec3 col = (uCamCol > .5 ? min(c * 1.5, 1.) : pal(.3 + .7 * fract(r / n))) * m * (.55 + maj * .45);
+  o = vec4(col + pal(.2) * .06 * l, 1);
+}` },
+
+{ name: 'Terrain', fs: `
+void main(){
+  float N = floor(22. + uD * 26.), hor = uRes.y * .64, y = gl_FragCoord.y, s = fract(uFlow * .03), m = meanL();
+  float amp0 = uRes.y * (.1 + .16 * uK) * (1. + uPulse * .5 * uK);
+  vec3 col = vec3(0);
+  for (int j = 0; j < 48; j++) {             // da frente para o fundo: a linha mais próxima tampa as de trás
+    float fj = float(j); if (fj >= N) break;
+    float z = fj + 2. - s, yb = hor * (1. - 1. / z);
+    vec3 c = camL(vec2(vUv.x, clamp(yb / hor, 0., 1.)), 1.5); float l = expo(luma(c), m);
+    float h = yb + amp0 / z * l * (j == 0 ? 1. - s : 1.);
+    if (y <= h + 1.5) {
+      float fade = (1. - fj / N) * (j == 0 ? 1. - s : 1.);
+      col = (uCamCol > .5 ? c * 1.4 : pal(.4 + .6 * l)) * smoothstep(1.6, .4, abs(y - h)) * fade;
+      break;
+    }
+  }
+  o = vec4(col, 1);
+}` },
+
+{ name: 'Engraving', fs: `
+void main(){
+  float N = floor(40. + uD * 80.), gap = uRes.y / N;
+  vec3 c = camL(vUv, cellLod(gap)); float l = clamp(expo(luma(c), meanL()) * (1. + uPulse * .4 * uK), 0., 1.);
+  float y = gl_FragCoord.y + l * gap * (1. + 2. * uK) + sin(gl_FragCoord.x * 6. / uRes.x + uT) * gap * .3;   // a linha entorta com o brilho
+  float f = abs(fract(y / gap) - .5) * 2., aa = 2. / gap;
+  float m = 1. - smoothstep(l - aa, l + aa, f);                                   // mais claro = traço mais grosso
+  o = vec4((uCamCol > .5 ? min(c * 1.5, 1.) : pal(.25 + .75 * l)) * m, 1);
+}` },
+
+{ name: 'Radar Rings', fs: `
+void main(){
+  vec2 p = gl_FragCoord.xy - uRes * .5; float r = length(p), a = atan(p.y, p.x) + uT * .1;
+  float N = floor(18. + uD * 30.), gap = length(uRes) * .5 / N, amp = gap * (2. + uK * 5.) * (1. + uPulse * .6), m = meanL();
+  vec2 dir = vec2(cos(a - uT * .1), sin(a - uT * .1));
+  float b = floor(r / gap); vec3 col = vec3(0);
+  for (int k = 8; k >= 0; k--) {             // anéis de dentro ficam na frente
+    float i = b - float(k); if (i < 0.) continue;
+    float ri = (i + .5) * gap; vec3 c = camL(clamp((uRes * .5 + dir * ri) / uRes, 0., 1.), 1.5); float l = expo(luma(c), m), h = ri + l * amp;
+    if (r <= h + 1.5) { col = (uCamCol > .5 ? c * 1.3 : pal(.4 + .6 * l)) * smoothstep(1.6, .4, abs(r - h)); break; }
+  }
+  o = vec4(col, 1);
+}` },
+
+{ name: 'Mesh Warp', fs: `
+void main(){
+  float N = floor(24. + uD * 40.), gap = uRes.x / N;
+  vec3 c = camL(vUv, cellLod(gap) + 1.); float l = expo(luma(c), meanL());
+  vec2 p = gl_FragCoord.xy, d = p - uRes * .5;
+  vec2 q = p - d / max(length(d), 1.) * l * gap * (1.5 + uK * 3.) * (1. + uPulse * .7);   // o claro estufa a malha
+  vec2 g = q / gap, w = max(fwidth(g), 1e-4), e = abs(fract(g + .5) - .5) / w;
+  float m = 1. - smoothstep(.6, 1.8, min(e.x, e.y));
+  o = vec4((uCamCol > .5 ? min(c * 1.5 + .1, 1.) : pal(.3 + .7 * l)) * m * (.35 + .8 * l), 1);
+}` },
+
+/* --- família mosaico (parentes do Mosaic) --- */
+{ name: 'Hex Mosaic', fs: `
+void main(){
+  float s = uRes.x / floor(14. + uD * 50.);                                      // distância entre centros
+  vec2 p = gl_FragCoord.xy / s, R = vec2(1., 1.732), a = mod(p, R) - R * .5, b = mod(p - R * .5, R) - R * .5;
+  vec2 g = dot(a, a) < dot(b, b) ? a : b, ctr = (p - g) * s;
+  vec3 c = camL(ctr / uRes, cellLod(s));
+  float lv = 3. + floor((1. - uK) * 5. + .5), ql = floor(expo(luma(c), meanL()) * lv + .5) / lv, pp = uPulse * uK;
+  float sz = min(.94, .5 + .45 * ql + .2 * pp * (sin(ctr.x * .01 + ctr.y * .013 + uT * 3.) * .5 + .5));
+  float hd = max(abs(g.x), dot(abs(g), vec2(.5, .866)));
+  float m = smoothstep(sz * .5 + .5 / s, sz * .5 - .5 / s, hd);
+  o = vec4((uCamCol > .5 ? floor(c * lv + .5) / lv : pal(clamp(ql + pp * .25, 0., 1.))) * m, 1);
+}` },
+
+{ name: 'Triangles', fs: `
+void main(){
+  float cw = uRes.x / floor(12. + uD * 44.), h = cw * .866;
+  vec2 ab = vec2(gl_FragCoord.x / cw - gl_FragCoord.y / h * .5, gl_FragCoord.y / h), cell = floor(ab), f = fract(ab);
+  float up = step(1., f.x + f.y);
+  vec2 cc = cell + mix(vec2(1. / 3.), vec2(2. / 3.), up), ctr = vec2((cc.x + cc.y * .5) * cw, cc.y * h);
+  float md = up > .5 ? min(min(1. - f.x, 1. - f.y), f.x + f.y - 1.) : min(min(f.x, f.y), 1. - f.x - f.y);   // distância até a borda
+  vec3 c = camL(ctr / uRes, cellLod(cw));
+  float lv = 3. + floor((1. - uK) * 5. + .5), ql = floor(expo(luma(c), meanL()) * lv + .5) / lv;
+  float sz = min(.92, .45 + .5 * ql + .3 * uPulse * uK * step(.5, h21(cell + up + floor(uSeed))));
+  float m = smoothstep(-.6 / h, .6 / h, md - (1. - sz) / 3.);
+  vec3 col = uCamCol > .5 ? floor(c * lv + .5) / lv : pal(clamp(ql, 0., 1.));
+  o = vec4(col * m * (up > .5 ? 1. : .78), 1);
+}` },
+
+{ name: 'Bricks', fs: `
+void main(){
+  float cw = uRes.x / floor(16. + uD * 48.);
+  vec2 g = gl_FragCoord.xy / cw, cell = floor(g), f = fract(g);
+  vec3 c = camL((cell + .5) * cw / uRes, cellLod(cw));
+  float lv = 3. + floor((1. - uK) * 4. + .5), ql = floor(expo(luma(c), meanL()) * lv + .5) / lv;
+  vec3 base = uCamCol > .5 ? floor(c * lv + .5) / lv : pal(.15 + .85 * ql);
+  base *= 1. + uPulse * uK * .6 * step(h21(cell + floor(uSeed)), .25);           // algumas peças acendem na batida
+  float bev = .07, sh = 1.;
+  if (f.x < bev || f.y > 1. - bev) sh = 1.3; if (f.x > 1. - bev || f.y < bev) sh = .55;   // chanfro: luz de cima à esquerda
+  vec2 d = f - .5; float r = length(d), lt = dot(d / max(r, 1e-3), vec2(-.707, .707));
+  if (r < .3) sh = mix(1.08, 1. + .45 * lt, smoothstep(.22, .3, r));              // pino redondo
+  if (r > .3 && r < .34 && lt < 0.) sh *= .6;                                      // sombra do pino
+  o = vec4(base * sh * step(.5 / cw, min(min(f.x, f.y), min(1. - f.x, 1. - f.y))), 1);
+}` },
+
+{ name: 'Truchet', fs: `
+void main(){
+  float cw = uRes.x / floor(16. + uD * 48.);
+  vec2 g = gl_FragCoord.xy / cw, cell = floor(g), f = fract(g);
+  vec3 c = camL((cell + .5) * cw / uRes, cellLod(cw)); float l = expo(luma(c), meanL());
+  float flip = abs(step(.5, h21(cell)) - step(h21(cell + floor(uSeed)), .25 * uK));  // na batida alguns ladrilhos viram
+  if (flip > .5) f.x = 1. - f.x;
+  float d = min(abs(length(f) - .5), abs(length(f - 1.) - .5)), w = .03 + .22 * l * (1. + uPulse * .5 * uK), aa = 1.2 / cw;
+  float m = smoothstep(w + aa, w - aa, d);
+  o = vec4((uCamCol > .5 ? min(c * 1.4 + .1, 1.) : pal(.25 + .75 * l)) * m * (.3 + .8 * l), 1);
+}` },
+
+{ name: 'Stained Glass', fs: `
+void main(){
+  float cw = uRes.x / floor(10. + uD * 36.);
+  vec2 g = gl_FragCoord.xy / cw, ci = floor(g), best = vec2(0); float d1 = 9., d2 = 9.;
+  for (int y = -1; y <= 1; y++) for (int x = -1; x <= 1; x++) {                   // voronoi: centro mais próximo e o segundo
+    vec2 n = ci + vec2(x, y), j = vec2(h21(n), h21(n + 7.3));
+    vec2 pt = n + .5 + (j - .5) * .8 * vec2(cos(uT * .4 + j.x * 6.3), sin(uT * .3 + j.y * 6.3));
+    float d = length(g - pt);
+    if (d < d1) { d2 = d1; d1 = d; best = pt; } else if (d < d2) d2 = d;
+  }
+  vec3 c = camL(best * cw / uRes, cellLod(cw)); float l = expo(luma(c), meanL());
+  vec3 glass = uCamCol > .5 ? c * 1.3 : pal(.25 + .75 * l);
+  glass *= (1.15 - d1 * .6) * (1. + uPulse * .35 * uK);                           // mais claro no meio do vidro
+  float lead = smoothstep(.04 + .03 * uK, .07 + .03 * uK, d2 - d1);               // chumbo entre os vidros
+  o = vec4(glass * lead, 1);
+}` },
 ];
 
 /* ---------- engine WebGL2 ---------- */
@@ -1314,7 +1462,7 @@ function loop(now) {
     strobeOn = strobeTick(dt, now);
     send({ t: 'a', a: audio, s: strobeOn });
     if (state.source === 'shapes') drawShapes(dt, audio);
-    if (state.auto && now - lastAuto > state.autoSec * 1000) setStyle((state.style + 1) % EFFECTS.length);
+    if (state.auto && now - lastAuto > state.autoSec * 1000) stepStyle(1);
     // a prévia roda a meia taxa: é só para conferir
     if (pvEng && state.preview && (pvTick++ & 1) === 0) pvEng.render(getSource(t), t, dt * 2);
     $('#mB').style.height = audio.bass * 100 + '%'; $('#mM').style.height = audio.mid * 100 + '%'; $('#mH').style.height = audio.high * 100 + '%';
@@ -1329,6 +1477,17 @@ function setStyle(i) {
   document.querySelectorAll('.card').forEach((el, k) => el.classList.toggle('sel', k === i));
   $('#curName').textContent = `${i + 1}. ${EFFECTS[i].name}`;
   commit();
+}
+const styleOn = i => !state.off.includes(EFFECTS[i].name);   // guardado pelo nome: sobrevive a estilos novos
+// próximo/anterior pulando os desligados (se todos estiverem desligados, fica onde está)
+function stepStyle(d) {
+  const n = EFFECTS.length;
+  for (let k = 1; k < n; k++) { const i = ((state.style + d * k) % n + n) % n; if (styleOn(i)) return setStyle(i); }
+  lastAuto = performance.now();
+}
+function toggleStyle(i, on = !styleOn(i)) {
+  state.off = state.off.filter(x => x !== EFFECTS[i].name); if (!on) state.off.push(EFFECTS[i].name);
+  document.querySelectorAll('.card')[i].classList.toggle('dis', !on); save();
 }
 function fillSelect(sel, items, cur, firstLabel) {
   sel.innerHTML = ''; const add = (v, l) => { const o = document.createElement('option'); o.value = v; o.textContent = l; sel.appendChild(o); };
@@ -1429,12 +1588,15 @@ function initPanel() {
   const grid = $('#grid');
   EFFECTS.forEach((e, i) => {
     const b = document.createElement('button'); b.className = 'card';
-    b.innerHTML = `<span class="num">${i < 10 ? (i + 1) % 10 : i < 20 ? '⇧' + (i - 9) % 10 : 'Alt' + (i - 19) % 10}</span><img alt=""><span class="nm">${e.name}</span>`;
+    const key = i < 10 ? (i + 1) % 10 : i < 20 ? '⇧' + (i - 9) % 10 : i < 30 ? 'Alt' + (i - 19) % 10 : i + 1;
+    b.innerHTML = `<span class="num">${key}</span><span class="tg" title="On: included in auto switch and ◀ ▶"></span><img alt=""><span class="nm">${e.name}</span>`;
     b.title = e.name; b.dataset.midi = 'style' + i; b.dataset.label = 'Style: ' + e.name;
-    b.onclick = () => setStyle(i); grid.appendChild(b);
+    b.onclick = ev => { if (ev.target.classList.contains('tg')) toggleStyle(i); else setStyle(i); };
+    grid.appendChild(b); b.classList.toggle('dis', !styleOn(i));
   });
-  $('#btnNext').onclick = () => setStyle((state.style + 1) % EFFECTS.length);
-  $('#btnPrev').onclick = () => setStyle((state.style + EFFECTS.length - 1) % EFFECTS.length);
+  $('#btnAllOn').onclick = () => EFFECTS.forEach((_, i) => toggleStyle(i, true));
+  $('#btnNext').onclick = () => stepStyle(1);
+  $('#btnPrev').onclick = () => stepStyle(-1);
   const help = $('#help');
   $('#btnHelp').onclick = () => help.showModal();
   $('#helpX').onclick = $('#helpOk').onclick = () => help.close();
@@ -1472,8 +1634,8 @@ function initPanel() {
       e.preventDefault(); const n = +dig[2] || 10, i = e.altKey ? n + 19 : e.shiftKey ? n + 9 : n - 1;
       if (i < EFFECTS.length) setStyle(i);
     }
-    else if (k === 'arrowright') setStyle((state.style + 1) % EFFECTS.length);
-    else if (k === 'arrowleft') setStyle((state.style + EFFECTS.length - 1) % EFFECTS.length);
+    else if (k === 'arrowright') stepStyle(1);
+    else if (k === 'arrowleft') stepStyle(-1);
     else if (k === ' ') { e.preventDefault(); flash(); }
     else if (k === 'b') black();
     else if (k === 't') tap();
@@ -1632,6 +1794,7 @@ async function init() {
   const g = gpuName();
   setChip('chGpu', pvEng ? 'gpu: ' + (g || 'WebGL2 ok') : 'gpu: WebGL2 unavailable', pvEng && !/intel/i.test(g) ? 'ok' : 'bad');
   if (!(state.style < EFFECTS.length)) state.style = 0;
+  if (!Array.isArray(state.off)) state.off = [];
   initPanel(); initMidi(); initOverlay(); setStyle(state.style);
   requestAnimationFrame(loop);
   // nada aqui espera pelo outro: uma permissão pendente não pode travar as miniaturas

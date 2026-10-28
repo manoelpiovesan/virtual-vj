@@ -26,8 +26,8 @@ Visuais ao vivo para DJ, gerados a partir da webcam e reagindo ao som. Não prec
 |---|---|
 | `1`–`9`, `0` | Estilos 1 a 10 |
 | `Shift` + `1`–`0` | Estilos 11 a 20 |
-| `Alt` + `1`–`7` | Estilos 21 a 27 |
-| `←` `→` ou ◀ ▶ (barra de ferramentas) | Estilo anterior / próximo |
+| `Alt` + `1`–`0` | Estilos 21 a 30 |
+| `←` `→` ou ◀ ▶ (barra de ferramentas) | Estilo anterior / próximo (pula os estilos desligados no ✓ do card) |
 | `Espaço` | Flash |
 | `B` | Blackout |
 | `T` | Tap tempo (BPM) |
@@ -59,7 +59,7 @@ Dá para controlar o Virtual VJ com qualquer controlador MIDI USB (pads, knobs, 
 
 O que dá para mapear:
 - **Knobs e faders**: Intensity, Detail, Strobe, Hue, Sensitivity e, da imagem, Size, Position X/Y e Opacity.
-- **Pads e botões**: cada um dos 27 estilos, ◀ e ▶ da barra de ferramentas (estilo anterior / próximo — ótimo em dois pads), cada paleta, Flash, Blackout, Grid, TAP, Flash on beat, Mirror, Switch every, Animated colors, Panel preview e Show (imagem).
+- **Pads e botões**: cada um dos 37 estilos, ◀ e ▶ da barra de ferramentas (estilo anterior / próximo — ótimo em dois pads), cada paleta, Flash, Blackout, Grid, TAP, Flash on beat, Mirror, Switch every, Animated colors, Panel preview e Show (imagem).
 
 Os mapeamentos ficam salvos e aparecem no painel **MIDI**, com ✕ para remover (**Clear mappings** apaga todos). O monitor mostra o último sinal recebido, o que ajuda a descobrir se o controlador está mandando algo.
 
