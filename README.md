@@ -22,7 +22,7 @@ Live DJ visuals in the browser: your webcam + the music become real-time visuals
 
 1. Extend your desktop to the projector (`Win + P`).
 2. Open the [live demo](https://manoelpiovesan.github.io/virtual-vj/), or double-click `Iniciar Virtual VJ.bat` to run offline (Chrome/Edge).
-3. Click **▶ Abrir saída**, move the window to the projector and press `F` for fullscreen.
+3. Click **▶ Open output**, move the window to the projector and press `F` for fullscreen.
 
 | Key | Action |
 |---|---|

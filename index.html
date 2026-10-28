@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <title>Virtual VJ</title>
@@ -220,128 +220,128 @@ body.out:fullscreen,body.out :fullscreen{cursor:none}
 
 <div id="app"><div class="window">
   <div class="title">
-    <span class="ic"></span><span class="name">Virtual VJ - show_sem_titulo.vvj</span>
-    <button id="btnOut" class="primary">▶ Abrir saída</button>
-    <button id="btnHelp" class="q" title="Atalhos">?</button>
+    <span class="ic"></span><span class="name">Virtual VJ - untitled_show.vvj</span>
+    <button id="btnOut" class="primary">▶ Open output</button>
+    <button id="btnHelp" class="q" title="Shortcuts">?</button>
   </div>
 
   <div class="toolbar">
-    <button id="btnFlash" data-midi="flash" data-label="Flash">⚡ Flash<kbd>Espaço</kbd></button>
+    <button id="btnFlash" data-midi="flash" data-label="Flash">⚡ Flash<kbd>Space</kbd></button>
     <button id="btnBlack" data-midi="blackout" data-label="Blackout">⏻ Blackout<kbd>B</kbd></button>
-    <button id="btnWarp" class="small" title="Ajustar perspectiva do projetor">⬚ Perspectiva</button>
+    <button id="btnWarp" class="small" title="Adjust projector keystone">⬚ Keystone</button>
     <span class="sep"></span>
     <div class="stylenav">
-      <button id="btnPrev" class="nav" data-midi="prev" data-label="Estilo anterior" title="Estilo anterior (←)">◀</button>
+      <button id="btnPrev" class="nav" data-midi="prev" data-label="Previous style" title="Previous style (←)">◀</button>
       <span class="well cur-style" id="curName">-</span>
-      <button id="btnNext" class="nav" data-midi="next" data-label="Próximo estilo" title="Próximo estilo (→)">▶</button>
+      <button id="btnNext" class="nav" data-midi="next" data-label="Next style" title="Next style (→)">▶</button>
     </div>
     <span class="sep"></span>
-    <label><input type="checkbox" id="strobe" data-midi="strobe" data-label="Strobe na batida"> Strobe na batida</label>
-    <label><input type="checkbox" id="mirror" data-midi="mirror" data-label="Espelhar"> Espelhar</label>
+    <label><input type="checkbox" id="strobe" data-midi="strobe" data-label="Flash on beat"> Flash on beat</label>
+    <label><input type="checkbox" id="mirror" data-midi="mirror" data-label="Mirror"> Mirror</label>
     <span class="sep"></span>
-    <label><input type="checkbox" id="auto" data-midi="auto" data-label="Troca automática"> Trocar a cada</label><input type="number" id="autoSec" min="3" max="300"> s
-    <button id="btnLearn" class="learn-btn" title="Ligar o MIDI Learn">🎹 MIDI Learn</button>
+    <label><input type="checkbox" id="auto" data-midi="auto" data-label="Auto switch"> Switch every</label><input type="number" id="autoSec" min="3" max="300"> s
+    <button id="btnLearn" class="learn-btn" title="Toggle MIDI Learn">🎹 MIDI Learn</button>
   </div>
 
   <div class="body">
     <section class="pane toolbox">
-      <div class="pane-h">Estilos</div>
+      <div class="pane-h">Styles</div>
       <div id="grid"></div>
     </section>
 
     <section class="pane">
       <div class="workspace">
-        <div class="pv"><canvas id="pv" width="480" height="270"></canvas><img class="ovl" alt=""><div class="ov flash"></div><div class="ov dark"></div><div class="off">prévia desligada</div><i class="hdl r"></i><i class="hdl b"></i><i class="hdl rb"></i></div>
-        <div class="ws-info"><span><kbd>1</kbd>–<kbd>0</kbd>, <kbd>⇧</kbd>+número e <kbd>Alt</kbd>+número escolhem · <kbd>←</kbd><kbd>→</kbd> passam</span></div>
+        <div class="pv"><canvas id="pv" width="480" height="270"></canvas><img class="ovl" alt=""><div class="ov flash"></div><div class="ov dark"></div><div class="off">preview off</div><i class="hdl r"></i><i class="hdl b"></i><i class="hdl rb"></i></div>
+        <div class="ws-info"><span><kbd>1</kbd>–<kbd>0</kbd>, <kbd>⇧</kbd>+number and <kbd>Alt</kbd>+number pick · <kbd>←</kbd><kbd>→</kbd> step</span></div>
       </div>
     </section>
 
     <aside class="pane props">
       <fieldset><legend>Visual</legend>
-        <div class="f"><label for="intensity">Intensidade</label><input type="range" id="intensity" min="0" max="1" step=".01" data-midi="intensity" data-label="Intensidade"><output id="intensityV"></output></div>
-        <div class="f"><label for="detail">Detalhe</label><input type="range" id="detail" min="0" max="1" step=".01" data-midi="detail" data-label="Detalhe"><output id="detailV"></output></div>
-        <div class="f strobe-row"><label for="strobeRate">Strobo</label><input type="range" id="strobeRate" min="0" max="1" step=".01" data-midi="strobeRate" data-label="Strobo (velocidade)"><output id="strobeRateV"></output></div>
-        <div class="chk"><label><input type="checkbox" id="strobeSync" data-midi="strobeSync" data-label="Strobo sincronizado ao BPM"> Strobo no ritmo do BPM</label></div>
+        <div class="f"><label for="intensity">Intensity</label><input type="range" id="intensity" min="0" max="1" step=".01" data-midi="intensity" data-label="Intensity"><output id="intensityV"></output></div>
+        <div class="f"><label for="detail">Detail</label><input type="range" id="detail" min="0" max="1" step=".01" data-midi="detail" data-label="Detail"><output id="detailV"></output></div>
+        <div class="f strobe-row"><label for="strobeRate">Strobe</label><input type="range" id="strobeRate" min="0" max="1" step=".01" data-midi="strobeRate" data-label="Strobe (rate)"><output id="strobeRateV"></output></div>
+        <div class="chk"><label><input type="checkbox" id="strobeSync" data-midi="strobeSync" data-label="Strobe synced to BPM"> Strobe synced to BPM</label></div>
       </fieldset>
       <fieldset><legend>MIDI</legend>
-        <div class="hint2">Ligue o <b>🎹 MIDI Learn</b>, clique num controle da tela (fica rosa) e mexa no botão, pad ou knob do controlador. <kbd>Esc</kbd> sai do Learn.</div>
-        <div class="well midi-mon" id="midiMon">nenhum sinal ainda</div>
+        <div class="hint2">Turn on <b>🎹 MIDI Learn</b>, click a control on screen (it turns pink) and move a button, pad or knob on your controller. <kbd>Esc</kbd> exits Learn.</div>
+        <div class="well midi-mon" id="midiMon">no signal yet</div>
         <div id="midiList"></div>
-        <div class="btns"><button id="btnMidiClear">Limpar mapeamentos</button><button id="btnMidiScan">↻ Procurar</button></div>
+        <div class="btns"><button id="btnMidiClear">Clear mappings</button><button id="btnMidiScan">↻ Rescan</button></div>
       </fieldset>
-      <fieldset><legend>Áudio</legend>
-        <div class="f sel"><label for="audioMode">Fonte</label><select id="audioMode"><option value="mic">Microfone / Line-in</option><option value="bpm">Só BPM (sem áudio)</option></select></div>
-        <div class="f sel"><label for="mic">Entrada</label><select id="mic"></select></div>
-        <div class="f"><label for="gain">Sensibilid.</label><input type="range" id="gain" min=".3" max="4" step=".05" data-midi="gain" data-label="Sensibilidade"><output id="gainV"></output></div>
+      <fieldset><legend>Audio</legend>
+        <div class="f sel"><label for="audioMode">Source</label><select id="audioMode"><option value="mic">Microphone / Line-in</option><option value="bpm">BPM only (no audio)</option></select></div>
+        <div class="f sel"><label for="mic">Input</label><select id="mic"></select></div>
+        <div class="f"><label for="gain">Sensitivity</label><input type="range" id="gain" min=".3" max="4" step=".05" data-midi="gain" data-label="Sensitivity"><output id="gainV"></output></div>
         <div class="bpm"><label for="bpm">BPM</label><input type="number" id="bpm" min="40" max="220"><button id="btnTap" data-midi="tap" data-label="TAP">TAP<kbd>T</kbd></button></div>
-        <div class="meters"><div><span>GRAVE</span><i id="mB"></i></div><div><span>MÉDIO</span><i id="mM"></i></div><div><span>AGUDO</span><i id="mH"></i></div></div>
+        <div class="meters"><div><span>LOW</span><i id="mB"></i></div><div><span>MID</span><i id="mM"></i></div><div><span>HIGH</span><i id="mH"></i></div></div>
       </fieldset>
-      <fieldset><legend>Vídeo e desempenho</legend>
+      <fieldset><legend>Video &amp; performance</legend>
         <div class="f sel"><label for="cam">Webcam</label><select id="cam"></select></div>
-        <div class="f sel"><label for="quality">Resolução</label>
-          <select id="quality"><option value="640">Leve (640)</option><option value="960">Média (960)</option><option value="1280">Alta (1280)</option><option value="1920">Full HD (1920)</option><option value="0">Nativa</option></select></div>
-        <div class="f sel"><label for="fpsCap">Limite FPS</label>
-          <select id="fpsCap"><option value="30">30 fps (mais leve)</option><option value="60">60 fps</option><option value="0">Sem limite</option></select></div>
-        <div class="chk"><label><input type="checkbox" id="preview" data-midi="preview" data-label="Prévia no painel"> Prévia no painel</label></div>
+        <div class="f sel"><label for="quality">Resolution</label>
+          <select id="quality"><option value="640">Light (640)</option><option value="960">Medium (960)</option><option value="1280">High (1280)</option><option value="1920">Full HD (1920)</option><option value="0">Native</option></select></div>
+        <div class="f sel"><label for="fpsCap">FPS limit</label>
+          <select id="fpsCap"><option value="30">30 fps (lighter)</option><option value="60">60 fps</option><option value="0">Unlimited</option></select></div>
+        <div class="chk"><label><input type="checkbox" id="preview" data-midi="preview" data-label="Panel preview"> Panel preview</label></div>
       </fieldset>
-      <fieldset><legend>Imagem / logo</legend>
+      <fieldset><legend>Image / logo</legend>
         <div class="ovl-row">
-          <div class="well ovl-thumb"><img id="ovlThumb" alt=""><span id="ovlNone">sem imagem</span></div>
-          <div class="ovl-btns"><button id="btnOvlLoad">📁 Carregar…</button><button id="btnOvlDel">✕ Remover</button></div>
+          <div class="well ovl-thumb"><img id="ovlThumb" alt=""><span id="ovlNone">no image</span></div>
+          <div class="ovl-btns"><button id="btnOvlLoad">📁 Load…</button><button id="btnOvlDel">✕ Remove</button></div>
           <input type="file" id="ovlFile" accept="image/*" hidden>
         </div>
         <div class="chk">
-          <label><input type="checkbox" id="ovlOn" data-midi="ovlOn" data-label="Mostrar imagem"> Mostrar</label>
-          <label><input type="checkbox" id="ovlPulse" data-midi="ovlPulse" data-label="Imagem pulsa na batida"> Pulsar na batida</label>
+          <label><input type="checkbox" id="ovlOn" data-midi="ovlOn" data-label="Show image"> Show</label>
+          <label><input type="checkbox" id="ovlPulse" data-midi="ovlPulse" data-label="Image pulses on beat"> Pulse on beat</label>
         </div>
-        <div class="f sel"><label for="ovlMode">Modo</label><select id="ovlMode"><option value="top">Por cima dos efeitos</option><option value="cam">Junto da câmera (recebe o efeito)</option></select></div>
-        <div class="f sel"><label for="ovlBlend">Mistura</label><select id="ovlBlend"><option value="normal">Normal</option><option value="screen">Tela (preto some)</option><option value="difference">Diferença</option></select></div>
-        <div class="f"><label for="ovlScale">Tamanho</label><input type="range" id="ovlScale" min=".05" max="1" step=".01" data-midi="ovlScale" data-label="Tamanho da imagem"><output id="ovlScaleV"></output></div>
-        <div class="f"><label for="ovlX">Posição X</label><input type="range" id="ovlX" min="0" max="1" step=".005" data-midi="ovlX" data-label="Posição X da imagem"><output id="ovlXV"></output></div>
-        <div class="f"><label for="ovlY">Posição Y</label><input type="range" id="ovlY" min="0" max="1" step=".005" data-midi="ovlY" data-label="Posição Y da imagem"><output id="ovlYV"></output></div>
-        <div class="f"><label for="ovlAlpha">Opacidade</label><input type="range" id="ovlAlpha" min="0" max="1" step=".01" data-midi="ovlAlpha" data-label="Opacidade da imagem"><output id="ovlAlphaV"></output></div>
-        <div class="hint2">PNG com fundo transparente fica melhor. Também dá para arrastar o arquivo para a janela.</div>
+        <div class="f sel"><label for="ovlMode">Mode</label><select id="ovlMode"><option value="top">On top of effects</option><option value="cam">Into the camera (gets the effect)</option></select></div>
+        <div class="f sel"><label for="ovlBlend">Blend</label><select id="ovlBlend"><option value="normal">Normal</option><option value="screen">Screen (black disappears)</option><option value="difference">Difference</option></select></div>
+        <div class="f"><label for="ovlScale">Size</label><input type="range" id="ovlScale" min=".05" max="1" step=".01" data-midi="ovlScale" data-label="Image size"><output id="ovlScaleV"></output></div>
+        <div class="f"><label for="ovlX">Position X</label><input type="range" id="ovlX" min="0" max="1" step=".005" data-midi="ovlX" data-label="Image position X"><output id="ovlXV"></output></div>
+        <div class="f"><label for="ovlY">Position Y</label><input type="range" id="ovlY" min="0" max="1" step=".005" data-midi="ovlY" data-label="Image position Y"><output id="ovlYV"></output></div>
+        <div class="f"><label for="ovlAlpha">Opacity</label><input type="range" id="ovlAlpha" min="0" max="1" step=".01" data-midi="ovlAlpha" data-label="Image opacity"><output id="ovlAlphaV"></output></div>
+        <div class="hint2">A PNG with a transparent background works best. You can also drag the file onto the window.</div>
       </fieldset>
     </aside>
   </div>
 
   <div class="colorbar">
-    <div class="cur" title="Paleta atual"><i id="curA"></i><i id="curB"></i></div>
+    <div class="cur" title="Current palette"><i id="curA"></i><i id="curB"></i></div>
     <div id="swatches"></div>
-    <div class="f"><label for="hue">Matiz</label><input type="range" id="hue" min="0" max="360" step="1" data-midi="hue" data-label="Matiz"><output id="hueV"></output></div>
-    <div class="chk"><label><input type="checkbox" id="drift" data-midi="drift" data-label="Cores animadas"> Cores animadas</label></div>
+    <div class="f"><label for="hue">Hue</label><input type="range" id="hue" min="0" max="360" step="1" data-midi="hue" data-label="Hue"><output id="hueV"></output></div>
+    <div class="chk"><label><input type="checkbox" id="drift" data-midi="drift" data-label="Animated colors"> Animated colors</label></div>
   </div>
 
-  <div class="status"><span id="chCam" class="chip">câmera…</span><span id="chMic" class="chip">áudio…</span><span id="chOut" class="chip">saída: fechada</span><span id="chGpu" class="chip">gpu…</span><span id="chMidi" class="chip">midi…</span></div>
+  <div class="status"><span id="chCam" class="chip">camera…</span><span id="chMic" class="chip">audio…</span><span id="chOut" class="chip">output: closed</span><span id="chGpu" class="chip">gpu…</span><span id="chMidi" class="chip">midi…</span></div>
 </div></div>
 
 <dialog id="help">
-  <div class="title"><span class="ic"></span><span class="name">Atalhos</span><button id="helpX">✕</button></div>
+  <div class="title"><span class="ic"></span><span class="name">Shortcuts</span><button id="helpX">✕</button></div>
   <div class="in">
-    <kbd>1 … 0</kbd><span>Estilos 1 a 10</span>
-    <kbd>⇧ + 1 … 0</kbd><span>Estilos 11 a 20</span>
-    <kbd>Alt + 1 … 7</kbd><span>Estilos 21 a 27</span>
-    <kbd>← →</kbd><span>Estilo anterior / próximo (ou ◀ ▶ na barra, mapeáveis no MIDI)</span>
-    <kbd>Espaço</kbd><span>Flash</span>
+    <kbd>1 … 0</kbd><span>Styles 1 to 10</span>
+    <kbd>⇧ + 1 … 0</kbd><span>Styles 11 to 20</span>
+    <kbd>Alt + 1 … 7</kbd><span>Styles 21 to 27</span>
+    <kbd>← →</kbd><span>Previous / next style (or ◀ ▶ on the toolbar, MIDI-mappable)</span>
+    <kbd>Space</kbd><span>Flash</span>
     <kbd>B</kbd><span>Blackout</span>
     <kbd>T</kbd><span>Tap tempo (BPM)</span>
-    <kbd>G</kbd><span>Grade de perspectiva (setas ajustam o canto)</span>
-    <kbd>F</kbd><span>Tela cheia (na janela do projetor)</span>
+    <kbd>G</kbd><span>Keystone grid (arrow keys nudge the corner)</span>
+    <kbd>F</kbd><span>Fullscreen (in the projector window)</span>
   </div>
   <div class="ft"><button id="helpOk" class="primary">OK</button></div>
 </dialog>
 
 <dialog id="warpDlg" class="warp">
-  <div class="title"><span class="ic"></span><span class="name">Perspectiva do projetor</span><button id="warpX">✕</button></div>
+  <div class="title"><span class="ic"></span><span class="name">Projector keystone</span><button id="warpX">✕</button></div>
   <div class="warp-in">
     <div class="kz" id="kz"><svg viewBox="0 0 100 100" preserveAspectRatio="none"><polygon id="kzPoly" fill="#ffd60a22" stroke="#ffd60a" stroke-width="2" vector-effect="non-scaling-stroke"/></svg></div>
-    <div class="btns"><button id="btnCalib" data-midi="grid" data-label="Grade">▦ Grade no projetor<kbd>G</kbd></button><button id="btnWarpReset">↺ Resetar cantos</button></div>
-    <div class="hint2">A grade aparece no projetor enquanto esta janela está aberta. Arraste os cantos (aqui ou direto no projetor) até a grade encaixar na parede. Clique num canto e use as setas para o ajuste fino (Shift = mais rápido).</div>
+    <div class="btns"><button id="btnCalib" data-midi="grid" data-label="Grid">▦ Grid on projector<kbd>G</kbd></button><button id="btnWarpReset">↺ Reset corners</button></div>
+    <div class="hint2">The grid shows on the projector while this window is open. Drag the corners (here or right on the projector) until the grid fits the wall. Click a corner and use the arrow keys to fine-tune (Shift = bigger steps).</div>
   </div>
-  <div class="ft"><button id="warpOk" class="primary">Pronto</button></div>
+  <div class="ft"><button id="warpOk" class="primary">Done</button></div>
 </dialog>
 
-<div id="outwrap"><div id="stage"><canvas id="out"></canvas><img class="ovl" alt=""><div class="ov flash"></div><div class="ov dark"></div><div id="grid2"></div></div><div id="hint">Clique aqui ou pressione F para tela cheia</div></div>
+<div id="outwrap"><div id="stage"><canvas id="out"></canvas><img class="ovl" alt=""><div class="ov flash"></div><div class="ov dark"></div><div id="grid2"></div></div><div id="hint">Click here or press F for fullscreen</div></div>
 
 <script>
 'use strict';
@@ -423,11 +423,11 @@ function hsl2rgb(h, s, l) {
 const PALS = [
   ['Matrix', ['#000000', '#003b00', '#00ff41', '#d9ffd9']],
   ['Neon', ['#0a0020', '#6a00ff', '#ff00aa', '#00f0ff', '#ffffff']],
-  ['Fogo', ['#000000', '#7a0000', '#ff4400', '#ffcc00', '#ffffff']],
-  ['Gelo', ['#000010', '#003a8c', '#00b4ff', '#bff6ff', '#ffffff']],
-  ['Arco-íris', ['#1a0033', '#0040ff', '#00ff80', '#ffee00', '#ff0040']],
-  ['Branco', ['#000000', '#ffffff'], 'mono'],
-  ['Cor da câmera', ['#000000', '#ffffff'], 'cam'],
+  ['Fire', ['#000000', '#7a0000', '#ff4400', '#ffcc00', '#ffffff']],
+  ['Ice', ['#000010', '#003a8c', '#00b4ff', '#bff6ff', '#ffffff']],
+  ['Rainbow', ['#1a0033', '#0040ff', '#00ff80', '#ffee00', '#ff0040']],
+  ['White', ['#000000', '#ffffff'], 'mono'],
+  ['Camera color', ['#000000', '#ffffff'], 'cam'],
 ].map(([n, s, k]) => ({ n, s, hsl: s.map(h => rgb2hsl(...hex2rgb(h))), mono: !!k, cam: k === 'cam' }));
 
 // paleta como tabela de 256 cores; vira uma textura 256×1 na GPU
@@ -581,7 +581,7 @@ void main(){
   o = vec4((uCamCol > .5 ? min(c * 1.4, 1.) : pal(l)) * m, 1);
 }` },
 
-{ name: 'Chuva Digital', fs: `
+{ name: 'Digital Rain', fs: `
 void main(){
   float fs = floor(uRes.x / (50. + uD * 90.)), rows = ceil(uRes.y / fs);
   vec2 g = gl_FragCoord.xy / fs, cell = floor(g), f = fract(g);
@@ -596,7 +596,7 @@ void main(){
   o = vec4(col * glyph(gi, f, fs) * a, 1);
 }` },
 
-{ name: 'Mosaico', fs: `
+{ name: 'Mosaic', fs: `
 void main(){
   float cols = floor(14. + uD * 60.), cw = uRes.x / cols;
   vec2 g = gl_FragCoord.xy / cw, cell = floor(g), f = fract(g) - .5;
@@ -607,7 +607,7 @@ void main(){
   o = vec4((uCamCol > .5 ? floor(c * lv + .5) / lv : pal(clamp(ql + p * .25, 0., 1.))) * in_, 1);
 }` },
 
-{ name: 'Contorno Neon', fb: true, fs: `
+{ name: 'Neon Edges', fb: true, fs: `
 #define L(x, y) luma(textureLod(uCam, uv + vec2(x, y) * px, lod).rgb)
 float ed(vec2 uv, vec2 px, float lod){
   float tl = L(-1., 1.), t = L(0., 1.), tr = L(1., 1.), l = L(-1., 0.), r = L(1., 0.), bl = L(-1., -1.), b = L(0., -1.), br = L(1., -1.);
@@ -621,14 +621,14 @@ void main(){
   o = vec4(max(texture(uPrev, vUv).rgb * .55 - 1.5 / 255., 0.) + col, 1);
 }` },
 
-{ name: 'Mapa Térmico', fs: `
+{ name: 'Thermal', fs: `
 void main(){
   float lod = mix(2.5, .5, uD); vec3 c = camL(vUv, lod); float l = expo(luma(c), meanL());
   float v = mod(l * (1. + uK * 3.) + uT * .08 + uPulse * .15 * uK + uBass * .2, 2.); if (v > 1.) v = 2. - v;
   o = vec4(uCamCol > .5 ? c * (.35 + v * .9) : pal(v), 1);
 }` },
 
-{ name: 'Glitch RGB', fs: `
+{ name: 'RGB Glitch', fs: `
 void main(){
   vec2 uv = vUv;
   for (int i = 0; i < 6; i++) { vec4 s = uSlices[i]; if (s.w > .5 && uv.y > s.x && uv.y < s.x + s.y) uv.x -= s.z; }
@@ -638,10 +638,10 @@ void main(){
   o = vec4(c * (mod(gl_FragCoord.y, 3.) < 1. ? .72 : 1.), 1);
 }` },
 
-{ name: 'Partículas', fb: true, points: true, fs: `
+{ name: 'Particles', fb: true, points: true, fs: `
 void main(){ o = vec4(max(texture(uPrev, vUv).rgb * .68 - 1.5 / 255., 0.), 1); }` },
 
-{ name: 'Caleidoscópio', fs: `
+{ name: 'Kaleidoscope', fs: `
 void main(){
   float n = 2. * floor(2. + uK * 4. + .5), seg = 6.28318 / n;
   vec2 p = gl_FragCoord.xy - uRes * .5; float r = length(p), a = atan(p.y, p.x) - (uT * .12 + uPulse * .15 * uK);
@@ -653,7 +653,7 @@ void main(){
   o = vec4(c, 1);
 }` },
 
-{ name: 'Meio-tom', fs: `
+{ name: 'Halftone', fs: `
 void main(){
   float cols = floor(28. + uD * 70.), cw = uRes.x / cols, rh = cw * .866;
   float row = floor(gl_FragCoord.y / rh), sh = mod(row, 2.) * .5, cl = floor(gl_FragCoord.x / cw - sh);
@@ -664,7 +664,7 @@ void main(){
   o = vec4((uCamCol > .5 ? c : pal(.25 + l * .75)) * m, 1);
 }` },
 
-{ name: 'Aura de Movimento', fb: true, fs: `
+{ name: 'Motion Aura', fb: true, fs: `
 void main(){
   float lod = mix(2., 1., uD); vec3 c = camL(vUv, lod);
   float l = luma(c), lp = luma(textureLod(uPrevCam, vUv, lod).rgb);
@@ -673,7 +673,7 @@ void main(){
   o = vec4(max(texture(uPrev, vUv).rgb * .84 - 1.5 / 255., 0.) + add, 1);
 }` },
 
-{ name: 'Túnel', fs: `
+{ name: 'Tunnel', fs: `
 vec2 mrep(vec2 u){ return 1. - abs(1. - mod(u, 2.)); }   // repete espelhando, sem emendas
 void main(){
   vec2 p = (gl_FragCoord.xy - uRes * .5) / uRes.y; float r = length(p), a = atan(p.y, p.x);
@@ -684,7 +684,7 @@ void main(){
   o = vec4(c * smoothstep(0., .45, r) * (1. + uPulse * .3), 1);
 }` },
 
-{ name: 'Líquido', fs: `
+{ name: 'Liquid', fs: `
 void main(){
   vec2 d = (vUv - .5) * vec2(uRes.x / uRes.y, 1.); float r = length(d);
   float rip = sin(r * 34. - uBeatAge * 14.) * exp(-uBeatAge * 2.2) * exp(-r * 1.5) * .035 * uK;   // onda a cada batida
@@ -735,7 +735,7 @@ void main(){
   o = vec4(min(e.x, e.y) < 4. ? vec3(0) : col, 1);
 }` },
 
-{ name: 'Feedback Infinito', fb: true, fs: `
+{ name: 'Infinite Feedback', fb: true, fs: `
 void main(){
   vec2 p = vUv - .5; float a = .006 + .02 * uK * uMid, z = .975 - .025 * uBass * uK;
   vec2 puv = mat2(cos(a), -sin(a), sin(a), cos(a)) * (p * z) + .5;
@@ -757,7 +757,7 @@ void main(){
   o = vec4(col, 1);
 }` },
 
-{ name: 'Linhas de Relevo', fs: `
+{ name: 'Ridgelines', fs: `
 void main(){
   float N = floor(30. + uD * 60.), gap = uRes.y / N, amp = gap * (3. + uK * 5.) * (1. + uPulse * .5), y = gl_FragCoord.y, m = meanL();
   float b = floor(y / gap); vec3 col = vec3(0);
@@ -818,7 +818,7 @@ void main(){
   o = vec4(mix(col, vec3(1), hot) * m * (kind == 0. ? 1. : .22 + .9 * l + hot), 1);
 }` },
 
-{ name: 'Binário', fs: `
+{ name: 'Binary', fs: `
 void main(){
   float cols = floor(36. + uD * 80.), cw = uRes.x / cols, ch = cw * 1.5, col = floor(gl_FragCoord.x / cw);
   float sp = .4 + h21(vec2(col, 2.3)) * .8, yT = uRes.y - gl_FragCoord.y + uFlow * sp * ch * .25, row = floor(yT / ch);
@@ -847,7 +847,7 @@ void main(){
 }` },
 
 /* --- família feedback: todos reaproveitam o quadro anterior (uPrev) --- */
-{ name: 'Espelho Infinito', fb: true, fs: `
+{ name: 'Infinite Mirror', fb: true, fs: `
 void main(){
   float s = .8 - .08 * uK - .05 * uPulse * uK, a = .02 * sin(uT * .3) + .03 * uBass * uK;   // tamanho e giro do quadro interno
   vec2 p = (vUv - .5) / s;
@@ -862,7 +862,7 @@ void main(){
   o = vec4(mix(bg, cam, smoothstep(.4, .6, l)), 1);                                // a pessoa fica na frente dos quadros
 }` },
 
-{ name: 'Espiral Infinita', fb: true, fs: `
+{ name: 'Infinite Spiral', fb: true, fs: `
 void main(){
   vec2 p = (vUv - .5) * vec2(uRes.x / uRes.y, 1.);
   float a = .035 + .09 * uK * uBass + .05 * uPulse, z = 1.025 + .02 * uMid * uK;
@@ -873,7 +873,7 @@ void main(){
   o = vec4(mix(prev, add, m * (.35 + .5 * uPulse)), 1);
 }` },
 
-{ name: 'Fumaça', fb: true, fs: `
+{ name: 'Smoke', fb: true, fs: `
 void main(){
   float k = (1. + uK * 2.) * (1. + uBass);
   vec2 v = vec2(sin(vUv.y * 7. + uT * 1.3) + sin(vUv.y * 13. - uT), cos(vUv.x * 6. - uT * 1.1)) * .0018 * k + vec2(0., .0025 * k);   // sobe e ondula
@@ -897,7 +897,7 @@ void main(){
   o = vec4(mix(prev, c, max(iframe, .03 + .05 * (1. - uK))), 1);
 }` },
 
-{ name: 'Eco na Batida', fb: true, fs: `
+{ name: 'Beat Echo', fb: true, fs: `
 void main(){
   vec3 prev = max(texture(uPrev, (vUv - .5) * (1. - .006 * uK) + .5).rgb * .935 - 1.5 / 255., 0.);   // ecos encolhem e somem
   vec3 c = camL(vUv, 1.); float l = expo(luma(c), meanL()), m = smoothstep(.45, .6, l);
@@ -1092,13 +1092,13 @@ let actx, analyser, fd, micStream, phase = 0, lastBeatT = 0, hist = [];
 function stopMic() { if (micStream) micStream.getTracks().forEach(t => t.stop()); micStream = null; analyser = null; if (actx) actx.close(); actx = null; }
 async function startMic() {
   stopMic();
-  if (state.audioMode !== 'mic') { setChip('chMic', 'áudio: só BPM', 'ok'); return; }
+  if (state.audioMode !== 'mic') { setChip('chMic', 'audio: BPM only', 'ok'); return; }
   try {
     micStream = await navigator.mediaDevices.getUserMedia({ audio: { deviceId: state.mic ? { exact: state.mic } : undefined, echoCancellation: false, noiseSuppression: false, autoGainControl: false } });
     actx = new AudioContext(); const s = actx.createMediaStreamSource(micStream);
     analyser = actx.createAnalyser(); analyser.fftSize = 1024; analyser.smoothingTimeConstant = .5; s.connect(analyser);
-    fd = new Uint8Array(analyser.frequencyBinCount); setChip('chMic', 'áudio: entrada ativa', 'ok');
-  } catch (e) { analyser = null; setChip('chMic', 'áudio: sem microfone (usando BPM)', 'bad'); }
+    fd = new Uint8Array(analyser.frequencyBinCount); setChip('chMic', 'audio: input active', 'ok');
+  } catch (e) { analyser = null; setChip('chMic', 'audio: no microphone (using BPM)', 'bad'); }
 }
 function clockAudio(dt) {
   phase += dt * state.bpm / 60;
@@ -1120,7 +1120,7 @@ function updateAudio(dt, now) {
 
 /* ---------- strobo (slider/knob) ---------- */
 // 0 = desligado; subindo, pisca mais rápido. Sincronizado: divisões da batida, travadas em cada beat.
-const STB_DIV = [4, 2, 1, .5, .25, .125], STB_LBL = ['1 COMP', '2 TEMPOS', '1 TEMPO', '1/8', '1/16', '1/32'];
+const STB_DIV = [4, 2, 1, .5, .25, .125], STB_LBL = ['1 BAR', '2 BEATS', '1 BEAT', '1/8', '1/16', '1/32'];
 let strobeOn = false, stbPhase = 0, stbBeat = -1, stbFire = -1e9, beatTimes = [], estBpm = 0;
 let grid = 0, lastSlot = null, lastDiv = 0;   // grid = posição em batidas, sempre andando no BPM
 const stbIndex = v => Math.min(5, Math.floor((v - .02) / .98 * 6));
@@ -1241,7 +1241,7 @@ function loop(now) {
     // a prévia roda a meia taxa: é só para conferir
     if (pvEng && state.preview && !thumbsBusy && (pvTick++ & 1) === 0) pvEng.render(getSource(t), t, dt * 2);
     $('#mB').style.height = audio.bass * 100 + '%'; $('#mM').style.height = audio.mid * 100 + '%'; $('#mH').style.height = audio.high * 100 + '%';
-    if (outWin && outWin.closed) { outWin = null; setChip('chOut', 'saída: fechada', ''); }
+    if (outWin && outWin.closed) { outWin = null; setChip('chOut', 'output: closed', ''); }
   }
 }
 
@@ -1260,8 +1260,8 @@ function fillSelect(sel, items, cur, firstLabel) {
 async function listDevices() {
   try {
     const d = await navigator.mediaDevices.enumerateDevices();
-    fillSelect($('#cam'), d.filter(x => x.kind === 'videoinput'), state.cam, 'Padrão');
-    fillSelect($('#mic'), d.filter(x => x.kind === 'audioinput'), state.mic, 'Padrão');
+    fillSelect($('#cam'), d.filter(x => x.kind === 'videoinput'), state.cam, 'Default');
+    fillSelect($('#mic'), d.filter(x => x.kind === 'audioinput'), state.mic, 'Default');
   } catch (e) {}
 }
 // miniaturas: um contexto WebGL temporário, descartado ao terminar
@@ -1293,8 +1293,8 @@ async function openOutput() {
   if (outWin && !outWin.closed) { outWin.focus(); return; }
   const base = location.href.split('#')[0] + '#out';
   outWin = window.open(base, 'visualdj_out', `popup=yes,left=${screen.availWidth},top=0,width=1280,height=720`);
-  if (!outWin) { alert('O navegador bloqueou a janela. Permita pop-ups para este app.'); return; }
-  setChip('chOut', 'saída: abrindo…', '');
+  if (!outWin) { alert('The browser blocked the window. Allow pop-ups for this app.'); return; }
+  setChip('chOut', 'output: opening…', '');
   try {
     if (window.getScreenDetails) {
       const d = await getScreenDetails(), s = d.screens.find(x => !x.isPrimary);
@@ -1323,7 +1323,7 @@ function initPanel() {
   const grad = p => p.cam ? 'linear-gradient(90deg,#f33,#fd0,#3f6,#3cf,#a4f)' : `linear-gradient(90deg,${p.s.join(',')})`;
   const sws = PALS.map((p, i) => {
     const b = document.createElement('button'); b.className = 'sw'; b.title = p.n; b.style.background = grad(p);
-    b.dataset.midi = 'pal' + i; b.dataset.label = 'Paleta: ' + p.n;
+    b.dataset.midi = 'pal' + i; b.dataset.label = 'Palette: ' + p.n;
     b.textContent = p.cam ? 'CAM' : ''; b.onclick = () => { state.palette = i; showPal(); commit(); scheduleThumbs(); };
     $('#swatches').appendChild(b); return b;
   });
@@ -1334,7 +1334,7 @@ function initPanel() {
   showPal();
   const am = $('#audioMode'); am.value = state.audioMode; am.onchange = () => { state.audioMode = am.value; commit(); startMic(); };
   $('#mic').onchange = e => { state.mic = e.target.value; commit(); startMic(); };
-  $('#cam').onchange = e => { state.cam = e.target.value; commit(); startCam(state.cam).then(ok => setChip('chCam', ok ? 'câmera: ativa' : 'câmera: indisponível (demo)', ok ? 'ok' : 'bad')); };
+  $('#cam').onchange = e => { state.cam = e.target.value; commit(); startCam(state.cam).then(ok => setChip('chCam', ok ? 'camera: active' : 'camera: unavailable (demo)', ok ? 'ok' : 'bad')); };
   const q = $('#quality'); q.value = state.quality; q.onchange = () => { state.quality = +q.value; commit(); };
   const fc = $('#fpsCap'); fc.value = state.fpsCap; fc.onchange = () => { state.fpsCap = +fc.value; commit(); };
 
@@ -1342,7 +1342,7 @@ function initPanel() {
   EFFECTS.forEach((e, i) => {
     const b = document.createElement('button'); b.className = 'card';
     b.innerHTML = `<span class="num">${i < 10 ? (i + 1) % 10 : i < 20 ? '⇧' + (i - 9) % 10 : 'Alt' + (i - 19) % 10}</span><img alt=""><span class="nm">${e.name}</span>`;
-    b.title = e.name; b.dataset.midi = 'style' + i; b.dataset.label = 'Estilo: ' + e.name;
+    b.title = e.name; b.dataset.midi = 'style' + i; b.dataset.label = 'Style: ' + e.name;
     b.onclick = () => setStyle(i); grid.appendChild(b);
   });
   $('#btnNext').onclick = () => setStyle((state.style + 1) % EFFECTS.length);
@@ -1393,8 +1393,8 @@ function initPanel() {
   addEventListener('click', () => actx && actx.state === 'suspended' && actx.resume());
   addEventListener('message', e => {
     const m = e.data || {};
-    if (m.t === 'hello') { pushState(); if (ovlBlob) send({ t: 'ovlimg', blob: ovlBlob }); setChip('chOut', 'saída: conectada', 'ok'); }
-    else if (m.t === 'fps') setChip('chOut', `saída: ${m.fps} fps`, m.fps >= Math.min(24, (+state.fpsCap || 60) * .8) ? 'ok' : 'bad');
+    if (m.t === 'hello') { pushState(); if (ovlBlob) send({ t: 'ovlimg', blob: ovlBlob }); setChip('chOut', 'output: connected', 'ok'); }
+    else if (m.t === 'fps') setChip('chOut', `output: ${m.fps} fps`, m.fps >= Math.min(24, (+state.fpsCap || 60) * .8) ? 'ok' : 'bad');
     else if (m.t === 'corners') { state.corners = m.c; selCorner = m.sel; drawKz(); save(); }
   });
   addEventListener('beforeunload', () => { try { outWin && outWin.close(); } catch (e) {} });
@@ -1407,17 +1407,17 @@ const ccLast = {};
 try { midiMap = JSON.parse(localStorage.getItem('visualdj_midi') || '{}'); } catch (e) {}
 const saveMidi = () => { try { localStorage.setItem('visualdj_midi', JSON.stringify(midiMap)); } catch (e) {} };
 const midiEl = id => document.querySelector(`[data-midi="${id}"]`);
-const midiName = k => (k[0] === 'n' ? 'NOTA ' : 'CC ') + k.split(':')[1] + ' · ch' + (+k.slice(1).split(':')[0] + 1);
+const midiName = k => (k[0] === 'n' ? 'NOTE ' : 'CC ') + k.split(':')[1] + ' · ch' + (+k.slice(1).split(':')[0] + 1);
 
 function renderMidi() {
   const used = new Set(Object.values(midiMap));
   document.querySelectorAll('[data-midi]').forEach(el => el.classList.toggle('mapped', used.has(el.dataset.midi)));
   const list = $('#midiList'); list.innerHTML = '';
   const keys = Object.keys(midiMap);
-  if (!keys.length) { list.innerHTML = '<div class="empty">Nenhum controle mapeado.</div>'; return; }
+  if (!keys.length) { list.innerHTML = '<div class="empty">No controls mapped yet.</div>'; return; }
   keys.forEach(k => {
     const el = midiEl(midiMap[k]), row = document.createElement('div'); row.className = 'row';
-    row.innerHTML = `<span></span><code>${midiName(k)}</code><button title="Remover">✕</button>`;
+    row.innerHTML = `<span></span><code>${midiName(k)}</code><button title="Remove">✕</button>`;
     row.firstChild.textContent = el ? el.dataset.label : midiMap[k];
     row.lastChild.onclick = () => { delete midiMap[k]; saveMidi(); renderMidi(); };
     list.appendChild(row);
@@ -1435,7 +1435,7 @@ function onMidi(ev) {
   else if (cmd === 0xb0) { type = 'c'; val = d2 / 127; }
   else return;
   const key = `${type}${ch}:${d1}`;
-  $('#midiMon').textContent = `${midiName(key)} → ${type === 'n' ? (val ? 'apertou' : 'soltou') : d2}` + (midiMap[key] ? ` (${midiEl(midiMap[key])?.dataset.label || ''})` : '');
+  $('#midiMon').textContent = `${midiName(key)} → ${type === 'n' ? (val ? 'pressed' : 'released') : d2}` + (midiMap[key] ? ` (${midiEl(midiMap[key])?.dataset.label || ''})` : '');
   if (waitEl) {                                   // Learn: liga este sinal ao controle escolhido
     if (type === 'n' && !val) return;
     for (const k in midiMap) if (midiMap[k] === waitEl.dataset.midi) delete midiMap[k];
@@ -1451,7 +1451,7 @@ function onMidi(ev) {
   else { if (val >= .5 && (ccLast[key] || 0) < .5) el.click(); ccLast[key] = val; }   // botão que manda CC
 }
 async function startMidi() {
-  if (!navigator.requestMIDIAccess) { setChip('chMidi', 'midi: navegador sem suporte', 'bad'); return; }
+  if (!navigator.requestMIDIAccess) { setChip('chMidi', 'midi: not supported by this browser', 'bad'); return; }
   try {
     midiAcc = midiAcc || await navigator.requestMIDIAccess();
     const hook = async () => {
@@ -1460,16 +1460,16 @@ async function startMidi() {
         inp.onmidimessage = onMidi;
         try { await inp.open(); ok.push(inp.name); } catch (e) { busy.push(inp.name); }
       }
-      setChip('chMidi', ok.length ? 'midi: ' + ok.join(', ') : busy.length ? 'midi: em uso por outro app' : 'midi: nenhum controlador', ok.length ? 'ok' : busy.length ? 'bad' : '');
-      if (busy.length) $('#midiMon').textContent = 'Em uso por outro programa (ex.: rekordbox): ' + busy.join(', ');
+      setChip('chMidi', ok.length ? 'midi: ' + ok.join(', ') : busy.length ? 'midi: in use by another app' : 'midi: no controller', ok.length ? 'ok' : busy.length ? 'bad' : '');
+      if (busy.length) $('#midiMon').textContent = 'In use by another program (e.g. rekordbox): ' + busy.join(', ');
     };
     midiAcc.onstatechange = e => { if (e.port.type === 'input' && e.port.state !== (e.port._last || '')) { e.port._last = e.port.state; hook(); } };
     await hook();
-  } catch (e) { setChip('chMidi', 'midi: permissão negada', 'bad'); }
+  } catch (e) { setChip('chMidi', 'midi: permission denied', 'bad'); }
 }
 function initMidi() {
   $('#btnLearn').onclick = () => setLearn(!learning);
-  $('#btnMidiClear').onclick = () => { if (confirm('Apagar todos os mapeamentos MIDI?')) { midiMap = {}; saveMidi(); renderMidi(); } };
+  $('#btnMidiClear').onclick = () => { if (confirm('Delete all MIDI mappings?')) { midiMap = {}; saveMidi(); renderMidi(); } };
   $('#btnMidiScan').onclick = startMidi;
   // no modo Learn, clicar escolhe o controle em vez de acioná-lo
   const pick = e => {
@@ -1480,7 +1480,7 @@ function initMidi() {
     e.preventDefault(); e.stopPropagation();
     if (e.type !== 'pointerdown') return;
     if (waitEl) waitEl.classList.remove('waiting');
-    waitEl = el; el.classList.add('waiting'); $('#midiMon').textContent = `Aguardando sinal para: ${el.dataset.label}…`;
+    waitEl = el; el.classList.add('waiting'); $('#midiMon').textContent = `Waiting for a signal for: ${el.dataset.label}…`;
   };
   ['pointerdown', 'mousedown', 'click'].forEach(t => addEventListener(t, pick, true));
   addEventListener('keydown', e => { if (learning && e.key === 'Escape') setLearn(false); }, true);
@@ -1499,7 +1499,7 @@ function gpuName() {
 async function init() {
   if (isOut) {
     const cv = $('#out'); outEng = createEngine(cv, $('#stage'));
-    if (!outEng) { $('#hint').textContent = 'Este navegador não suporta WebGL2. Atualize o Chrome/Edge ou os drivers de vídeo.'; return; }
+    if (!outEng) { $('#hint').textContent = 'This browser does not support WebGL2. Update Chrome/Edge or your graphics drivers.'; return; }
     const drawHandles = cornerEditor($('#outwrap'), (i, p) => moveCorner(i, p));
     const warp = () => {
       $('#stage').style.transform = quadMatrix(innerWidth, innerHeight, state.corners);
@@ -1531,12 +1531,12 @@ async function init() {
   }
   pvEng = createEngine($('#pv'), $('.pv'));
   const g = gpuName();
-  setChip('chGpu', pvEng ? 'gpu: ' + (g || 'WebGL2 ok') : 'gpu: WebGL2 indisponível', pvEng && !/intel/i.test(g) ? 'ok' : 'bad');
+  setChip('chGpu', pvEng ? 'gpu: ' + (g || 'WebGL2 ok') : 'gpu: WebGL2 unavailable', pvEng && !/intel/i.test(g) ? 'ok' : 'bad');
   if (!(state.style < EFFECTS.length)) state.style = 0;
   initPanel(); initMidi(); initOverlay(); setStyle(state.style);
   requestAnimationFrame(loop);
   // nada aqui espera pelo outro: uma permissão pendente não pode travar as miniaturas
-  const camP = startCam(state.cam).then(ok => { setChip('chCam', ok ? 'câmera: ativa' : 'câmera: indisponível (modo demo)', ok ? 'ok' : 'bad'); listDevices(); });
+  const camP = startCam(state.cam).then(ok => { setChip('chCam', ok ? 'camera: active' : 'camera: unavailable (demo mode)', ok ? 'ok' : 'bad'); listDevices(); });
   startMic().then(listDevices);
   Promise.race([camP, new Promise(r => setTimeout(r, 4000))]).then(() => setTimeout(genThumbs, 1200));
 }
