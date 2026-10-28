@@ -1,11 +1,11 @@
-# VisualDJ
+# Virtual VJ
 
 Visuais ao vivo para DJ, gerados a partir da webcam e reagindo ao som. Não precisa instalar nada: roda no Chrome ou no Edge que já vêm no Windows. A pasta inteira é portátil (dá para levar num pendrive).
 
 ## Como usar
 
 1. Conecte o projetor como **tela estendida** (Win + P → *Estender*) e ligue a webcam externa.
-2. Dê dois cliques em **`Iniciar VisualDJ.bat`**. O painel de controle abre no notebook.
+2. Dê dois cliques em **`Iniciar Virtual VJ.bat`**. O painel de controle abre no notebook.
 3. Clique em **▶ Abrir saída** (na barra de título). A janela de saída tenta ir sozinha para a segunda tela. Se não for, arraste-a para o projetor.
 4. **Clique uma vez na janela do projetor** (ou aperte `F`) para deixá-la em tela cheia.
 5. Em *Vídeo e desempenho*, escolha a webcam externa. Em *Áudio*, escolha o microfone ou a entrada de linha (line-in) que capta o som.
@@ -47,9 +47,9 @@ Visuais ao vivo para DJ, gerados a partir da webcam e reagindo ao som. Não prec
 
 ## Controlador MIDI
 
-Dá para controlar o VisualDJ com qualquer controlador MIDI USB (pads, knobs, faders), sem instalar nada.
+Dá para controlar o Virtual VJ com qualquer controlador MIDI USB (pads, knobs, faders), sem instalar nada.
 
-1. Ligue o controlador **antes** de abrir o VisualDJ (ou clique em **↻ Procurar** no painel MIDI). Na primeira vez, o navegador pede permissão para usar MIDI: clique em **Permitir**.
+1. Ligue o controlador **antes** de abrir o Virtual VJ (ou clique em **↻ Procurar** no painel MIDI). Na primeira vez, o navegador pede permissão para usar MIDI: clique em **Permitir**.
 2. Clique em **🎹 MIDI Learn** (na barra de ferramentas). Os controles que podem ser mapeados ganham um contorno amarelo.
 3. Clique no controle da tela (ele fica rosa) e então aperte o pad ou gire o knob do controlador. Pronto, está ligado (contorno verde).
 4. Repita para outros controles e aperte `Esc` ou clique de novo em **MIDI Learn** para sair.
@@ -60,7 +60,7 @@ O que dá para mapear:
 
 Os mapeamentos ficam salvos e aparecem no painel **MIDI**, com ✕ para remover. O monitor mostra o último sinal recebido, o que ajuda a descobrir se o controlador está mandando algo.
 
-> **Atenção com o rekordbox:** no Windows, normalmente só um programa por vez consegue usar o mesmo aparelho MIDI. Se for a mesma controladora do rekordbox (uma DDJ, por exemplo), o VisualDJ provavelmente vai mostrar **"midi: em uso por outro app"**. O mais garantido é usar um controlador MIDI pequeno separado só para os visuais (ex.: Akai LPD8, Korg nanoKONTROL).
+> **Atenção com o rekordbox:** no Windows, normalmente só um programa por vez consegue usar o mesmo aparelho MIDI. Se for a mesma controladora do rekordbox (uma DDJ, por exemplo), o Virtual VJ provavelmente vai mostrar **"midi: em uso por outro app"**. O mais garantido é usar um controlador MIDI pequeno separado só para os visuais (ex.: Akai LPD8, Korg nanoKONTROL).
 
 ## Projetor torto (perspectiva)
 
