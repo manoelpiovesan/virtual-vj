@@ -1,8 +1,27 @@
+<div align="center">
+
 # Virtual VJ
 
-Live DJ visuals in the browser: your webcam + the music become real-time visuals on a projector. 27 GPU styles, BPM-synced strobe, MIDI Learn. No install.
+**Virtual VJ** turns your webcam and the music into live DJ visuals on a projector — 27 GPU styles, BPM-synced strobe, MIDI Learn. No install.
 
-**[▶ Open the live demo](https://manoelpiovesan.github.io/virtual-vj/)** · [Guia completo em português](LEIA-ME.md)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-online-ffd60a?style=for-the-badge&logo=githubpages&logoColor=black)](https://manoelpiovesan.github.io/virtual-vj/)
+[![Pages](https://img.shields.io/github/deployments/manoelpiovesan/virtual-vj/github-pages?style=for-the-badge&label=pages&logo=github)](https://github.com/manoelpiovesan/virtual-vj/actions)
+[![Latest Release](https://img.shields.io/github/v/release/manoelpiovesan/virtual-vj?style=for-the-badge)](https://github.com/manoelpiovesan/virtual-vj/releases/latest)
+[![WebGL2](https://img.shields.io/badge/WebGL-2.0-990000?style=for-the-badge&logo=webgl&logoColor=white)](https://developer.mozilla.org/docs/Web/API/WebGL2RenderingContext)
+[![JavaScript](https://img.shields.io/badge/JavaScript-no%20build-f7df1e?style=for-the-badge&logo=javascript&logoColor=black)](index.html)
+[![No install](https://img.shields.io/badge/Install-none-3cf2ff?style=for-the-badge)](https://manoelpiovesan.github.io/virtual-vj/)
+[![Platform](https://img.shields.io/badge/Platform-Chrome%20%7C%20Edge%20%7C%20Windows-black?style=for-the-badge)](https://github.com/manoelpiovesan/virtual-vj/releases/latest)
+[![Ko-Fi](https://img.shields.io/badge/Support-Ko--Fi-ff5f5f?style=for-the-badge&logo=kofi&logoColor=white)](https://ko-fi.com/L3L61SRB88)
+
+<br>
+
+[Live demo](https://manoelpiovesan.github.io/virtual-vj/) •
+[Download](https://github.com/manoelpiovesan/virtual-vj/releases/latest) •
+[Usage](#usage) •
+[Guia em português](LEIA-ME.md) •
+[Support](#support-the-project)
+
+</div>
 
 ![Virtual VJ control panel](docs/interface.png)
 
@@ -33,3 +52,13 @@ Live DJ visuals in the browser: your webcam + the music become real-time visuals
 | `G` | Keystone grid |
 
 > Screenshots use the built-in demo animation; with a webcam the visuals follow you.
+
+## Support the Project
+
+If you enjoy the project and want to support future development:
+
+<p align="left">
+  <a href="https://ko-fi.com/L3L61SRB88">
+    <img src="https://ko-fi.com/img/githubbutton_sm.svg" alt="Support me on Ko-Fi">
+  </a>
+</p>
