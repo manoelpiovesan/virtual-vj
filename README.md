@@ -1,6 +1,6 @@
 # Virtual VJ
 
-Live DJ visuals in the browser: your webcam + the music become real-time visuals on a projector. 22 GPU styles, BPM-synced strobe, MIDI Learn. No install.
+Live DJ visuals in the browser: your webcam + the music become real-time visuals on a projector. 27 GPU styles, BPM-synced strobe, MIDI Learn. No install.
 
 **[▶ Open the live demo](https://manoelpiovesan.github.io/virtual-vj/)** · [Guia completo em português](LEIA-ME.md)
 
@@ -8,7 +8,7 @@ Live DJ visuals in the browser: your webcam + the music become real-time visuals
 
 ## Features
 
-- **22 styles**: ASCII, digital rain, neon edges, glitch, tunnel, VHS, pop art, slit-scan, terminal, hex dump, ANSI…
+- **27 styles**: ASCII, digital rain, neon edges, glitch, tunnel, VHS, pop art, terminal, hex dump, ANSI, infinite feedback, datamosh…
 - **Audio-reactive**: mic/line-in beat detection, or manual BPM with tap tempo
 - **Strobe knob**: off → 1 bar → 1/32, locked to the beat
 - **MIDI Learn**: map any pad, knob or fader

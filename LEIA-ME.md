@@ -24,8 +24,8 @@ Visuais ao vivo para DJ, gerados a partir da webcam e reagindo ao som. Não prec
 |---|---|
 | `1`–`9`, `0` | Estilos 1 a 10 |
 | `Shift` + `1`–`0` | Estilos 11 a 20 |
-| `Alt` + `1`–`2` | Estilos 21 e 22 |
-| `←` `→` | Estilo anterior / próximo |
+| `Alt` + `1`–`7` | Estilos 21 a 27 |
+| `←` `→` ou ◀ ▶ (barra de ferramentas) | Estilo anterior / próximo |
 | `Espaço` | Flash |
 | `B` | Blackout |
 | `T` | Tap tempo (BPM) |
@@ -36,6 +36,7 @@ Visuais ao vivo para DJ, gerados a partir da webcam e reagindo ao som. Não prec
 1 ASCII · 2 Chuva Digital · 3 Mosaico · 4 Contorno Neon · 5 Mapa Térmico · 6 Glitch RGB · 7 Partículas · 8 Caleidoscópio · 9 Meio-tom · 0 Aura de Movimento
 ⇧1 Túnel · ⇧2 Líquido · ⇧3 VHS · ⇧4 Pixel Dither · ⇧5 Pop Art · ⇧6 Feedback Infinito · ⇧7 Slit-scan · ⇧8 Linhas de Relevo
 **Terminal:** ⇧9 Terminal CRT · ⇧0 Hex Dump · Alt1 Binário · Alt2 ANSI DOS
+**Feedback:** ⇧6 Feedback Infinito · Alt3 Espelho Infinito · Alt4 Espiral Infinita · Alt5 Fumaça · Alt6 Datamosh · Alt7 Eco na Batida
 
 - **Intensidade**: o quanto o visual reage às batidas.
 - **Detalhe**: a resolução (de caracteres, pontos, blocos ou linhas).
@@ -56,7 +57,7 @@ Dá para controlar o Virtual VJ com qualquer controlador MIDI USB (pads, knobs, 
 
 O que dá para mapear:
 - **Knobs e faders**: Intensidade, Detalhe, Matiz, Sensibilidade.
-- **Pads e botões**: cada um dos 18 estilos, ◀ e ▶ (estilo anterior / próximo), cada paleta, Flash, Blackout, Grade, TAP, Strobe, Espelhar, Troca automática, Cores animadas e Prévia.
+- **Pads e botões**: cada um dos 27 estilos, ◀ e ▶ da barra de ferramentas (estilo anterior / próximo — ótimo em dois pads), cada paleta, Flash, Blackout, Grade, TAP, Strobe, Espelhar, Troca automática, Cores animadas e Prévia.
 
 Os mapeamentos ficam salvos e aparecem no painel **MIDI**, com ✕ para remover. O monitor mostra o último sinal recebido, o que ajuda a descobrir se o controlador está mandando algo.
 

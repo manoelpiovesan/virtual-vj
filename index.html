@@ -95,6 +95,10 @@ input[type=range]::-moz-range-thumb{width:10px;height:20px;background:var(--y);b
 .pv .hdl.r{right:-12px;top:50%}.pv .hdl.b{bottom:-12px;left:50%}.pv .hdl.rb{right:-12px;bottom:-12px}
 .ws-info{display:flex;flex-wrap:wrap;gap:8px 18px;color:var(--mut);font-size:12px}
 .ws-info b{color:var(--tx);font-family:var(--px);font-weight:400;font-size:11px}
+.stylenav{display:flex;align-items:center;gap:8px}
+.stylenav .nav{font-size:15px;padding:3px 14px;background:var(--c);color:#000}
+.stylenav .nav:hover{background:#8ff8ff}
+.cur-style{width:190px;padding:5px 10px;font-family:var(--px);font-size:11px;color:var(--y);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 /* propriedades */
 .props{border-left:2px solid var(--lo);overflow:auto;gap:12px}
@@ -211,6 +215,12 @@ body.out:fullscreen,body.out :fullscreen{cursor:none}
     <button id="btnBlack" data-midi="blackout" data-label="Blackout">⏻ Blackout<kbd>B</kbd></button>
     <button id="btnCalib" data-midi="grid" data-label="Grade">▦ Grade<kbd>G</kbd></button>
     <span class="sep"></span>
+    <div class="stylenav">
+      <button id="btnPrev" class="nav" data-midi="prev" data-label="Estilo anterior" title="Estilo anterior (←)">◀</button>
+      <span class="well cur-style" id="curName">-</span>
+      <button id="btnNext" class="nav" data-midi="next" data-label="Próximo estilo" title="Próximo estilo (→)">▶</button>
+    </div>
+    <span class="sep"></span>
     <label><input type="checkbox" id="strobe" data-midi="strobe" data-label="Strobe na batida"> Strobe na batida</label>
     <label><input type="checkbox" id="mirror" data-midi="mirror" data-label="Espelhar"> Espelhar</label>
     <span class="sep"></span>
@@ -227,7 +237,7 @@ body.out:fullscreen,body.out :fullscreen{cursor:none}
     <section class="pane">
       <div class="workspace">
         <div class="pv"><canvas id="pv" width="480" height="270"></canvas><div class="ov flash"></div><div class="ov dark"></div><div class="off">prévia desligada</div><i class="hdl r"></i><i class="hdl b"></i><i class="hdl rb"></i></div>
-        <div class="ws-info"><button id="btnPrev" class="mini" data-midi="prev" data-label="Estilo anterior">◀</button><button id="btnNext" class="mini" data-midi="next" data-label="Próximo estilo">▶</button><span>Estilo: <b id="curName">-</b></span><span><kbd>1</kbd>–<kbd>0</kbd>, <kbd>⇧</kbd>+número e <kbd>Alt</kbd>+número escolhem · <kbd>←</kbd><kbd>→</kbd> passam</span></div>
+        <div class="ws-info"><span><kbd>1</kbd>–<kbd>0</kbd>, <kbd>⇧</kbd>+número e <kbd>Alt</kbd>+número escolhem · <kbd>←</kbd><kbd>→</kbd> passam</span></div>
       </div>
     </section>
 
@@ -282,8 +292,8 @@ body.out:fullscreen,body.out :fullscreen{cursor:none}
   <div class="in">
     <kbd>1 … 0</kbd><span>Estilos 1 a 10</span>
     <kbd>⇧ + 1 … 0</kbd><span>Estilos 11 a 20</span>
-    <kbd>Alt + 1 … 2</kbd><span>Estilos 21 e 22 (terminal)</span>
-    <kbd>← →</kbd><span>Estilo anterior / próximo</span>
+    <kbd>Alt + 1 … 7</kbd><span>Estilos 21 a 27</span>
+    <kbd>← →</kbd><span>Estilo anterior / próximo (ou ◀ ▶ na barra, mapeáveis no MIDI)</span>
     <kbd>Espaço</kbd><span>Flash</span>
     <kbd>B</kbd><span>Blackout</span>
     <kbd>T</kbd><span>Tap tempo (BPM)</span>
@@ -783,6 +793,65 @@ void main(){
   float on = fr < .25 ? 0. : fr < .5 ? lo : fr < .75 ? mod(p.x + p.y, 2.) : 1. - step(mod(p.x + 1., 2.) + mod(p.y + 1., 2.), .5);   // ▒ ▓
   vec3 bg = uCamCol > .5 ? ega(c * .55) : pal(base / 4.), fg = uCamCol > .5 ? ega(min(c * 1.6, 1.)) : pal((base + 1.) / 4.);
   o = vec4(mix(bg, fg, on), 1);
+}` },
+
+/* --- família feedback: todos reaproveitam o quadro anterior (uPrev) --- */
+{ name: 'Espelho Infinito', fb: true, fs: `
+void main(){
+  float s = .8 - .08 * uK - .05 * uPulse * uK, a = .02 * sin(uT * .3) + .03 * uBass * uK;   // tamanho e giro do quadro interno
+  vec2 p = (vUv - .5) / s;
+  p = mat2(cos(a), -sin(a), sin(a), cos(a)) * p;
+  vec3 cam = camL(vUv, 0.); float l = expo(luma(cam), meanL());
+  if (uCamCol < .5) cam = pal(.15 + .85 * l);
+  vec3 bg = cam; vec2 q = abs(p);
+  if (max(q.x, q.y) < .5) {                                                       // dentro: o quadro anterior, menor
+    float edge = step(.5 - 3. / (uRes.y * s), max(q.x, q.y));
+    bg = mix(texture(uPrev, p + .5).rgb * .97, pal(fract(uT * .05 + .5)), edge);  // moldura colorida entre níveis
+  }
+  o = vec4(mix(bg, cam, smoothstep(.4, .6, l)), 1);                                // a pessoa fica na frente dos quadros
+}` },
+
+{ name: 'Espiral Infinita', fb: true, fs: `
+void main(){
+  vec2 p = (vUv - .5) * vec2(uRes.x / uRes.y, 1.);
+  float a = .035 + .09 * uK * uBass + .05 * uPulse, z = 1.025 + .02 * uMid * uK;
+  p = mat2(cos(a), -sin(a), sin(a), cos(a)) * p * z;                              // gira e afunda
+  vec3 prev = max(texture(uPrev, p / vec2(uRes.x / uRes.y, 1.) + .5).rgb * .972 - 1.5 / 255., 0.);
+  vec3 c = camL(vUv, 1.); float l = expo(luma(c), meanL()), m = smoothstep(.45, .7, l);
+  vec3 add = (uCamCol > .5 ? c : pal(.3 + .7 * fract(uT * .3))) * m;              // cor muda rápido → espiral colorida
+  o = vec4(mix(prev, add, m * (.35 + .5 * uPulse)), 1);
+}` },
+
+{ name: 'Fumaça', fb: true, fs: `
+void main(){
+  float k = (1. + uK * 2.) * (1. + uBass);
+  vec2 v = vec2(sin(vUv.y * 7. + uT * 1.3) + sin(vUv.y * 13. - uT), cos(vUv.x * 6. - uT * 1.1)) * .0018 * k + vec2(0., .0025 * k);   // sobe e ondula
+  vec3 prev = max(texture(uPrev, vUv - v).rgb * .972 - 1.5 / 255., 0.);
+  vec3 c = camL(vUv, 1.); float l = expo(luma(c), meanL());
+  float e = clamp(length(vec2(dFdx(l), dFdy(l))) * uRes.x / 120., 0., 1.);
+  vec3 add = (uCamCol > .5 ? c * 1.4 : pal(.4 + .6 * fract(vUv.y * .5 + uT * .05))) * e * (.35 + .6 * uPulse);
+  o = vec4(prev + add, 1);
+}` },
+
+{ name: 'Datamosh', fb: true, fs: `
+void main(){
+  vec2 bs = vec2(32., 18.) * (1. + uD * 1.5), bu = (floor(vUv * bs) + .5) / bs, dx = vec2(1. / bs.x, 0.), dy = vec2(0., 1. / bs.y);
+  float lc = luma(camL(bu, 3.)), d = lc - luma(textureLod(uPrevCam, bu, 3.).rgb);
+  vec2 g = vec2(luma(camL(bu + dx, 3.)) - luma(camL(bu - dx, 3.)), luma(camL(bu + dy, 3.)) - luma(camL(bu - dy, 3.)));
+  vec2 drift = (vec2(h21(floor(vUv * bs) + floor(uSeed)), h21(floor(vUv * bs) - floor(uSeed))) - .5) * .004 * uK;   // cada bloco escorre para um lado
+  vec2 mv = g * d * (8. + uK * 24.) + drift;                                      // "vetor de movimento" por bloco
+  vec3 prev = texture(uPrev, vUv - mv).rgb;
+  vec3 c = camL(vUv, 0.); if (uCamCol < .5) c = pal(.15 + .85 * expo(luma(c), meanL()));
+  float iframe = step(uBeatAge, .05) * step(h21(vec2(floor(uSeed), 3.)), .6 - .35 * uK);   // às vezes reconstrói na batida
+  o = vec4(mix(prev, c, max(iframe, .03 + .05 * (1. - uK))), 1);
+}` },
+
+{ name: 'Eco na Batida', fb: true, fs: `
+void main(){
+  vec3 prev = max(texture(uPrev, (vUv - .5) * (1. - .006 * uK) + .5).rgb * .935 - 1.5 / 255., 0.);   // ecos encolhem e somem
+  vec3 c = camL(vUv, 1.); float l = expo(luma(c), meanL()), m = smoothstep(.45, .6, l);
+  vec3 stamp = (uCamCol > .5 ? c : pal(.35 + .6 * fract(uSeed * .137))) * m * exp(-uBeatAge * 14.);   // carimbo a cada batida
+  o = vec4(max(prev, stamp) + pal(.5) * m * .06, 1);
 }` },
 ];
 
