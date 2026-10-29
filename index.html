@@ -265,6 +265,9 @@ body.out:fullscreen,body.out :fullscreen{cursor:none}
       <fieldset><legend>Visual</legend>
         <div class="f"><label for="intensity">Intensity</label><input type="range" id="intensity" min="0" max="1" step=".01" data-midi="intensity" data-label="Intensity"><output id="intensityV"></output></div>
         <div class="f"><label for="detail">Detail</label><input type="range" id="detail" min="0" max="1" step=".01" data-midi="detail" data-label="Detail"><output id="detailV"></output></div>
+        <div class="f" title="Brightness of the camera before the effect. Double-click to reset"><label for="exposure">Exposure</label><input type="range" id="exposure" min="-2" max="2" step=".1" data-midi="exposure" data-label="Exposure"><output id="exposureV"></output></div>
+        <div class="f" title="Contrast of the camera. Double-click to reset"><label for="contrast">Contrast</label><input type="range" id="contrast" min=".5" max="3" step=".05" data-midi="contrast" data-label="Contrast"><output id="contrastV"></output></div>
+        <div class="f" title="Everything darker than this turns black. Double-click to reset"><label for="threshold">Threshold</label><input type="range" id="threshold" min="0" max=".7" step=".01" data-midi="threshold" data-label="Threshold"><output id="thresholdV"></output></div>
         <div class="f strobe-row"><label for="strobeRate">Strobe</label><input type="range" id="strobeRate" min="0" max="1" step=".01" data-midi="strobeRate" data-label="Strobe (rate)"><output id="strobeRateV"></output></div>
         <div class="chk"><label><input type="checkbox" id="strobeSync" data-midi="strobeSync" data-label="Strobe synced to BPM"> Strobe synced to BPM</label></div>
       </fieldset>
@@ -366,7 +369,7 @@ const DEF = { style: 0, intensity: .7, detail: .5, hue: 0, palette: 1, drift: tr
   blackout: false, auto: false, autoSec: 20, cam: '', mic: '', gain: 1.2, bpm: 124, audioMode: 'mic', quality: 1280,
   fpsCap: 60, preview: true, corners: null, calib: false, strobeRate: 0, strobeSync: true,
   ovlOn: true, ovlMode: 'top', ovlBlend: 'normal', ovlScale: .3, ovlX: .5, ovlY: .5, ovlAlpha: 1, ovlPulse: true,
-  source: 'cam', shapeSet: 'mix', shapeCount: 12, shapeSpeed: .4, shapeLine: 3, off: [] };
+  source: 'cam', shapeSet: 'mix', shapeCount: 12, shapeSpeed: .4, shapeLine: 3, off: [], exposure: 0, contrast: 1, threshold: .12 };
 const FLAT = () => [[0, 0], [1, 0], [1, 1], [0, 1]];   // cantos: sup-esq, sup-dir, inf-dir, inf-esq (0..1)
 const state = { ...DEF, corners: FLAT() };
 if (!isOut) { try { Object.assign(state, JSON.parse(localStorage.getItem('visualdj') || '{}'), { blackout: false, calib: false, strobeRate: 0 }); } catch (e) {} }
@@ -576,10 +579,10 @@ void main(){ vUv = p * .5 + .5; gl_Position = vec4(p, 0, 1); }`;
 const CAM_FS = `#version 300 es
 precision highp float;
 in vec2 vUv; out vec4 o;
-uniform sampler2D uVid, uOvl; uniform vec4 uCrop, uOvlR; uniform float uMirror, uOvlA, uOvlB;
+uniform sampler2D uVid, uOvl; uniform vec4 uCrop, uOvlR; uniform float uMirror, uOvlA, uOvlB, uExp, uCon;
 void main(){
   vec2 uv = vUv; if (uMirror > .5) uv.x = 1. - uv.x;
-  vec3 c = texture(uVid, uCrop.xy + uv * uCrop.zw).rgb;
+  vec3 c = clamp(((texture(uVid, uCrop.xy + uv * uCrop.zw).rgb - .5) * uCon + .5) * uExp, 0., 1.);   // contraste e exposição do painel
   if (uOvlA > 0.) {                       // imagem "junto da câmera": entra antes do efeito (sem espelhar)
     vec2 q = (vUv - uOvlR.xy) / uOvlR.zw;
     if (q.x >= 0. && q.y >= 0. && q.x <= 1. && q.y <= 1.) {
@@ -601,12 +604,12 @@ precision highp float;
 in vec2 vUv; out vec4 o;
 uniform sampler2D uCam, uPrevCam, uLut, uPrev, uFont;
 uniform vec2 uRes;
-uniform float uT, uK, uD, uBass, uMid, uHigh, uPulse, uFlow, uBeatAge, uSeed, uCamCol, uNG, uCamW;
+uniform float uT, uK, uD, uBass, uMid, uHigh, uPulse, uFlow, uBeatAge, uSeed, uCamCol, uNG, uCamW, uExp, uBlk;
 uniform vec4 uSlices[6];
 float luma(vec3 c){ return dot(c, vec3(.299, .587, .114)); }
 vec3 camL(vec2 uv, float l){ return textureLod(uCam, uv, l).rgb; }
 float meanL(){ return luma(textureLod(uCam, vec2(.5), 12.).rgb); }          // brilho médio = último mipmap
-float expo(float l, float m){ return clamp((l * .45 / max(m, .04) - .12) / .88, 0., 1.); }  // autoexposição + corte de pretos
+float expo(float l, float m){ return clamp((l * .45 / max(m, .04) * uExp - uBlk) / (1. - uBlk), 0., 1.); }  // autoexposição × exposição do painel, menos o corte de pretos (threshold)
 vec3 pal(float v){ return texture(uLut, vec2(clamp(v, 0., 1.) * .99609 + .00195, .5)).rgb; }
 float h21(vec2 p){ p = fract(p * vec2(123.34, 456.21)); p += dot(p, p + 45.32); return fract(p.x * p.y); }
 float cellLod(float cw){ return max(0., log2(cw * uCamW / uRes.x)); }
@@ -625,7 +628,7 @@ const PTS_VS = `#version 300 es
 precision highp float;
 uniform sampler2D uCam, uLut;
 uniform vec2 uRes, uGrid;
-uniform float uK, uPulse, uBeatAge, uSeed, uCamCol, uCamW;
+uniform float uK, uPulse, uBeatAge, uSeed, uCamCol, uCamW, uExp, uBlk;
 out vec3 vCol;
 float luma(vec3 c){ return dot(c, vec3(.299, .587, .114)); }
 float h21(vec2 p){ p = fract(p * vec2(123.34, 456.21)); p += dot(p, p + 45.32); return fract(p.x * p.y); }
@@ -634,7 +637,7 @@ void main(){
   vec2 g = vec2(mod(id, uGrid.x), floor(id / uGrid.x)), home = (g + .5) / uGrid;
   float cell = uRes.x / uGrid.x;
   vec3 c = textureLod(uCam, home, max(0., log2(cell * uCamW / uRes.x))).rgb;
-  float m = luma(textureLod(uCam, vec2(.5), 12.).rgb), l = clamp((luma(c) * .45 / max(m, .04) - .12) / .88, 0., 1.);
+  float m = luma(textureLod(uCam, vec2(.5), 12.).rgb), l = clamp((luma(c) * .45 / max(m, .04) * uExp - uBlk) / (1. - uBlk), 0., 1.);
   float ang = atan((home.y - .5) * uRes.y, (home.x - .5) * uRes.x) + (h21(g + uSeed) - .5) * 1.6;
   float sp = (150. + h21(g * 1.3 + uSeed) * 550.) * uK * uRes.x / 1280.;
   float disp = sp * exp(-uBeatAge * 1.6) * sin(uBeatAge * 6.2) / 6.2;   // mola amortecida após cada batida
@@ -1321,7 +1324,7 @@ function createEngine(canvas, wrap, opt = {}) {
         bind(5, vidTex); gl.texImage2D(T2, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, src);
         [camA, camB] = [camB, camA];
         const [sw, sh] = dims(src), sa = sw / sh, ta = W / H, crop = sa > ta ? [(1 - ta / sa) / 2, 0, ta / sa, 1] : [0, (1 - sa / ta) / 2, 1, sa / ta];
-        const P = prog('cam', CAM_FS); gl.useProgram(P.p); U(P, 'uCrop', crop); U(P, 'uMirror', state.mirror ? 1 : 0);
+        const P = prog('cam', CAM_FS); gl.useProgram(P.p); U(P, 'uCrop', crop); U(P, 'uMirror', state.mirror ? 1 : 0); U(P, 'uExp', 2 ** state.exposure); U(P, 'uCon', state.contrast);
         const ovOn = state.ovlOn && ovlW && state.ovlMode === 'cam';
         U(P, 'uOvlA', ovOn ? state.ovlAlpha : 0); bind(6, ovlTex);
         if (ovOn) {
@@ -1354,7 +1357,7 @@ function createEngine(canvas, wrap, opt = {}) {
       gl.bindFramebuffer(FB, E.fb ? fbB.f : null); gl.viewport(0, 0, W, H);
       gl.useProgram(P.p);
       const camCol = PALS[state.palette].cam ? 1 : 0;
-      U(P, 'uRes', [W, H]); U(P, 'uT', t % 3600); U(P, 'uK', state.intensity); U(P, 'uD', state.detail);
+      U(P, 'uRes', [W, H]); U(P, 'uT', t % 3600); U(P, 'uK', state.intensity); U(P, 'uD', state.detail); U(P, 'uExp', 2 ** state.exposure); U(P, 'uBlk', state.threshold);
       U(P, 'uBass', aud.bass); U(P, 'uMid', aud.mid); U(P, 'uHigh', aud.high); U(P, 'uPulse', aud.pulse);
       U(P, 'uFlow', flow % 1e5); U(P, 'uBeatAge', Math.min(99, t - beatT)); U(P, 'uSeed', seed); U(P, 'uCamCol', camCol);
       U(P, 'uNG', GLYPHS.length); U(P, 'uCamW', CAMW); U(P, 'uSlices', slices);
@@ -1364,7 +1367,7 @@ function createEngine(canvas, wrap, opt = {}) {
         const nx = Math.round(48 + state.detail * 72), ny = Math.round(nx * H / W), PP = prog('pts', PTS_FS, PTS_VS);
         gl.useProgram(PP.p);
         U(PP, 'uRes', [W, H]); U(PP, 'uGrid', [nx, ny]); U(PP, 'uK', state.intensity); U(PP, 'uPulse', aud.pulse);
-        U(PP, 'uBeatAge', Math.min(99, t - beatT)); U(PP, 'uSeed', seed); U(PP, 'uCamCol', camCol); U(PP, 'uCamW', CAMW);
+        U(PP, 'uBeatAge', Math.min(99, t - beatT)); U(PP, 'uSeed', seed); U(PP, 'uCamCol', camCol); U(PP, 'uCamW', CAMW); U(PP, 'uExp', 2 ** state.exposure); U(PP, 'uBlk', state.threshold);
         gl.bindVertexArray(empty); gl.drawArrays(gl.POINTS, 0, nx * ny); gl.bindVertexArray(tri);
       }
       if (E.fb) {   // mostra o resultado e guarda para o próximo quadro
@@ -1632,6 +1635,11 @@ function initPanel() {
   range('intensity', 'intensity', v => Math.round(v * 100)); range('detail', 'detail', v => Math.round(v * 100));
   range('hue', 'hue', v => v + '°'); range('gain', 'gain', v => v.toFixed(1) + '×');
   range('strobeRate', 'strobeRate', strobeLabel);
+  range('exposure', 'exposure', v => (v > 0 ? '+' : '') + v.toFixed(1)); range('contrast', 'contrast', v => v.toFixed(1) + '×');
+  range('threshold', 'threshold', v => Math.round(v * 100));
+  ['exposure', 'contrast', 'threshold'].forEach(k => $('#' + k).addEventListener('dblclick', () => {   // duplo clique volta ao padrão
+    $('#' + k).value = state[k] = DEF[k]; $('#' + k).dispatchEvent(new Event('input'));
+  }));
   ['drift', 'mirror', 'strobe', 'auto', 'strobeSync', 'ovlOn', 'ovlPulse'].forEach(k => check(k, k));
   const pct = v => Math.round(v * 100);
   range('ovlScale', 'ovlScale', pct); range('ovlX', 'ovlX', pct); range('ovlY', 'ovlY', pct); range('ovlAlpha', 'ovlAlpha', pct);

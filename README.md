@@ -30,6 +30,7 @@
 - **42 styles**: ASCII, digital rain, neon edges, glitch, tunnel, VHS, pop art, terminal, hex dump, ANSI, infinite feedback, datamosh, terrain, contour map, hex mosaic, stained glass, oscilloscope, Lissajous…
 - **Your own rotation**: switch any style off (✓ on its card) to skip it in auto switch and ◀ ▶
 - **Audio-reactive**: mic/line-in beat detection, or manual BPM with tap tempo
+- **Image controls**: exposure, contrast and threshold for dim cameras or dark venues
 - **Strobe knob**: off → 1 bar → 1/32, locked to the beat
 - **MIDI Learn**: map any pad, knob or fader
 - **Keystone**: drag 4 corners to fit a tilted projector

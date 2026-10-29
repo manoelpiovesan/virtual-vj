@@ -42,6 +42,7 @@ Visuais ao vivo para DJ, gerados a partir da webcam e reagindo ao som. Não prec
 
 - **Intensity**: o quanto o visual reage às batidas.
 - **Detail**: a resolução (de caracteres, pontos, blocos ou linhas).
+- **Exposure**, **Contrast** e **Threshold**: clareiam a câmera, dão mais contraste e mandam para o preto tudo o que for mais escuro que o limite. Use quando a imagem estiver apagada. Duplo clique volta ao padrão.
 - **Paletas** (caixa de cores), **Hue** e **Animated colors**: as cores. Na paleta **CAM**, os estilos usam as cores reais da imagem.
 - **Flash on beat** e **Switch every…**: deixam o show rodar no automático.
 - **Strobe** (slider, ótimo num knob MIDI): em 0 não pisca. Girando, pisca cada vez mais rápido. Com **Strobe synced to BPM** marcado, ele segue a música em passos de 1 compasso → 2 tempos → 1 tempo → 1/8 → 1/16 → 1/32 (*1 BAR … 1/32*), travado nas batidas. É perfeito para ir subindo durante um build-up e zerar no drop. Desmarcado, vai de 1,5 a 15 piscadas por segundo, sem seguir a música.
@@ -58,7 +59,7 @@ Dá para controlar o Virtual VJ com qualquer controlador MIDI USB (pads, knobs, 
 4. Repita para outros controles e aperte `Esc` ou clique de novo em **MIDI Learn** para sair.
 
 O que dá para mapear:
-- **Knobs e faders**: Intensity, Detail, Strobe, Hue, Sensitivity e, da imagem, Size, Position X/Y e Opacity.
+- **Knobs e faders**: Intensity, Detail, Exposure, Contrast, Threshold, Strobe, Hue, Sensitivity e, da imagem, Size, Position X/Y e Opacity.
 - **Pads e botões**: cada um dos 42 estilos, ◀ e ▶ da barra de ferramentas (estilo anterior / próximo — ótimo em dois pads), cada paleta, Flash, Blackout, Grid, TAP, Flash on beat, Mirror, Switch every, Animated colors, Panel preview e Show (imagem).
 
 Os mapeamentos ficam salvos e aparecem no painel **MIDI**, com ✕ para remover (**Clear mappings** apaga todos). O monitor mostra o último sinal recebido, o que ajuda a descobrir se o controlador está mandando algo.
