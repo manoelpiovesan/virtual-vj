@@ -613,6 +613,12 @@ float cellLod(float cw){ return max(0., log2(cw * uCamW / uRes.x)); }
 float glyph(float i, vec2 f, float cw){ f = clamp(f, .02, .98); return textureLod(uFont, vec2((i + f.x) / uNG, f.y), max(0., log2(32. / cw))).r; }
 float chi(float code){ return ${ASC0}. + code - 33.; }   // código ASCII → índice no atlas
 float hexI(float d){ return chi(d < 10. ? 48. + d : 55. + d); }
+float sdSeg(vec2 p, vec2 a, vec2 b){ vec2 pa = p - a, ba = b - a; return length(pa - ba * clamp(dot(pa, ba) / max(dot(ba, ba), 1e-6), 0., 1.)); }
+float beam(float d){ float w = 1.3 * uRes.x / 1280.; return exp(-d * d / (w * w)) + .3 * exp(-d / (w * 5.)); }   // traço de fósforo: núcleo + brilho
+float grat(vec2 fc){                                                               // retícula do osciloscópio: 10×8 divisões
+  vec2 g = uRes / vec2(10., 8.), e = abs(fract(fc / g + .5) - .5) * g, c = abs(fc - uRes * .5), s = abs(fract(fc / g * 5. + .5) - .5) * g / 5.;
+  return step(min(e.x, e.y), .6) * .1 + min(1., step(c.x, 4.) * step(s.y, .6) + step(c.y, 4.) * step(s.x, .6)) * .14;
+}
 `;
 
 const PTS_VS = `#version 300 es
@@ -1119,6 +1125,80 @@ void main(){
   glass *= (1.15 - d1 * .6) * (1. + uPulse * .35 * uK);                           // mais claro no meio do vidro
   float lead = smoothstep(.04 + .03 * uK, .07 + .03 * uK, d2 - d1);               // chumbo entre os vidros
   o = vec4(glass * lead, 1);
+}` },
+
+/* --- família osciloscópio: traço de fósforo verde, retícula, persistência --- */
+{ name: 'Oscilloscope', fb: true, fs: `
+void main(){
+  float x = gl_FragCoord.x, y = gl_FragCoord.y, m = meanL(), row = .5 + .3 * sin(uT * .23);   // a linha da câmera lida passeia
+  float amp = uRes.y * (.1 + .14 * uK) * (1. + uPulse * .5), car = 6.28318 * (2. + floor(uD * 6.)) / uRes.x;
+  #define F(xx) (uRes.y * .5 + (expo(luma(camL(vec2((xx) / uRes.x, row), 2.)), m) - .5) * amp * 2. + sin((xx) * car + uT * 3.) * amp * .3 * (.3 + uBass))
+  float f0 = F(x - 1.5), f1 = F(x), f2 = F(x + 1.5), d = max(0., max(min(f0, min(f1, f2)) - y, y - max(f0, max(f1, f2))));
+  float sx = fract(uT * (.5 + uK)) * uRes.x, age = fract((sx - x) / uRes.x), on = step(age, .05);   // feixe varrendo →
+  vec3 c = camL(vec2(x / uRes.x, row), 2.), ph = uCamCol > .5 ? min(c * 1.6 + .15, 1.) : pal(.75);
+  float b = beam(d) * on;
+  vec3 prev = texture(uPrev, vUv).rgb * (.93 - .05 * uK);
+  o = vec4(max(prev, ph * b * 1.2 + vec3(b * b * .4) + pal(.6) * grat(gl_FragCoord.xy)), 1);
+}` },
+
+{ name: 'Lissajous', fb: true, fs: `
+void main(){
+  vec2 p = (gl_FragCoord.xy - uRes * .5) / uRes.y;
+  float s = floor(uT * .1), fa = 1. + floor(h21(vec2(s, 1.)) * 4.), fb = fa + 1. + floor(h21(vec2(s, 2.)) * 3.), ph = uT * (.3 + uK * .6);
+  float R = (.3 + .08 * uBass * uK) * (1. + uPulse * .15), m = meanL(), d = 9., lb = 0.; vec2 q0 = vec2(0);
+  for (int i = 0; i <= 96; i++) {           // a figura XY "respira" com o brilho da câmera ao longo do caminho
+    float t = float(i) / 96. * 6.28318, l = expo(luma(camL(vec2(fract(t / 6.28318 + uT * .05), .5 + .3 * sin(t * 2. + uT * .2)), 4.)), m);
+    vec2 q = vec2(sin(fa * t + ph) * 1.4, sin(fb * t)) * R * (.8 + .35 * l);
+    if (i > 0) { float dd = sdSeg(p, q0, q); if (dd < d) { d = dd; lb = l; } }
+    q0 = q;
+  }
+  float b = beam(d * uRes.y);
+  vec3 ph2 = uCamCol > .5 ? min(camL(vUv, 2.) * 1.6 + .2, 1.) : pal(.55 + .45 * lb);
+  vec3 prev = texture(uPrev, vUv).rgb * (.86 - .06 * uK);
+  o = vec4(max(prev, ph2 * b * 1.2 + vec3(b * b * .4) + pal(.6) * grat(gl_FragCoord.xy)), 1);
+}` },
+
+{ name: 'Multi-Trace', fs: `
+void main(){
+  float K = floor(3. + uD * 6.), gap = uRes.y / K, x = gl_FragCoord.x, y = gl_FragCoord.y, m = meanL(), best = 9e3, bk = 0.;
+  float amp = gap * (.5 + uK * 1.3) * (1. + uPulse * .5);
+  vec3 bc = vec3(0);
+  for (int k = 0; k < 9; k++) {             // vários canais, um por faixa da câmera
+    float fk = float(k); if (fk >= K) break;
+    float yc = (fk + .5) * gap, v = yc / uRes.y;
+    vec3 c = camL(vec2(x / uRes.x, v), 1.5);
+    float f0 = yc + (expo(luma(camL(vec2((x - 2.) / uRes.x, v), 1.5)), m) - .5) * amp, f1 = yc + (expo(luma(c), m) - .5) * amp,
+          f2 = yc + (expo(luma(camL(vec2((x + 2.) / uRes.x, v), 1.5)), m) - .5) * amp;
+    float d = max(0., max(min(f0, min(f1, f2)) - y, y - max(f0, max(f1, f2))));
+    if (d < best) { best = d; bc = c; bk = fk; }
+  }
+  float b = beam(best);
+  vec3 ph = uCamCol > .5 ? min(bc * 1.6 + .15, 1.) : pal(.4 + .6 * (bk + .5) / K);
+  o = vec4(ph * b * 1.2 + vec3(b * b * .35) + pal(.6) * grat(gl_FragCoord.xy), 1);
+}` },
+
+{ name: 'Polar Scope', fb: true, fs: `
+void main(){
+  vec2 p = gl_FragCoord.xy - uRes * .5; float r = length(p), a = atan(p.y, p.x), m = meanL();
+  float R = uRes.y * (.2 + .05 * uBass * uK), amp = uRes.y * (.05 + .08 * uK) * (1. + uPulse * .6), da = min(2. / max(r, 1.), .02);
+  #define G(aa) (R + (expo(luma(camL(.5 + vec2(cos((aa) - uT * .3), sin((aa) - uT * .3)) * vec2(uRes.y / uRes.x, 1.) * .3, 3.)), m) - .5) * amp * 2.)
+  float f0 = G(a - da), f1 = G(a), f2 = G(a + da), d = max(0., max(min(f0, min(f1, f2)) - r, r - max(f0, max(f1, f2))));
+  float b = beam(d);
+  vec3 ph = uCamCol > .5 ? min(camL(.5 + vec2(cos(a), sin(a)) * vec2(uRes.y / uRes.x, 1.) * .3, 1.5) * 1.6 + .15, 1.) : pal(.5 + .5 * fract(uT * .05));
+  vec3 prev = texture(uPrev, (vUv - .5) * (.985 - .015 * uPulse * uK) + .5).rgb * (.92 - .04 * uK);   // anéis antigos se expandem
+  o = vec4(max(prev, ph * b * 1.2 + vec3(b * b * .4)), 1);
+}` },
+
+{ name: 'VU Bars', fb: true, fs: `
+void main(){
+  float N = floor(20. + uD * 52.), bw = uRes.x / N, i = floor(gl_FragCoord.x / bw), fx = fract(gl_FragCoord.x / bw), m = meanL();
+  float l = 0.; for (int k = 0; k < 6; k++) l += expo(luma(camL(vec2((i + .5) / N, (float(k) + .5) / 6.), cellLod(bw) + 1.)), m);
+  float h = clamp(l / 6. * (1.3 + uK) * (1. + uPulse * .5 * uK) * (.9 + .25 * uHigh * h21(vec2(i, floor(uT * 12.)))), 0., 1.);   // média da coluna
+  float seg = uRes.y / floor(18. + uD * 28.), y = gl_FragCoord.y;
+  float cell = step(.12, fx) * step(fx, .88) * step(.2, fract(y / seg));          // blocos de LED
+  vec3 col = uCamCol > .5 ? min(camL(vec2((i + .5) / N, y / uRes.y), 2.) * 1.5 + .1, 1.) : pal(.3 + .7 * y / uRes.y);
+  vec3 ghost = texture(uPrev, vUv + vec2(0., 2. / uRes.y)).rgb * .9;            // a sobra cai devagar: marca de pico
+  o = vec4(max(col * step(y, h * uRes.y), ghost) * cell, 1);
 }` },
 ];
 

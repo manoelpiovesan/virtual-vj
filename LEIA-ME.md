@@ -59,7 +59,7 @@ Dá para controlar o Virtual VJ com qualquer controlador MIDI USB (pads, knobs, 
 
 O que dá para mapear:
 - **Knobs e faders**: Intensity, Detail, Strobe, Hue, Sensitivity e, da imagem, Size, Position X/Y e Opacity.
-- **Pads e botões**: cada um dos 37 estilos, ◀ e ▶ da barra de ferramentas (estilo anterior / próximo — ótimo em dois pads), cada paleta, Flash, Blackout, Grid, TAP, Flash on beat, Mirror, Switch every, Animated colors, Panel preview e Show (imagem).
+- **Pads e botões**: cada um dos 42 estilos, ◀ e ▶ da barra de ferramentas (estilo anterior / próximo — ótimo em dois pads), cada paleta, Flash, Blackout, Grid, TAP, Flash on beat, Mirror, Switch every, Animated colors, Panel preview e Show (imagem).
 
 Os mapeamentos ficam salvos e aparecem no painel **MIDI**, com ✕ para remover (**Clear mappings** apaga todos). O monitor mostra o último sinal recebido, o que ajuda a descobrir se o controlador está mandando algo.
 
