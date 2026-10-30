@@ -108,6 +108,25 @@ input[type=range]::-moz-range-thumb{width:10px;height:20px;background:var(--y);b
 .stylenav .nav{font-size:15px;padding:3px 14px;background:var(--c);color:#000}
 .stylenav .nav:hover{background:#8ff8ff}
 .cur-style{width:190px;padding:5px 10px;font-family:var(--px);font-size:11px;color:var(--y);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* slots do loop (setlist) */
+.slotbar{display:flex;flex-direction:column;gap:9px;flex:none}
+.slot-h{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--mut)}
+.slot-h b{color:var(--y);font-family:var(--px);font-weight:400;font-size:11px}
+.slot-h .mini{margin-left:auto}
+.slots{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+.slot{position:relative;aspect-ratio:16/9;min-height:48px;background:var(--well);border:2px solid;border-color:var(--lo) var(--hi) var(--hi) var(--lo);
+  box-shadow:3px 3px 0 #000;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden}
+.slot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.5}
+.slot .ph{font-family:var(--px);font-size:18px;color:var(--mut);opacity:.6}
+.slot .lbl{position:relative;z-index:1;font-family:var(--px);font-size:8px;line-height:1.2;color:#fff;text-shadow:1px 1px 0 #000,0 0 3px #000;
+  padding:2px 5px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.slot .sn{position:absolute;top:2px;left:2px;z-index:2;background:var(--c);color:#000;font-family:var(--px);font-size:8px;line-height:1.3;padding:0 3px;border:1px solid #000}
+.slot .rm{position:absolute;top:2px;right:2px;z-index:2;width:15px;height:15px;display:none;align-items:center;justify-content:center;
+  background:var(--r);color:#000;border:1px solid #000;font-size:10px;font-weight:700}
+.slot.filled:hover .rm{display:flex}
+.slot.active{outline:3px solid var(--p);outline-offset:-3px}
+.slot.over{outline:3px solid var(--y);outline-offset:-3px}
+.card[draggable=true]{cursor:grab}.card:active{cursor:grabbing}
 
 /* propriedades */
 .props{border-left:2px solid var(--lo);overflow:auto;gap:12px}
@@ -258,6 +277,10 @@ body.out:fullscreen,body.out :fullscreen{cursor:none}
       <div class="workspace">
         <div class="pv"><canvas id="pv" width="480" height="270"></canvas><img class="ovl" alt=""><div class="ov flash"></div><div class="ov dark"></div><div class="off">preview off</div><i class="hdl r"></i><i class="hdl b"></i><i class="hdl rb"></i></div>
         <div class="ws-info"><span><kbd>1</kbd>–<kbd>0</kbd>, <kbd>⇧</kbd>+number and <kbd>Alt</kbd>+number pick · <kbd>←</kbd><kbd>→</kbd> step</span></div>
+        <div class="slotbar">
+          <div class="slot-h"><b>Loop slots</b><span>drag styles here — ◀ ▶ and auto-switch cycle only these (empty = all)</span><button id="btnSlotsClear" class="mini" title="Empty all slots">clear</button></div>
+          <div class="slots" id="slots"></div>
+        </div>
       </div>
     </section>
 
@@ -369,7 +392,8 @@ const DEF = { style: 0, intensity: .7, detail: .5, hue: 0, palette: 1, drift: tr
   blackout: false, auto: false, autoSec: 20, cam: '', mic: '', gain: 1.2, bpm: 124, audioMode: 'mic', quality: 1280,
   fpsCap: 60, preview: true, corners: null, calib: false, strobeRate: 0, strobeSync: true,
   ovlOn: true, ovlMode: 'top', ovlBlend: 'normal', ovlScale: .3, ovlX: .5, ovlY: .5, ovlAlpha: 1, ovlPulse: true,
-  source: 'cam', shapeSet: 'mix', shapeCount: 12, shapeSpeed: .4, shapeLine: 3, off: [], exposure: 0, contrast: 1, threshold: .12 };
+  source: 'cam', shapeSet: 'mix', shapeCount: 12, shapeSpeed: .4, shapeLine: 3, off: [], exposure: 0, contrast: 1, threshold: .12,
+  slots: [null, null, null, null, null, null] };   // "setlist": estilos arrastados para o loop (◀ ▶ e troca automática)
 const FLAT = () => [[0, 0], [1, 0], [1, 1], [0, 1]];   // cantos: sup-esq, sup-dir, inf-dir, inf-esq (0..1)
 const state = { ...DEF, corners: FLAT() };
 if (!isOut) { try { Object.assign(state, JSON.parse(localStorage.getItem('visualdj') || '{}'), { blackout: false, calib: false, strobeRate: 0 }); } catch (e) {} }
@@ -622,6 +646,14 @@ float grat(vec2 fc){                                                            
   vec2 g = uRes / vec2(10., 8.), e = abs(fract(fc / g + .5) - .5) * g, c = abs(fc - uRes * .5), s = abs(fract(fc / g * 5. + .5) - .5) * g / 5.;
   return step(min(e.x, e.y), .6) * .1 + min(1., step(c.x, 4.) * step(s.y, .6) + step(c.y, 4.) * step(s.x, .6)) * .14;
 }
+vec2 sobel(vec2 uv, float lod){                                                    // gradiente da imagem (Sobel 3×3)
+  vec2 px = exp2(lod) / vec2(textureSize(uCam, 0));
+  #define SL(x, y) luma(textureLod(uCam, uv + vec2(x, y) * px, lod).rgb)
+  float tl = SL(-1., 1.), t = SL(0., 1.), tr = SL(1., 1.), l = SL(-1., 0.), r = SL(1., 0.), bl = SL(-1., -1.), b = SL(0., -1.), br = SL(1., -1.);
+  #undef SL
+  return vec2(tr + 2. * r + br - tl - 2. * l - bl, tl + 2. * t + tr - bl - 2. * b - br);
+}
+float tri(float x){ return abs(fract(x) * 2. - 1.); }                              // vai e volta sem salto (paleta cíclica)
 `;
 
 const PTS_VS = `#version 300 es
@@ -1203,6 +1235,60 @@ void main(){
   vec3 ghost = texture(uPrev, vUv + vec2(0., 2. / uRes.y)).rgb * .9;            // a sobra cai devagar: marca de pico
   o = vec4(max(col * step(y, h * uRes.y), ghost) * cell, 1);
 }` },
+
+{ name: 'Neon Bloom', fb: true, fs: `
+void main(){
+  float lod = mix(1., 0., uD), gain = (2. + uK * 5.) * (1. + uPulse * .8);
+  vec2 g = sobel(vUv, lod); float e = clamp(length(g) * gain * .6, 0., 1.), glow = 0.;
+  for (int i = 1; i < 4; i++) glow += smoothstep(.2, .9, length(sobel(vUv, lod + float(i) * 1.3)) * gain * .5) / float(i);   // halo largo
+  vec3 tint = uCamCol > .5 ? min(camL(vUv, lod) * 1.6, 1.) : pal(.3 + .7 * tri(atan(g.y, g.x) / 6.2832 + uFlow * .004));   // cor pela direção da borda
+  vec3 col = tint * (e * 1.4 + glow * .45 * (1. + uBass * uK)) + smoothstep(.6, 1., e) * .5;
+  o = vec4(max(texture(uPrev, vUv).rgb * .6 - 1.5 / 255., 0.) + col, 1);
+}` },
+
+{ name: 'Neon Chroma', fb: true, fs: `
+void main(){
+  float lod = mix(1., 0., uD), gain = (2. + uK * 5.) * (1. + uPulse * .8);
+  vec2 sh = vec2(cos(uT * .7), sin(uT * .9)) * (.002 + .014 * uK * (uBass + uPulse));     // separação RGB pulsa com o grave
+  float r = clamp(length(sobel(vUv + sh, lod)) * gain * .6, 0., 1.), gr = clamp(length(sobel(vUv, lod)) * gain * .6, 0., 1.), b = clamp(length(sobel(vUv - sh, lod)) * gain * .6, 0., 1.);
+  vec3 col = uCamCol > .5 ? vec3(r, gr, b) * 1.3 : pal(.95) * r + pal(.65) * gr + pal(.4) * b;
+  o = vec4(max(texture(uPrev, (vUv - .5) * .997 + .5).rgb * .5 - 1.5 / 255., 0.) + col, 1);
+}` },
+
+{ name: 'Neon Zoom', fb: true, fs: `
+void main(){
+  float lod = mix(1., 0., uD), gain = (2. + uK * 5.) * (1. + uPulse * .8);
+  float e = clamp(length(sobel(vUv, lod)) * gain * .6, 0., 1.);
+  float z = 1. - (.006 + .03 * uK * (.3 + uBass + uPulse));                              // o rastro cresce para fora
+  vec3 tint = uCamCol > .5 ? min(camL(vUv, lod) * 1.6, 1.) : pal(.35 + .65 * tri(uFlow * .006));   // cor muda com o tempo: faixas no túnel
+  o = vec4(max(texture(uPrev, (vUv - .5) * z + .5).rgb * (.86 + .08 * uK) - 2. / 255., 0.) + tint * min(1., e * 1.5), 1);
+}` },
+
+{ name: 'Neon Sketch', fs: `
+void main(){
+  float lod = mix(1.5, .3, uD), gain = (2. + uK * 5.) * (1. + uPulse * .8), fr = floor(uT * 8.);
+  vec3 col = vec3(0);
+  for (int i = 0; i < 3; i++) {                                                       // três passadas tremidas de caneta
+    float s = float(i) + fr * 3.;
+    vec2 j = (vec2(h21(vec2(s, 1.3)), h21(vec2(s, 7.1))) - .5) * (.004 + .012 * uK);
+    vec2 w = vec2(sin(vUv.y * 40. + s * 3.), cos(vUv.x * 35. + s * 2.)) * .002;
+    float e = clamp(length(sobel(vUv + j + w, lod)) * gain * .5, 0., 1.);
+    col += (uCamCol > .5 ? min(camL(vUv, lod) * 1.6, 1.) : pal(.35 + .25 * float(i))) * smoothstep(.15, .6, e) * .6;
+  }
+  o = vec4(min(col, 1.), 1);
+}` },
+
+{ name: 'Neon Mirror', fb: true, fs: `
+void main(){
+  vec2 p = (vUv - .5) * vec2(uRes.x / uRes.y, 1.); float r = length(p), a = uT * .05;
+  p = abs(mat2(cos(a), -sin(a), sin(a), cos(a)) * p); if (p.y > p.x) p = p.yx;          // 8 fatias espelhadas
+  vec2 uv = .25 + p * vec2(uRes.y / uRes.x, 1.) * .9;
+  float lod = mix(1., 0., uD), gain = (2. + uK * 5.) * (1. + uPulse * .8);
+  float e = clamp(length(sobel(uv, lod)) * gain * .6, 0., 1.);
+  vec3 tint = uCamCol > .5 ? min(camL(uv, lod) * 1.6, 1.) : pal(.35 + .65 * tri(r * 1.5 - uFlow * .004));
+  float b = .004 * (1. + uPulse * 3. * uK); vec2 q = mat2(cos(b), -sin(b), sin(b), cos(b)) * (vUv - .5) * .995;   // rastro gira e encolhe
+  o = vec4(max(texture(uPrev, q + .5).rgb * .7 - 1.5 / 255., 0.) + tint * min(1., e * 1.5), 1);
+}` },
 ];
 
 /* ---------- engine WebGL2 ---------- */
@@ -1513,7 +1599,7 @@ function initOverlay() {
 }
 
 /* ---------- loop principal ---------- */
-let outEng, pvEng, outWin = null, lastAudioMsg = 0, lastAuto = 0, fpsN = 0, fpsT = 0, thumbsBusy = false, pvTick = 0;
+let outEng, pvEng, outWin = null, lastAudioMsg = 0, lastAuto = 0, fpsN = 0, fpsT = 0, thumbsBusy = false, pvTick = 0, curSlot = -1;
 
 function send(m) { if (outWin && !outWin.closed) { try { outWin.postMessage(m, '*'); } catch (e) {} } }
 const pushState = () => send({ t: 'state', s: state });
@@ -1555,18 +1641,59 @@ function loop(now) {
 
 /* ---------- controles (painel) ---------- */
 function setChip(id, txt, cls) { const e = $('#' + id); if (!e) return; e.textContent = txt; e.className = 'chip ' + cls; }
-function setStyle(i) {
+function setStyle(i, slot = -1) {
+  curSlot = slot;                                            // de qual slot do loop viemos (-1 = fora da setlist)
   state.style = i; lastAuto = performance.now(); if (pvEng) pvEng.setStyle(i);
   document.querySelectorAll('.card').forEach((el, k) => el.classList.toggle('sel', k === i));
+  document.querySelectorAll('.slot').forEach((el, k) => el.classList.toggle('active', k === slot));
   $('#curName').textContent = `${i + 1}. ${EFFECTS[i].name}`;
   commit();
 }
 const styleOn = i => !state.off.includes(EFFECTS[i].name);   // guardado pelo nome: sobrevive a estilos novos
-// próximo/anterior pulando os desligados (se todos estiverem desligados, fica onde está)
+const slotEff = i => { const nm = state.slots[i]; return nm ? EFFECTS.findIndex(e => e.name === nm) : -1; };
+// próximo/anterior: se há slots no loop, percorre só eles (em ordem); senão, todos os estilos pulando os desligados
 function stepStyle(d) {
+  const filled = []; for (let i = 0; i < state.slots.length; i++) if (slotEff(i) >= 0) filled.push(i);
+  if (filled.length) {
+    let p = filled.indexOf(curSlot); if (p < 0) p = d > 0 ? -1 : 0;
+    const slot = filled[((p + d) % filled.length + filled.length) % filled.length];
+    return setStyle(slotEff(slot), slot);
+  }
   const n = EFFECTS.length;
   for (let k = 1; k < n; k++) { const i = ((state.style + d * k) % n + n) % n; if (styleOn(i)) return setStyle(i); }
   lastAuto = performance.now();
+}
+function renderSlots() {
+  const host = $('#slots'); if (!host) return;
+  host.innerHTML = '';
+  state.slots.forEach((nm, i) => {
+    const k = slotEff(i), el = document.createElement('div');
+    el.className = 'slot' + (k >= 0 ? ' filled' : '') + (i === curSlot ? ' active' : '');
+    el.draggable = k >= 0;
+    el.dataset.midi = 'slot' + i; el.dataset.label = 'Loop slot ' + (i + 1);   // mapeável no MIDI Learn (aciona o slot, qualquer estilo que esteja nele)
+    if (k >= 0) {
+      const src = document.querySelectorAll('.card img')[k]?.src || '';
+      el.innerHTML = `<span class="sn">${i + 1}</span>${src ? '<img alt="">' : ''}<span class="lbl">${EFFECTS[k].name}</span><span class="rm" title="Remove">✕</span>`;
+      if (src) el.querySelector('img').src = src;
+    } else el.innerHTML = `<span class="sn">${i + 1}</span><span class="ph">+</span>`;
+    el.ondragover = e => { e.preventDefault(); el.classList.add('over'); };
+    el.ondragleave = () => el.classList.remove('over');
+    el.ondrop = e => {
+      e.preventDefault(); el.classList.remove('over');
+      const d = e.dataTransfer.getData('text/plain'); if (d === '') return;
+      if (d.startsWith('slot:')) { const f = +d.slice(5); const t = state.slots[f]; state.slots[f] = state.slots[i]; state.slots[i] = t; }
+      else state.slots[i] = EFFECTS[+d].name;
+      save(); renderSlots();
+      const nk = slotEff(i); if (nk >= 0) setStyle(nk, i);
+    };
+    el.ondragstart = e => { if (k >= 0) { e.dataTransfer.setData('text/plain', 'slot:' + i); e.dataTransfer.effectAllowed = 'move'; } };
+    el.onclick = e => {
+      if (e.target.classList.contains('rm')) { state.slots[i] = null; if (curSlot === i) curSlot = -1; save(); renderSlots(); return; }
+      if (k >= 0) setStyle(k, i);
+    };
+    host.appendChild(el);
+  });
+  renderMidi();                                              // reaplica o destaque "mapeado" nos slots recriados
 }
 function toggleStyle(i, on = !styleOn(i)) {
   state.off = state.off.filter(x => x !== EFFECTS[i].name); if (!on) state.off.push(EFFECTS[i].name);
@@ -1612,7 +1739,7 @@ async function genThumbs() {
       }
       imgs[i].src = cv.toDataURL('image/jpeg', .75);
     }
-  } finally { te.destroy(); thumbsBusy = false; }
+  } finally { te.destroy(); thumbsBusy = false; renderSlots(); }
 }
 
 async function openOutput() {
@@ -1679,9 +1806,13 @@ function initPanel() {
     const key = i < 10 ? (i + 1) % 10 : i < 20 ? '⇧' + (i - 9) % 10 : i < 30 ? 'Alt' + (i - 19) % 10 : i + 1;
     b.innerHTML = `<span class="num">${key}</span><span class="tg" title="On: included in auto switch and ◀ ▶"></span><img alt=""><span class="nm">${e.name}</span>`;
     b.title = e.name; b.dataset.midi = 'style' + i; b.dataset.label = 'Style: ' + e.name;
+    b.draggable = true;
+    b.ondragstart = ev => { ev.dataTransfer.setData('text/plain', String(i)); ev.dataTransfer.effectAllowed = 'copy'; };
     b.onclick = ev => { if (ev.target.classList.contains('tg')) toggleStyle(i); else setStyle(i); };
     grid.appendChild(b); b.classList.toggle('dis', !styleOn(i));
   });
+  renderSlots();
+  $('#btnSlotsClear').onclick = () => { state.slots = [null, null, null, null, null, null]; curSlot = -1; save(); renderSlots(); };
   $('#btnAllOn').onclick = () => EFFECTS.forEach((_, i) => toggleStyle(i, true));
   $('#btnNext').onclick = () => stepStyle(1);
   $('#btnPrev').onclick = () => stepStyle(-1);
@@ -1883,6 +2014,8 @@ async function init() {
   setChip('chGpu', pvEng ? 'gpu: ' + (g || 'WebGL2 ok') : 'gpu: WebGL2 unavailable', pvEng && !/intel/i.test(g) ? 'ok' : 'bad');
   if (!(state.style < EFFECTS.length)) state.style = 0;
   if (!Array.isArray(state.off)) state.off = [];
+  if (!Array.isArray(state.slots) || state.slots.length !== 6) state.slots = [null, null, null, null, null, null];
+  state.slots = state.slots.map(nm => EFFECTS.some(e => e.name === nm) ? nm : null);   // descarta nomes que não existem mais
   initPanel(); initMidi(); initOverlay(); setStyle(state.style);
   requestAnimationFrame(loop);
   // nada aqui espera pelo outro: uma permissão pendente não pode travar as miniaturas

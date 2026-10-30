@@ -45,6 +45,7 @@ Visuais ao vivo para DJ, gerados a partir da webcam e reagindo ao som. Não prec
 - **Exposure**, **Contrast** e **Threshold**: clareiam a câmera, dão mais contraste e mandam para o preto tudo o que for mais escuro que o limite. Use quando a imagem estiver apagada. Duplo clique volta ao padrão.
 - **Paletas** (caixa de cores), **Hue** e **Animated colors**: as cores. Na paleta **CAM**, os estilos usam as cores reais da imagem.
 - **Flash on beat** e **Switch every…**: deixam o show rodar no automático.
+- **Loop slots** (abaixo da prévia): arraste estilos da lista para os 6 slots. As setas ◀ ▶ e o **Switch every** passam a usar só esses estilos, na ordem dos slots (slots vazios = todos). Clique num slot para selecionar, arraste um slot sobre outro para reordenar, **✕** remove e **clear** esvazia tudo. Cada slot também pode ser mapeado no MIDI Learn — um botão aciona o slot (o estilo que estiver nele).
 - **Strobe** (slider, ótimo num knob MIDI): em 0 não pisca. Girando, pisca cada vez mais rápido. Com **Strobe synced to BPM** marcado, ele segue a música em passos de 1 compasso → 2 tempos → 1 tempo → 1/8 → 1/16 → 1/32 (*1 BAR … 1/32*), travado nas batidas. É perfeito para ir subindo durante um build-up e zerar no drop. Desmarcado, vai de 1,5 a 15 piscadas por segundo, sem seguir a música.
   - No modo *BPM only*, ele usa o BPM do campo (use o TAP). No modo microfone, ele estima o BPM sozinho pelas batidas detectadas.
 - **BPM only (no audio)**: se não houver microfone, as batidas seguem o BPM (use o TAP).
@@ -60,7 +61,7 @@ Dá para controlar o Virtual VJ com qualquer controlador MIDI USB (pads, knobs, 
 
 O que dá para mapear:
 - **Knobs e faders**: Intensity, Detail, Exposure, Contrast, Threshold, Strobe, Hue, Sensitivity e, da imagem, Size, Position X/Y e Opacity.
-- **Pads e botões**: cada um dos 42 estilos, ◀ e ▶ da barra de ferramentas (estilo anterior / próximo — ótimo em dois pads), cada paleta, Flash, Blackout, Grid, TAP, Flash on beat, Mirror, Switch every, Animated colors, Panel preview e Show (imagem).
+- **Pads e botões**: cada um dos 47 estilos, ◀ e ▶ da barra de ferramentas (estilo anterior / próximo — ótimo em dois pads), cada paleta, Flash, Blackout, Grid, TAP, Flash on beat, Mirror, Switch every, Animated colors, Panel preview e Show (imagem).
 
 Os mapeamentos ficam salvos e aparecem no painel **MIDI**, com ✕ para remover (**Clear mappings** apaga todos). O monitor mostra o último sinal recebido, o que ajuda a descobrir se o controlador está mandando algo.
 

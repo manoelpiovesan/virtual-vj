@@ -2,7 +2,7 @@
 
 # Virtual VJ
 
-**Virtual VJ** turns your webcam and the music into live DJ visuals on a projector — 42 GPU styles, BPM-synced strobe, MIDI Learn. No install.
+**Virtual VJ** turns your webcam and the music into live DJ visuals on a projector — 47 GPU styles, BPM-synced strobe, MIDI Learn. No install.
 
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-online-ffd60a?style=for-the-badge&logo=githubpages&logoColor=black)](https://manoelpiovesan.github.io/virtual-vj/)
 [![Pages](https://img.shields.io/github/deployments/manoelpiovesan/virtual-vj/github-pages?style=for-the-badge&label=pages&logo=github)](https://github.com/manoelpiovesan/virtual-vj/actions)
@@ -27,8 +27,9 @@
 
 ## Features
 
-- **42 styles**: ASCII, digital rain, neon edges, glitch, tunnel, VHS, pop art, terminal, hex dump, ANSI, infinite feedback, datamosh, terrain, contour map, hex mosaic, stained glass, oscilloscope, Lissajous…
+- **47 styles**: ASCII, digital rain, neon edges, neon bloom, neon chroma, glitch, tunnel, VHS, pop art, terminal, hex dump, ANSI, infinite feedback, datamosh, terrain, contour map, hex mosaic, stained glass, oscilloscope, Lissajous…
 - **Your own rotation**: switch any style off (✓ on its card) to skip it in auto switch and ◀ ▶
+- **Loop slots**: drag styles into 6 slots below the preview — ◀ ▶ and auto-switch cycle only those, and each slot is MIDI-mappable
 - **Audio-reactive**: mic/line-in beat detection, or manual BPM with tap tempo
 - **Image controls**: exposure, contrast and threshold for dim cameras or dark venues
 - **Strobe knob**: off → 1 bar → 1/32, locked to the beat
