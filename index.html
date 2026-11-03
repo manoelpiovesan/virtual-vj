@@ -138,9 +138,17 @@ legend{font-family:var(--px);font-size:10px;color:#000;background:var(--c);paddi
 .strobe-row{grid-template-columns:88px 1fr 64px}
 .strobe-row output{color:var(--y)}
 .f.sel{grid-template-columns:88px minmax(0,1fr)}
-.vidrow{display:flex;gap:6px;align-items:center;min-width:0}
-.vidrow button{padding:3px 8px}.vidrow button.small{padding:3px 7px}
-.vidname{font-size:11px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.vidlbl{display:block;color:var(--mut);margin-bottom:8px}.vidlbl span{font-size:11px}
+.vslots{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.vslot{position:relative;aspect-ratio:16/9;min-height:40px;background:var(--well);border:2px solid;border-color:var(--lo) var(--hi) var(--hi) var(--lo);
+  box-shadow:3px 3px 0 #000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;overflow:hidden;padding:3px}
+.vslot .vn{position:absolute;top:2px;left:2px;z-index:2;background:var(--c);color:#000;font-family:var(--px);font-size:8px;line-height:1.3;padding:0 3px;border:1px solid #000}
+.vslot .ph{font-family:var(--px);font-size:16px;color:var(--mut);opacity:.6}
+.vslot .vlbl{font-size:9px;line-height:1.15;color:var(--tx);text-align:center;max-width:100%;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;word-break:break-word}
+.vslot .vrm{position:absolute;top:2px;right:2px;z-index:2;width:15px;height:15px;display:none;align-items:center;justify-content:center;background:var(--r);color:#000;border:1px solid #000;font-size:10px;font-weight:700}
+.vslot.filled:hover .vrm{display:flex}
+.vslot.active{outline:3px solid var(--p);outline-offset:-3px}
+.vslot.over{outline:3px solid var(--y);outline-offset:-3px}
 .chk{display:flex;flex-wrap:wrap;gap:6px 14px}
 .chk label{display:flex;align-items:center;gap:6px;cursor:pointer}
 .meters{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;height:40px}
@@ -313,8 +321,8 @@ body.out:fullscreen,body.out :fullscreen{cursor:none}
       <fieldset><legend>Video &amp; performance</legend>
         <div class="f sel"><label for="source">Source</label><select id="source"><option value="cam">Webcam</option><option value="shapes">Abstract shapes</option><option value="video">Video file</option></select></div>
         <div class="f sel src-cam"><label for="cam">Webcam</label><select id="cam"></select></div>
-        <div class="f sel src-video" hidden><label>Video</label>
-          <div class="vidrow"><button id="btnVidLoad">📁 Load…</button><button id="btnVidDel" class="small" title="Remove video">✕</button><span id="vidName" class="vidname">no file</span></div>
+        <div class="src-video" hidden><label class="vidlbl">Videos <span>— clique para carregar e trocar · mapeável no MIDI</span></label>
+          <div class="vslots" id="vslots"></div>
           <input type="file" id="vidFile" accept="video/*" hidden></div>
         <div class="f sel src-shapes" hidden><label for="shapeSet">Shapes</label>
           <select id="shapeSet"><option value="mix">Mix</option><option value="squares">Squares</option><option value="diamonds">Diamonds</option><option value="triangles">Triangles</option><option value="hexagons">Hexagons</option><option value="circles">Circles</option><option value="stars">Stars</option><option value="wire3d">3D wireframes</option></select></div>
@@ -399,7 +407,8 @@ const DEF = { style: 0, intensity: .7, detail: .5, hue: 0, palette: 1, drift: tr
   fpsCap: 60, preview: true, corners: null, calib: false, strobeRate: 0, strobeSync: true,
   ovlOn: true, ovlMode: 'top', ovlBlend: 'normal', ovlScale: .3, ovlX: .5, ovlY: .5, ovlAlpha: 1, ovlPulse: true,
   source: 'cam', shapeSet: 'mix', shapeCount: 12, shapeSpeed: .4, shapeLine: 3, off: [], exposure: 0, contrast: 1, threshold: .12,
-  slots: [null, null, null, null, null, null] };   // "setlist": estilos arrastados para o loop (◀ ▶ e troca automática)
+  slots: [null, null, null, null, null, null],   // "setlist": estilos arrastados para o loop (◀ ▶ e troca automática)
+  vids: [null, null, null, null, null, null], vidSlot: -1 };   // 6 slots de vídeo de fundo (nome por slot; o blob fica no IndexedDB)
 const FLAT = () => [[0, 0], [1, 0], [1, 1], [0, 1]];   // cantos: sup-esq, sup-dir, inf-dir, inf-esq (0..1)
 const state = { ...DEF, corners: FLAT() };
 if (!isOut) { try { Object.assign(state, JSON.parse(localStorage.getItem('visualdj') || '{}'), { blackout: false, calib: false, strobeRate: 0 }); } catch (e) {} }
@@ -1596,27 +1605,77 @@ async function setOverlay(blob, { persist = true } = {}) {
   }
   return true;
 }
-async function setBgVideo(blob, { persist = true } = {}) {
+// toca um blob no fvid e espelha para o projetor (a persistência fica a cargo dos slots)
+async function setBgVideo(blob) {
   if (blob && !/^video\//.test(blob.type)) return false;
   if (fvidUrl) { URL.revokeObjectURL(fvidUrl); fvidUrl = ''; }
   fvidReady = false; bgBlob = blob || null;
   if (blob) { fvidUrl = URL.createObjectURL(blob); fvid.src = fvidUrl; fvid.loop = true; fvid.muted = true; try { await fvid.play(); } catch (e) {} }
   else { fvid.removeAttribute('src'); fvid.load(); }
   if (!isOut) {
-    const nm = $('#vidName'); if (nm) nm.textContent = blob ? (blob.name || 'video') : 'no file';
     send({ t: 'bgvid', blob });
-    if (persist) { try { await idb('readwrite', s => blob ? s.put(blob, 'bgvideo') : s.delete('bgvideo')); } catch (e) {} }
-    if (state.source === 'video') setChip('chCam', blob ? 'source: video file' : 'source: video — import a file', blob ? 'ok' : '');
+    if (state.source === 'video') setChip('chCam', blob ? 'source: video file' : 'source: video — carregue um clipe', blob ? 'ok' : '');
   }
   return !!blob;
 }
-function pickVideo(ok) { if (ok) { $('#source').value = 'video'; state.source = 'video'; commit(); applySource(); } }
+/* ---------- 6 slots de vídeo de fundo ---------- */
+const vidBlobs = [null, null, null, null, null, null];   // blobs em memória (o IndexedDB guarda em disco)
+let vidPick = -1;                                         // slot aguardando o seletor de arquivo
+const vidKey = i => 'vid' + i;
+function selectVid(i) {                                   // troca o fundo para o vídeo do slot i
+  if (!vidBlobs[i]) return;
+  state.vidSlot = i;
+  if (state.source !== 'video') { $('#source').value = 'video'; state.source = 'video'; applySource(); }
+  setBgVideo(vidBlobs[i]); save(); renderVids();
+}
+async function assignVid(i, blob) {                       // coloca um vídeo no slot i e seleciona
+  if (!blob || !/^video\//.test(blob.type)) return;
+  vidBlobs[i] = blob; state.vids[i] = blob.name || 'video ' + (i + 1);
+  try { await idb('readwrite', s => s.put(blob, vidKey(i))); } catch (e) {}
+  save(); renderVids(); selectVid(i);
+}
+async function removeVid(i) {
+  vidBlobs[i] = null; state.vids[i] = null;
+  try { await idb('readwrite', s => s.delete(vidKey(i))); } catch (e) {}
+  if (state.vidSlot === i) { state.vidSlot = -1; setBgVideo(null); }
+  save(); renderVids();
+}
+function addVideo(blob) {                                 // arrastou um vídeo: vai para o próximo slot vazio
+  let i = state.vids.findIndex(v => !v); if (i < 0) i = state.vidSlot >= 0 ? state.vidSlot : 0;
+  assignVid(i, blob);
+}
+function renderVids() {
+  const host = $('#vslots'); if (!host) return;
+  host.innerHTML = '';
+  state.vids.forEach((nm, i) => {
+    const has = !!vidBlobs[i], el = document.createElement('div');
+    el.className = 'vslot' + (has ? ' filled' : '') + (i === state.vidSlot ? ' active' : '');
+    el.dataset.midi = 'vslot' + i; el.dataset.label = 'Video slot ' + (i + 1);   // mapeável no MIDI Learn
+    el.innerHTML = has
+      ? `<span class="vn">${i + 1}</span><span class="vlbl">${nm || 'video'}</span><span class="vrm" title="Remove">✕</span>`
+      : `<span class="vn">${i + 1}</span><span class="ph">+</span>`;
+    el.ondragover = e => { e.preventDefault(); el.classList.add('over'); };
+    el.ondragleave = () => el.classList.remove('over');
+    el.ondrop = e => { e.preventDefault(); el.classList.remove('over'); const f = [...e.dataTransfer.files].find(x => /^video\//.test(x.type)); if (f) assignVid(i, f); };
+    el.onclick = e => {
+      if (e.target.classList.contains('vrm')) { removeVid(i); return; }
+      if (has) selectVid(i); else { vidPick = i; $('#vidFile').click(); }
+    };
+    host.appendChild(el);
+  });
+  renderMidi();                                           // reaplica o destaque "mapeado" nos slots recriados
+}
 function initVideo() {
   const file = $('#vidFile');
-  $('#btnVidLoad').onclick = () => file.click();
-  file.onchange = () => { if (file.files[0]) setBgVideo(file.files[0]).then(pickVideo); file.value = ''; };
-  $('#btnVidDel').onclick = () => setBgVideo(null);
-  idb('readonly', s => s.get('bgvideo')).then(b => b && setBgVideo(b, { persist: false })).catch(() => {});
+  file.onchange = () => { const f = file.files[0]; file.value = ''; if (f && vidPick >= 0) assignVid(vidPick, f); vidPick = -1; };
+  (async () => {                                          // restaura blobs guardados + migra o vídeo único da versão anterior
+    try {
+      for (let i = 0; i < 6; i++) { const b = await idb('readonly', s => s.get(vidKey(i))); if (b) { vidBlobs[i] = b; if (!state.vids[i]) state.vids[i] = b.name || 'video ' + (i + 1); } }
+      if (!vidBlobs[0]) { const old = await idb('readonly', s => s.get('bgvideo')); if (old) { vidBlobs[0] = old; state.vids[0] = old.name || 'video 1'; await idb('readwrite', s => s.put(old, vidKey(0))); await idb('readwrite', s => s.delete('bgvideo')); } }
+    } catch (e) {}
+    save(); renderVids();
+    if (state.source === 'video' && state.vidSlot >= 0 && vidBlobs[state.vidSlot]) setBgVideo(vidBlobs[state.vidSlot]);
+  })();
 }
 function initOverlay() {
   const file = $('#ovlFile');
@@ -1632,7 +1691,7 @@ function initOverlay() {
     const img = files.find(x => /^image\//.test(x.type));
     if (img) setOverlay(img).then(ok => { if (ok && !state.ovlOn) $('#ovlOn').click(); });
     const vid = files.find(x => /^video\//.test(x.type));
-    if (vid) setBgVideo(vid).then(pickVideo);
+    if (vid) addVideo(vid);
   });
   idb('readonly', s => s.get('overlay')).then(b => b && setOverlay(b, { persist: false })).catch(() => {});
 }
@@ -2060,6 +2119,8 @@ async function init() {
   if (!Array.isArray(state.off)) state.off = [];
   if (!Array.isArray(state.slots) || state.slots.length !== 6) state.slots = [null, null, null, null, null, null];
   state.slots = state.slots.map(nm => EFFECTS.some(e => e.name === nm) ? nm : null);   // descarta nomes que não existem mais
+  if (!Array.isArray(state.vids) || state.vids.length !== 6) state.vids = [null, null, null, null, null, null];
+  if (typeof state.vidSlot !== 'number') state.vidSlot = -1;
   initPanel(); initMidi(); initOverlay(); initVideo(); setStyle(state.style);
   requestAnimationFrame(loop);
   // nada aqui espera pelo outro: uma permissão pendente não pode travar as miniaturas

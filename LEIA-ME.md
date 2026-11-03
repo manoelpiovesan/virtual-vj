@@ -86,7 +86,10 @@ Em *Video & performance*, troque **Source** para **Abstract shapes**. Em vez da 
 
 ## Vídeo de fundo
 
-Em *Video & performance*, troque **Source** para **Video file** e clique em **📁 Load…** (ou simplesmente arraste o arquivo de vídeo para a janela — já entra como fundo). O clipe roda em **loop** e passa pelos efeitos no lugar da câmera. O vídeo fica salvo para as próximas vezes, e a janela do projetor recebe o mesmo clipe. **✕** remove. A webcam é desligada enquanto isso.
+Em *Video & performance*, troque **Source** para **Video file**. Aparecem **6 slots de vídeo**: clique num slot vazio (**+**) para carregar um clipe, e clique num slot cheio para trocar o fundo para ele na hora. Também dá para **arrastar** arquivos de vídeo para a janela (vão para o próximo slot livre). O clipe roda em **loop** e passa pelos efeitos no lugar da câmera.
+
+- Cada slot é **mapeável no MIDI Learn** — um pad aciona aquele vídeo (ótimo para trocar de clipe no controlador).
+- Os vídeos ficam salvos para as próximas vezes, e a janela do projetor recebe o clipe ativo. **✕** remove um slot. A webcam é desligada enquanto isso.
 
 ## Imagem / logo por cima
 

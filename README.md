@@ -36,7 +36,7 @@
 - **MIDI Learn**: map any pad, knob or fader
 - **Keystone**: drag 4 corners to fit a tilted projector
 - **Abstract shapes source**: no webcam? Feed the effects with wireframe squares, diamonds, hexagons, stars or 3D cubes
-- **Video background**: import a video file (Source → Video file, or drag it onto the window) and run it, looping, through any style
+- **Video background**: 6 slots to import clips (Source → Video file, or drag files onto the window), switch between them live, looping through any style — each slot is MIDI-mappable
 - **Logo overlay**: drop a PNG on top of the visuals, or mix it into the camera so it gets the effect too
 - **Light**: one HTML file, WebGL2 shaders, ~0.1 ms CPU per frame
 
