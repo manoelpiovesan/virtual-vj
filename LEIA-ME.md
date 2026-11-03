@@ -84,6 +84,10 @@ Em *Video & performance*, troque **Source** para **Abstract shapes**. Em vez da 
 - **Count**, **Speed** e **Line**: quantidade, velocidade e espessura da linha (mapeáveis em knobs MIDI).
 - Metade das formas forma um túnel de contornos saindo do centro, e o resto flutua pela tela. Tudo cresce na batida e acelera com o grave.
 
+## Vídeo de fundo
+
+Em *Video & performance*, troque **Source** para **Video file** e clique em **📁 Load…** (ou simplesmente arraste o arquivo de vídeo para a janela — já entra como fundo). O clipe roda em **loop** e passa pelos efeitos no lugar da câmera. O vídeo fica salvo para as próximas vezes, e a janela do projetor recebe o mesmo clipe. **✕** remove. A webcam é desligada enquanto isso.
+
 ## Imagem / logo por cima
 
 No painel **Image / logo**, clique em **📁 Load…** (ou arraste o arquivo para a janela) e escolha um PNG, JPG, GIF ou WebP. A imagem fica salva para as próximas vezes.

@@ -138,6 +138,9 @@ legend{font-family:var(--px);font-size:10px;color:#000;background:var(--c);paddi
 .strobe-row{grid-template-columns:88px 1fr 64px}
 .strobe-row output{color:var(--y)}
 .f.sel{grid-template-columns:88px minmax(0,1fr)}
+.vidrow{display:flex;gap:6px;align-items:center;min-width:0}
+.vidrow button{padding:3px 8px}.vidrow button.small{padding:3px 7px}
+.vidname{font-size:11px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .chk{display:flex;flex-wrap:wrap;gap:6px 14px}
 .chk label{display:flex;align-items:center;gap:6px;cursor:pointer}
 .meters{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;height:40px}
@@ -308,8 +311,11 @@ body.out:fullscreen,body.out :fullscreen{cursor:none}
         <div class="meters"><div><span>LOW</span><i id="mB"></i></div><div><span>MID</span><i id="mM"></i></div><div><span>HIGH</span><i id="mH"></i></div></div>
       </fieldset>
       <fieldset><legend>Video &amp; performance</legend>
-        <div class="f sel"><label for="source">Source</label><select id="source"><option value="cam">Webcam</option><option value="shapes">Abstract shapes</option></select></div>
+        <div class="f sel"><label for="source">Source</label><select id="source"><option value="cam">Webcam</option><option value="shapes">Abstract shapes</option><option value="video">Video file</option></select></div>
         <div class="f sel src-cam"><label for="cam">Webcam</label><select id="cam"></select></div>
+        <div class="f sel src-video" hidden><label>Video</label>
+          <div class="vidrow"><button id="btnVidLoad">📁 Load…</button><button id="btnVidDel" class="small" title="Remove video">✕</button><span id="vidName" class="vidname">no file</span></div>
+          <input type="file" id="vidFile" accept="video/*" hidden></div>
         <div class="f sel src-shapes" hidden><label for="shapeSet">Shapes</label>
           <select id="shapeSet"><option value="mix">Mix</option><option value="squares">Squares</option><option value="diamonds">Diamonds</option><option value="triangles">Triangles</option><option value="hexagons">Hexagons</option><option value="circles">Circles</option><option value="stars">Stars</option><option value="wire3d">3D wireframes</option></select></div>
         <div class="f src-shapes" hidden><label for="shapeCount">Count</label><input type="range" id="shapeCount" min="2" max="30" step="1" data-midi="shapeCount" data-label="Shape count"><output id="shapeCountV"></output></div>
@@ -483,6 +489,10 @@ function buildLut(t) {
 
 /* ---------- fonte de vídeo (webcam ou demo) ---------- */
 const video = document.createElement('video'); video.muted = true; video.playsInline = true;
+// fonte "Video file": um clipe importado que roda em loop e passa pelos efeitos como a câmera
+const fvid = document.createElement('video'); fvid.muted = true; fvid.loop = true; fvid.playsInline = true;
+let fvidReady = false, fvidUrl = '', bgBlob = null;
+fvid.addEventListener('loadeddata', () => { fvidReady = fvid.videoWidth > 0; });
 const demo = document.createElement('canvas'); demo.width = 640; demo.height = 360;
 const dctx = demo.getContext('2d');
 function drawDemo(t) {
@@ -505,6 +515,10 @@ function hookVfc() {
 }
 function getSource(t) {
   if (state.source === 'shapes') { frameId++; return shp; }   // desenhado no loop por drawShapes()
+  if (state.source === 'video') {                             // clipe importado (ou demo enquanto carrega / sem arquivo)
+    if (fvidReady && fvid.readyState >= 2 && fvid.videoWidth) { frameId++; return fvid; }
+    drawDemo(t); frameId++; return demo;
+  }
   if (camLive && video.readyState >= 2 && video.videoWidth) { if (!vfc) frameId++; return video; }
   drawDemo(t); frameId++; return demo;
 }
@@ -571,7 +585,7 @@ function drawShapes(dt, a) {
   }
 }
 function stopCam() { camToken++; if (camStream) camStream.getTracks().forEach(t => t.stop()); camStream = null; camLive = false; }
-function dims(s) { return s === video ? [video.videoWidth, video.videoHeight] : [s.width, s.height]; }
+function dims(s) { return s === video ? [video.videoWidth, video.videoHeight] : s === fvid ? [fvid.videoWidth, fvid.videoHeight] : [s.width, s.height]; }
 
 let camStream = null, camToken = 0;
 async function startCam(id) {
@@ -1582,6 +1596,28 @@ async function setOverlay(blob, { persist = true } = {}) {
   }
   return true;
 }
+async function setBgVideo(blob, { persist = true } = {}) {
+  if (blob && !/^video\//.test(blob.type)) return false;
+  if (fvidUrl) { URL.revokeObjectURL(fvidUrl); fvidUrl = ''; }
+  fvidReady = false; bgBlob = blob || null;
+  if (blob) { fvidUrl = URL.createObjectURL(blob); fvid.src = fvidUrl; fvid.loop = true; fvid.muted = true; try { await fvid.play(); } catch (e) {} }
+  else { fvid.removeAttribute('src'); fvid.load(); }
+  if (!isOut) {
+    const nm = $('#vidName'); if (nm) nm.textContent = blob ? (blob.name || 'video') : 'no file';
+    send({ t: 'bgvid', blob });
+    if (persist) { try { await idb('readwrite', s => blob ? s.put(blob, 'bgvideo') : s.delete('bgvideo')); } catch (e) {} }
+    if (state.source === 'video') setChip('chCam', blob ? 'source: video file' : 'source: video — import a file', blob ? 'ok' : '');
+  }
+  return !!blob;
+}
+function pickVideo(ok) { if (ok) { $('#source').value = 'video'; state.source = 'video'; commit(); applySource(); } }
+function initVideo() {
+  const file = $('#vidFile');
+  $('#btnVidLoad').onclick = () => file.click();
+  file.onchange = () => { if (file.files[0]) setBgVideo(file.files[0]).then(pickVideo); file.value = ''; };
+  $('#btnVidDel').onclick = () => setBgVideo(null);
+  idb('readonly', s => s.get('bgvideo')).then(b => b && setBgVideo(b, { persist: false })).catch(() => {});
+}
 function initOverlay() {
   const file = $('#ovlFile');
   $('#btnOvlLoad').onclick = () => file.click();
@@ -1592,8 +1628,11 @@ function initOverlay() {
   addEventListener('dragleave', e => { if (!e.relatedTarget) document.body.classList.remove('dropping'); });
   addEventListener('drop', e => {
     e.preventDefault(); document.body.classList.remove('dropping');
-    const f = [...e.dataTransfer.files].find(x => /^image\//.test(x.type));
-    if (f) setOverlay(f).then(ok => { if (ok && !state.ovlOn) $('#ovlOn').click(); });
+    const files = [...e.dataTransfer.files];
+    const img = files.find(x => /^image\//.test(x.type));
+    if (img) setOverlay(img).then(ok => { if (ok && !state.ovlOn) $('#ovlOn').click(); });
+    const vid = files.find(x => /^video\//.test(x.type));
+    if (vid) setBgVideo(vid).then(pickVideo);
   });
   idb('readonly', s => s.get('overlay')).then(b => b && setOverlay(b, { persist: false })).catch(() => {});
 }
@@ -1862,7 +1901,7 @@ function initPanel() {
   addEventListener('click', () => actx && actx.state === 'suspended' && actx.resume());
   addEventListener('message', e => {
     const m = e.data || {};
-    if (m.t === 'hello') { pushState(); if (ovlBlob) send({ t: 'ovlimg', blob: ovlBlob }); setChip('chOut', 'output: connected', 'ok'); }
+    if (m.t === 'hello') { pushState(); if (ovlBlob) send({ t: 'ovlimg', blob: ovlBlob }); if (bgBlob) send({ t: 'bgvid', blob: bgBlob }); setChip('chOut', 'output: connected', 'ok'); }
     else if (m.t === 'fps') setChip('chOut', `output: ${m.fps} fps`, m.fps >= Math.min(24, (+state.fpsCap || 60) * .8) ? 'ok' : 'bad');
     else if (m.t === 'corners') { state.corners = m.c; selCorner = m.sel; drawKz(); save(); }
   });
@@ -1958,10 +1997,13 @@ function initMidi() {
 
 // troca entre webcam e formas abstratas (painel); mostra só os controles da fonte escolhida
 async function applySource() {
-  const shapes = state.source === 'shapes';
-  document.querySelectorAll('.src-cam').forEach(el => el.hidden = shapes);
-  document.querySelectorAll('.src-shapes').forEach(el => el.hidden = !shapes);
-  if (shapes) { stopCam(); setChip('chCam', 'source: abstract shapes', 'ok'); return; }
+  const s = state.source;
+  document.querySelectorAll('.src-cam').forEach(el => el.hidden = s !== 'cam');
+  document.querySelectorAll('.src-shapes').forEach(el => el.hidden = s !== 'shapes');
+  document.querySelectorAll('.src-video').forEach(el => el.hidden = s !== 'video');
+  if (s !== 'video' && fvidUrl) fvid.pause();                 // não decodifica o clipe fora do modo vídeo
+  if (s === 'shapes') { stopCam(); setChip('chCam', 'source: abstract shapes', 'ok'); return; }
+  if (s === 'video') { stopCam(); if (fvidUrl) { try { await fvid.play(); } catch (e) {} } setChip('chCam', bgBlob ? 'source: video file' : 'source: video — import a file', bgBlob ? 'ok' : ''); return; }
   const ok = await startCam(state.cam);
   if (state.source === 'cam') setChip('chCam', ok ? 'camera: active' : 'camera: unavailable (demo mode)', ok ? 'ok' : 'bad');
 }
@@ -1995,11 +2037,13 @@ async function init() {
       const m = e.data || {};
       if (m.t === 'state') {
         Object.assign(state, m.s); outEng.setStyle(state.style); fit();
-        const src = state.source === 'shapes' ? 'shapes' : 'cam:' + state.cam;   // formas abstratas desligam a câmera
-        if (src !== lastCam) { lastCam = src; if (state.source === 'shapes') stopCam(); else startCam(state.cam); }
+        const src = state.source === 'shapes' ? 'shapes' : state.source === 'video' ? 'video' : 'cam:' + state.cam;   // só 'cam' abre a câmera
+        if (src !== lastCam) { lastCam = src; if (state.source === 'cam') startCam(state.cam); else stopCam(); }
+        if (state.source === 'video' && fvidUrl) fvid.play().catch(() => {}); else if (state.source !== 'video' && fvidUrl) fvid.pause();
       } else if (m.t === 'a') { Object.assign(audio, m.a); strobeOn = !!m.s; lastAudioMsg = performance.now(); }
       else if (m.t === 'flash') outEng.kick();
       else if (m.t === 'ovlimg') setOverlay(m.blob || null);
+      else if (m.t === 'bgvid') setBgVideo(m.blob || null, { persist: false });
     });
     const fs = () => document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen().catch(() => {});
     addEventListener('click', fs);
@@ -2016,7 +2060,7 @@ async function init() {
   if (!Array.isArray(state.off)) state.off = [];
   if (!Array.isArray(state.slots) || state.slots.length !== 6) state.slots = [null, null, null, null, null, null];
   state.slots = state.slots.map(nm => EFFECTS.some(e => e.name === nm) ? nm : null);   // descarta nomes que não existem mais
-  initPanel(); initMidi(); initOverlay(); setStyle(state.style);
+  initPanel(); initMidi(); initOverlay(); initVideo(); setStyle(state.style);
   requestAnimationFrame(loop);
   // nada aqui espera pelo outro: uma permissão pendente não pode travar as miniaturas
   const camP = applySource().then(() => listDevices());
