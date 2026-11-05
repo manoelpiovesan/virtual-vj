@@ -33,6 +33,7 @@
 - **Audio-reactive**: mic/line-in beat detection, or manual BPM with tap tempo
 - **Image controls**: exposure, contrast and threshold for dim cameras or dark venues
 - **Strobe knob**: off → 1 bar → 1/32, locked to the beat
+- **No FX / bypass**: a button (or `N`) to drop the effect and show the raw video / webcam
 - **MIDI Learn**: map any pad, knob or fader
 - **Keystone**: drag 4 corners to fit a tilted projector
 - **Abstract shapes source**: no webcam? Feed the effects with wireframe squares, diamonds, hexagons, stars or 3D cubes

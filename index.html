@@ -261,6 +261,7 @@ body.out:fullscreen,body.out :fullscreen{cursor:none}
   <div class="toolbar">
     <button id="btnFlash" data-midi="flash" data-label="Flash">⚡ Flash<kbd>Space</kbd></button>
     <button id="btnBlack" data-midi="blackout" data-label="Blackout">⏻ Blackout<kbd>B</kbd></button>
+    <button id="btnBypass" data-midi="bypass" data-label="No effect (bypass)" title="Show the raw video / webcam with no effect applied">⃠ No FX<kbd>N</kbd></button>
     <button id="btnWarp" class="small" title="Adjust projector keystone">⬚ Keystone</button>
     <span class="sep"></span>
     <div class="stylenav">
@@ -375,6 +376,7 @@ body.out:fullscreen,body.out :fullscreen{cursor:none}
     <kbd>← →</kbd><span>Previous / next style (or ◀ ▶ on the toolbar, MIDI-mappable). Styles switched off with ✓ on their card are skipped</span>
     <kbd>Space</kbd><span>Flash</span>
     <kbd>B</kbd><span>Blackout</span>
+    <kbd>N</kbd><span>No effect (bypass) — raw video / webcam</span>
     <kbd>T</kbd><span>Tap tempo (BPM)</span>
     <kbd>G</kbd><span>Keystone grid (arrow keys nudge the corner)</span>
     <kbd>F</kbd><span>Fullscreen (in the projector window)</span>
@@ -403,7 +405,7 @@ if (isOut) document.body.classList.add('out');
 
 /* ---------- estado ---------- */
 const DEF = { style: 0, intensity: .7, detail: .5, hue: 0, palette: 1, drift: true, mirror: true, strobe: false,
-  blackout: false, auto: false, autoSec: 20, cam: '', mic: '', gain: 1.2, bpm: 124, audioMode: 'mic', quality: 1280,
+  blackout: false, bypass: false, auto: false, autoSec: 20, cam: '', mic: '', gain: 1.2, bpm: 124, audioMode: 'mic', quality: 1280,
   fpsCap: 60, preview: true, corners: null, calib: false, strobeRate: 0, strobeSync: true,
   ovlOn: true, ovlMode: 'top', ovlBlend: 'normal', ovlScale: .3, ovlX: .5, ovlY: .5, ovlAlpha: 1, ovlPulse: true,
   source: 'cam', shapeSet: 'mix', shapeCount: 12, shapeSpeed: .4, shapeLine: 3, off: [], exposure: 0, contrast: 1, threshold: .12,
@@ -645,6 +647,12 @@ const COPY_FS = `#version 300 es
 precision highp float;
 in vec2 vUv; out vec4 o; uniform sampler2D uPrev;
 void main(){ o = texture(uPrev, vUv); }`;
+
+// "sem efeito": mostra a câmera/vídeo já recortada e corrigida (crop, espelho, exposição/contraste), sem nenhum estilo
+const RAW_FS = `#version 300 es
+precision highp float;
+in vec2 vUv; out vec4 o; uniform sampler2D uCam;
+void main(){ o = texture(uCam, vUv); }`;
 
 const HEAD = `#version 300 es
 precision highp float;
@@ -1408,6 +1416,22 @@ function createEngine(canvas, wrap, opt = {}) {
   }
   const bind = (unit, t) => { gl.activeTexture(gl.TEXTURE0 + unit); gl.bindTexture(T2, t); };
 
+  // flash / fade / blackout e imagem "por cima" = camadas HTML (custo zero na GPU); roda com ou sem efeito
+  function drawLayers(dt, aud) {
+    if (ovEl) {
+      const on = state.ovlOn && !!ovlURL && state.ovlMode === 'top';
+      ovEl.style.display = on ? 'block' : 'none';
+      if (on) {
+        const s = 1 + (state.ovlPulse ? aud.pulse * .15 : 0);
+        ovEl.style.left = state.ovlX * 100 + '%'; ovEl.style.top = state.ovlY * 100 + '%'; ovEl.style.width = state.ovlScale * 100 + '%';
+        ovEl.style.transform = `translate(-50%,-50%) scale(${s.toFixed(3)})`; ovEl.style.opacity = state.ovlAlpha; ovEl.style.mixBlendMode = state.ovlBlend;
+      }
+    }
+    if (fl) { fl.style.opacity = strobeOn ? 1 : flash > .01 ? flash : 0; flash *= Math.exp(-dt * 8); }
+    if (dk) dk.style.opacity = state.blackout ? 1 : Math.max(0, fade);
+    fade -= dt * 3;
+  }
+
   return {
     get style() { return style; },
     setStyle,
@@ -1461,6 +1485,12 @@ function createEngine(canvas, wrap, opt = {}) {
       if (sliceN > 0) sliceN--; else slices.fill(0);
       flow += dt * (10 + state.intensity * 14) * (1 + aud.pulse * 1.5 + aud.bass);
 
+      // 3) sem efeito: joga a câmera/vídeo direto na tela
+      if (state.bypass) {
+        const R = prog('raw', RAW_FS); gl.bindFramebuffer(FB, null); gl.viewport(0, 0, W, H);
+        gl.useProgram(R.p); bind(0, camA.t); gl.drawArrays(gl.TRIANGLES, 0, 3);
+        drawLayers(dt, aud); return;
+      }
       // 3) efeito
       const E = EFFECTS[style], P = prog(style, HEAD + E.fs);
       gl.bindFramebuffer(FB, E.fb ? fbB.f : null); gl.viewport(0, 0, W, H);
@@ -1485,19 +1515,7 @@ function createEngine(canvas, wrap, opt = {}) {
         [fbA, fbB] = [fbB, fbA];
       }
 
-      // 4) flash / fade / blackout em camadas HTML (custo zero)
-      if (ovEl) {   // imagem "por cima dos efeitos": camada HTML, custo zero na GPU
-        const on = state.ovlOn && !!ovlURL && state.ovlMode === 'top';
-        ovEl.style.display = on ? 'block' : 'none';
-        if (on) {
-          const s = 1 + (state.ovlPulse ? aud.pulse * .15 : 0);
-          ovEl.style.left = state.ovlX * 100 + '%'; ovEl.style.top = state.ovlY * 100 + '%'; ovEl.style.width = state.ovlScale * 100 + '%';
-          ovEl.style.transform = `translate(-50%,-50%) scale(${s.toFixed(3)})`; ovEl.style.opacity = state.ovlAlpha; ovEl.style.mixBlendMode = state.ovlBlend;
-        }
-      }
-      if (fl) { fl.style.opacity = strobeOn ? 1 : flash > .01 ? flash : 0; flash *= Math.exp(-dt * 8); }
-      if (dk) dk.style.opacity = state.blackout ? 1 : Math.max(0, fade);
-      fade -= dt * 3;
+      drawLayers(dt, aud);
     },
   };
 }
@@ -1920,7 +1938,9 @@ function initPanel() {
 
   const flash = () => { if (pvEng) pvEng.kick(); send({ t: 'flash' }); };
   const black = () => { state.blackout = !state.blackout; $('#btnBlack').classList.toggle('on', state.blackout); commit(); };
-  $('#btnFlash').onclick = flash; $('#btnBlack').onclick = black; $('#btnOut').onclick = openOutput;
+  const bypass = () => { state.bypass = !state.bypass; $('#btnBypass').classList.toggle('on', state.bypass); commit(); };
+  $('#btnFlash').onclick = flash; $('#btnBlack').onclick = black; $('#btnBypass').onclick = bypass; $('#btnOut').onclick = openOutput;
+  $('#btnBypass').classList.toggle('on', state.bypass);
   let taps = [];
   const tap = () => {
     const n = performance.now(); if (taps.length && n - taps[taps.length - 1] > 2000) taps = []; taps.push(n); phase = 1;
@@ -1955,6 +1975,7 @@ function initPanel() {
     else if (k === 'arrowleft') stepStyle(-1);
     else if (k === ' ') { e.preventDefault(); flash(); }
     else if (k === 'b') black();
+    else if (k === 'n') bypass();
     else if (k === 't') tap();
   });
   addEventListener('click', () => actx && actx.state === 'suspended' && actx.resume());
