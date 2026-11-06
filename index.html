@@ -1743,16 +1743,33 @@ function loop(now) {
     fpsN++;
     if (now - fpsT > 1000) { if (window.opener) window.opener.postMessage({ t: 'fps', fps: fpsN }, '*'); fpsN = 0; fpsT = now; }
   } else {
-    updateAudio(dt, now);
-    strobeOn = strobeTick(dt, now);
-    send({ t: 'a', a: audio, s: strobeOn });
+    driveAudio(dt, now);
     if (state.source === 'shapes') drawShapes(dt, audio);
-    if (state.auto && now - lastAuto > state.autoSec * 1000) stepStyle(1);
     // a prévia roda a meia taxa: é só para conferir
     if (pvEng && state.preview && (pvTick++ & 1) === 0) pvEng.render(getSource(t), t, dt * 2);
     $('#mB').style.height = audio.bass * 100 + '%'; $('#mM').style.height = audio.mid * 100 + '%'; $('#mH').style.height = audio.high * 100 + '%';
     if (outWin && outWin.closed) { outWin = null; setChip('chOut', 'output: closed', ''); }
   }
+}
+// áudio + batida + strobo + troca automática: a parte que precisa continuar mesmo com a aba minimizada
+// (um Web Worker chama isto quando a aba está oculta, porque o requestAnimationFrame é congelado pelo navegador)
+function driveAudio(dt, now) {
+  updateAudio(dt, now);
+  strobeOn = strobeTick(dt, now);
+  send({ t: 'a', a: audio, s: strobeOn });
+  if (state.auto && now - lastAuto > state.autoSec * 1000) stepStyle(1);
+}
+let bgLast = performance.now();
+function startBgDriver() {
+  if (isOut) return;
+  let bg;
+  try { bg = new Worker(URL.createObjectURL(new Blob(['setInterval(()=>postMessage(0),16)'], { type: 'text/javascript' }))); } catch (e) { return; }
+  bg.onmessage = () => {
+    const now = performance.now();
+    if (!document.hidden) { bgLast = now; return; }   // visível: o rAF cuida de tudo
+    const dt = Math.min(.1, (now - bgLast) / 1000); bgLast = now;
+    driveAudio(dt, now);
+  };
 }
 
 /* ---------- controles (painel) ---------- */
@@ -2143,7 +2160,7 @@ async function init() {
   if (!Array.isArray(state.vids) || state.vids.length !== 6) state.vids = [null, null, null, null, null, null];
   if (typeof state.vidSlot !== 'number') state.vidSlot = -1;
   initPanel(); initMidi(); initOverlay(); initVideo(); setStyle(state.style);
-  requestAnimationFrame(loop);
+  requestAnimationFrame(loop); startBgDriver();
   // nada aqui espera pelo outro: uma permissão pendente não pode travar as miniaturas
   const camP = applySource().then(() => listDevices());
   startMic().then(listDevices);
