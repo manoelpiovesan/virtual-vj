@@ -1882,6 +1882,7 @@ function fontAtlas() {
   return cv;
 }
 
+const FLASH_S = .08;   // duração do flash (botão e "Flash on beat"): corte seco, 80 ms de branco e apaga
 function createEngine(canvas, wrap, opt = {}) {
   const gl = canvas.getContext('webgl2', { alpha: false, antialias: false, depth: false, stencil: false,
     preserveDrawingBuffer: !!opt.keep, powerPreference: 'high-performance' });
@@ -1946,7 +1947,7 @@ function createEngine(canvas, wrap, opt = {}) {
   const ovlTex = tex(false); let ovlW = 0, ovlH = 0;   // imagem sobreposta (modo "junto da câmera")
   gl.texImage2D(T2, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(4));
 
-  let W = 0, H = 0, camA, camB, fbA, fbB, style = -1, flash = 0, fade = 0, lastBeat = -1, beatT = -99, seed = 0, flow = 0, lastFrame = -1, sliceN = 0;
+  let W = 0, H = 0, camA, camB, fbA, fbB, style = -1, flash = 0, flashT = 0, fade = 0, lastBeat = -1, beatT = -99, seed = 0, flow = 0, lastFrame = -1, sliceN = 0;
   const slices = new Float32Array(24);
   function alloc(w, h) {
     canvas.width = W = w; canvas.height = H = h;
@@ -1989,7 +1990,10 @@ function createEngine(canvas, wrap, opt = {}) {
         ovEl.style.transform = `translate(-50%,-50%) scale(${s.toFixed(3)})`; ovEl.style.opacity = state.ovlAlpha; ovEl.style.mixBlendMode = state.ovlBlend;
       }
     }
-    if (fl) { fl.style.opacity = strobeOn ? 1 : flash > .01 ? flash : 0; flash *= Math.exp(-dt * 8); }
+    if (fl) {   // flash = corte seco: acende na hora e apaga na hora, sem fade (o strobo também é liga/desliga)
+      fl.style.opacity = strobeOn ? 1 : flashT > 0 ? flash : 0;
+      if (flashT > 0) { flashT -= dt; if (flashT <= 0) flash = 0; }   // o quadro em que nasce sempre aparece, mesmo com dt grande
+    }
     if (dk) dk.style.opacity = state.blackout ? 1 : Math.max(0, fade);
     fade -= dt * 3;
   }
@@ -1997,7 +2001,7 @@ function createEngine(canvas, wrap, opt = {}) {
   return {
     get style() { return style; },
     setStyle,
-    kick() { flash = 1; },
+    kick() { flash = 1; flashT = FLASH_S; },
     resize(w, h) { if (W !== w || H !== h) { alloc(w, h); const s = style; style = -1; setStyle(s < 0 ? 0 : s); } },
     destroy() { const e = gl.getExtension('WEBGL_lose_context'); if (e) e.loseContext(); },
     // pré-compila os shaders de um estilo em segundo plano; isReady diz quando dá para usar sem travar
@@ -2029,7 +2033,7 @@ function createEngine(canvas, wrap, opt = {}) {
         const first = lastBeat < 0; lastBeat = aud.beatId;
         if (!first) {
           beatT = t; seed = Math.random() * 100;
-          if (state.strobe) flash = Math.max(flash, .55);
+          if (state.strobe) { flash = Math.max(flash, .55); flashT = FLASH_S; }
           if (Math.random() < .35 + state.intensity * .6) {
             sliceN = 6; const n = 3 + Math.random() * 4 | 0;
             for (let i = 0; i < 6; i++) slices.set(i < n ? [Math.random(), .02 + Math.random() * .1, (Math.random() - .5) * (.05 + state.intensity * .2), 1] : [0, 0, 0, 0], i * 4);
