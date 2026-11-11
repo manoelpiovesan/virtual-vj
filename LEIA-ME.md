@@ -8,7 +8,7 @@ Visuais ao vivo para DJ, gerados a partir da webcam e reagindo ao som. Não prec
 
 1. Conecte o projetor como **tela estendida** (Win + P → *Estender*) e ligue a webcam externa.
 2. Dê dois cliques em **`Iniciar Virtual VJ.bat`**. O painel de controle abre no notebook.
-3. Clique em **▶ Open output** (no canto direito da barra de ferramentas). A janela de saída tenta ir sozinha para a segunda tela. Se não for, arraste-a para o projetor.
+3. Clique no botão **▶ (play)** no canto direito da barra de ferramentas, o "Open output". A janela de saída tenta ir sozinha para a segunda tela. Se não for, arraste-a para o projetor.
 4. **Clique uma vez na janela do projetor** (ou aperte `F`) para deixá-la em tela cheia.
 5. Em *Video & performance*, escolha a webcam externa. Em *Audio*, escolha o microfone ou a entrada de linha (line-in) que capta o som.
 
@@ -18,9 +18,9 @@ Visuais ao vivo para DJ, gerados a partir da webcam e reagindo ao som. Não prec
 - **Centro**: a prévia do que está no projetor, com as 12 cenas logo abaixo. A prévia se ajusta ao espaço que sobra, então a prévia e as cenas aparecem juntas, sem rolagem.
 - **Direita**: os ajustes *Visual*, *MIDI*, *Audio*, *Video & performance* e *Image / logo*. Clique no título de uma seção (ou use Enter/Espaço nele) para **recolher ou expandir**; o que você recolheu fica lembrado.
 - **Embaixo**: a caixa de cores com as paletas, o controle *Hue* e a barra de status (camera, audio, output, gpu, midi).
-- A barra de cima cabe numa linha só. Em janelas mais estreitas ela esconde as teclas dos botões e encurta o "Open output" para "Output".
+- A barra de cima cabe numa linha só e **não troca mais de efeito**: a troca é toda pelas **cenas** (os botões ◀ ▶ ficam ao lado do título *Scenes*, embaixo da prévia). Em janelas mais estreitas ela esconde as teclas dos botões.
 - O botão **⚙** abre as **Settings**, onde você escolhe o **estilo do painel**. São seis estéticas diferentes (não só cores; quem tinha escolhido Glass ou Swiss passa automaticamente para Booth ou Crate): *Retro Paint* (neobrutalista, o original), *Studio* (escuro e plano, de app profissional), *Hardware* (equipamento de rack, com metal, parafusos, leituras LCD âmbar e faders), *Terminal* (console verde, tudo monoespaçado), *Booth* (inspirado no rekordbox: painéis cinza-carvão com barra de título, faders com escala, azul e o laranja de cue) e *Crate* (inspirado no Serato: preto puro, sem bordas, sliders com cursor de playhead, vermelho e ciano). **Todos têm modo escuro e modo claro**: em *Mode* escolha *Dark*, *Light* ou *System* (acompanha o tema do Windows). Por exemplo, o Hardware claro vira um painel de alumínio e o Terminal claro vira tinta verde em papel. A escolha de estilo e de modo fica salva e nunca afeta a imagem do projetor.
-- O botão **?** (ao lado do Open output) mostra os atalhos.
+- O botão **?** (ao lado do play) mostra os atalhos.
 - Ao trocar para a webcam, a tela fica preta até a imagem chegar (o boneco de demonstração só aparece se a câmera não abrir).
 
 ## Atalhos (no painel)
@@ -30,11 +30,11 @@ Visuais ao vivo para DJ, gerados a partir da webcam e reagindo ao som. Não prec
 | `1`–`9`, `0` | Estilos 1 a 10 |
 | `Shift` + `1`–`0` | Estilos 11 a 20 |
 | `Alt` + `1`–`0` | Estilos 21 a 30 |
-| `←` `→` ou ◀ ▶ (barra de ferramentas) | Cena anterior / próxima (se houver cenas salvas); senão, estilo anterior / próximo (pula os estilos desligados no ✓ do card) |
+| `←` `→` ou ◀ ▶ (ao lado das cenas) | Cena anterior / próxima. Sem nenhuma cena salva, passam pelos estilos |
 | `Espaço` | Flash |
 | `B` | Blackout |
 | `N` | Sem efeito (**No FX**) — mostra o vídeo/webcam cru |
-| `R` | **Randomizar**: sorteia um efeito e embaralha o visual dele (igual ao botão do dado ao lado do ▶) |
+| `R` | **Randomizar**: sorteia um efeito e embaralha o visual dele (igual ao botão do dado na barra de cima) |
 | `T` | Tap tempo (BPM) |
 | `G` | Grade de perspectiva (o botão **⬚ Keystone** abre a janela de ajuste) |
 
@@ -50,7 +50,7 @@ Visuais ao vivo para DJ, gerados a partir da webcam e reagindo ao som. Não prec
 - **Exposure**, **Contrast** e **Threshold**: clareiam a câmera, dão mais contraste e mandam para o preto tudo o que for mais escuro que o limite. Use quando a imagem estiver apagada. Duplo clique volta ao padrão.
 - **Paletas** (caixa de cores), **Hue** e **Animated colors**: as cores. Na paleta **CAM**, os estilos usam as cores reais da imagem.
 - **Flash on beat** e **Switch every…**: deixam o show rodar no automático.
-- **Randomizar** (botão do dado ao lado do ▶, ou a tecla `R`): sorteia um efeito entre os que estão ligados (✓) e embaralha o visual dele: Intensity, Detail, Exposure, Contrast, Threshold, paleta, Hue e Animated colors, sempre em faixas que mantêm a imagem visível. Ele **não mexe no fundo** (webcam, formas, vídeo ou texto, com as configurações de cada um), na imagem/logo, no Mirror, no Flash on beat, no Strobe, no BPM nem nas cenas. Se o **No FX** estiver ligado, ele é desligado para o efeito sorteado aparecer. Nunca repete o efeito anterior, e dá para mapear no MIDI Learn.
+- **Randomizar** (botão do dado na barra de cima, ou a tecla `R`): sorteia um efeito e embaralha o visual dele: Intensity, Detail, Exposure, Contrast, Threshold, paleta, Hue e Animated colors, sempre em faixas que mantêm a imagem visível. Ele **não mexe no fundo** (webcam, formas, vídeo ou texto, com as configurações de cada um), na imagem/logo, no Mirror, no Flash on beat, no Strobe, no BPM nem nas cenas. Se o **No FX** estiver ligado, ele é desligado para o efeito sorteado aparecer. Nunca repete o efeito anterior, e dá para mapear no MIDI Learn.
 - **Cenas** (12 slots abaixo da prévia): uma cena é uma "foto" completa do que está na tela. Clique num slot vazio (**+**) para salvar a cena atual e clique numa cena salva para chamá-la de volta.
   - **O que entra na cena**: o tipo de fundo (webcam, formas, vídeo ou texto, com as configurações de cada um; no vídeo, qual slot de vídeo está tocando), o estilo, Intensity, Detail, Exposure, Contrast e Threshold, paleta, Hue, Animated colors, Mirror, Flash on beat, o botão No FX e a imagem/logo (a imagem em si, tamanho, posição, opacidade e modo).
   - **O que não entra**: câmera/microfone/BPM, resolução, calibração do projetor (Keystone), Blackout e o Strobe manual.
@@ -67,13 +67,13 @@ Visuais ao vivo para DJ, gerados a partir da webcam e reagindo ao som. Não prec
 Dá para controlar o Virtual VJ com qualquer controlador MIDI USB (pads, knobs, faders), sem instalar nada.
 
 1. Ligue o controlador **antes** de abrir o Virtual VJ (ou clique em **↻ Rescan** no painel MIDI). Na primeira vez, o navegador pede permissão para usar MIDI: clique em **Permitir**.
-2. Clique em **🎹 MIDI Learn** (na barra de ferramentas). Os controles que podem ser mapeados ganham um contorno amarelo.
+2. Clique em **MIDI Learn** (na barra de ferramentas). Os controles que podem ser mapeados ganham um contorno amarelo.
 3. Clique no controle da tela (ele fica rosa) e então aperte o pad ou gire o knob do controlador. Pronto, está ligado (contorno verde).
 4. Repita para outros controles e aperte `Esc` ou clique de novo em **MIDI Learn** para sair.
 
 O que dá para mapear:
 - **Knobs e faders**: Intensity, Detail, Exposure, Contrast, Threshold, Strobe, Hue, Sensitivity e, da imagem, Size, Position X/Y e Opacity.
-- **Pads e botões**: cada um dos 47 estilos, as 12 cenas e os 6 slots de vídeo, ◀ e ▶ da barra de ferramentas (estilo anterior / próximo — ótimo em dois pads), cada paleta, Flash, Blackout, **No FX** (sem efeito), **Randomizar** (o dado), Grid, TAP, Flash on beat, Mirror, Switch every, Animated colors, Panel preview e Show (imagem).
+- **Pads e botões**: cada um dos 47 estilos, as 12 cenas e os 6 slots de vídeo, ◀ e ▶ ao lado das cenas (cena anterior / próxima — ótimo em dois pads), cada paleta, Flash, Blackout, **No FX** (sem efeito), **Randomizar** (o dado), Grid, TAP, Flash on beat, Mirror, Switch every, Animated colors, Panel preview e Show (imagem).
 
 Os mapeamentos ficam salvos e aparecem no painel **MIDI**, com ✕ para remover (**Clear mappings** apaga todos). O monitor mostra o último sinal recebido, o que ajuda a descobrir se o controlador está mandando algo.
 
@@ -116,7 +116,7 @@ Em *Video & performance*, troque **Source** para **Video file**. Aparecem **6 sl
 
 ## Imagem / logo por cima
 
-No painel **Image / logo**, clique em **📁 Load…** (ou arraste o arquivo para a janela) e escolha um PNG, JPG, GIF ou WebP. A imagem fica salva para as próximas vezes.
+No painel **Image / logo**, clique em **Load…** (ou arraste o arquivo para a janela) e escolha um PNG, JPG, GIF ou WebP. A imagem fica salva para as próximas vezes.
 
 - **On top of effects**: a imagem aparece nítida sobre o visual. Com **Pulse on beat**, ela cresce um pouco em cada batida.
 - **Into the camera (gets the effect)**: a imagem é misturada à câmera *antes* do efeito, então o logo também vira ASCII, glitch, feedback…

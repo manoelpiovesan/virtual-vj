@@ -80,9 +80,8 @@ input[type=range]::-moz-range-thumb{width:10px;height:20px;background:var(--y);b
 .toolbar button{padding:4px 9px}
 .toolbar .learn-btn{padding:4px 8px}
 .sep{width:4px;align-self:stretch;border-left:2px solid var(--lo);border-right:2px solid var(--hi)}
-@media(max-width:1560px){.toolbar button kbd{display:none}.toolbar .stylenav .cur-style{width:150px}.toolbar .stylenav .nav{padding:3px 12px}}                                   /* as teclas continuam no ? (atalhos) */
-@media(max-width:1400px){.toolbar .stylenav .cur-style{width:130px}.toolbar{gap:6px}.toolbar #btnWarp{padding:4px 7px}.toolbar .stylenav .nav{padding:3px 10px}.toolbar .stylenav #btnRand{padding:3px 8px}}
-@media(max-width:1340px){.toolbar .stylenav .cur-style{width:100px}.toolbar .lg{display:none}.toolbar .q{padding:4px 9px}.toolbar{gap:4px}.toolbar .stylenav{gap:4px}.toolbar .stylenav .nav{padding:3px 10px}.toolbar .stylenav #btnRand{padding:3px 8px}}   /* cabe numa linha só, com o ⚙ e o 🎲 */
+.toolbar .ico{display:flex;align-items:center;justify-content:center;padding:4px 11px}      /* botões só com ícone: dado (randomizar) e play (abrir saída) */
+@media(max-width:1400px){.toolbar button kbd{display:none}}                                   /* as teclas continuam no ? (atalhos) */
 @media(max-width:1200px){.toolbar{flex-wrap:wrap}}   /* janelas estreitas: volta a quebrar em mais de uma linha em vez de cortar */
 .toolbar label{display:flex;align-items:center;gap:6px;cursor:pointer;white-space:nowrap}
 .toolbar input[type=number]{width:52px}
@@ -101,12 +100,6 @@ input[type=range]::-moz-range-thumb{width:10px;height:20px;background:var(--y);b
 .card .num{position:absolute;top:3px;left:3px;background:var(--y);color:#000;border:2px solid #000;font-family:var(--px);font-size:9px;padding:0 3px;line-height:1.3}
 .card.sel{background:var(--p);color:#000}
 .card.sel img{filter:none}
-/* estilo desligado: fora da troca automática e das setas ◀ ▶ */
-.card .tg{position:absolute;top:3px;right:3px;width:17px;height:17px;display:flex;align-items:center;justify-content:center;
-  background:var(--g);color:#000;border:2px solid #000;font-size:10px;line-height:1;cursor:pointer}
-.card .tg::before{content:'✓'}
-.card.dis .tg{background:var(--face);color:var(--mut)}.card.dis .tg::before{content:'✕'}
-.card.dis img{opacity:.3;filter:grayscale(1)}.card.dis .nm{color:var(--mut);text-decoration:line-through}
 .pane-row{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
 .pane-row .mini{font-family:var(--px);font-size:9px;padding:2px 6px;box-shadow:2px 2px 0 #000}
 
@@ -121,17 +114,13 @@ input[type=range]::-moz-range-thumb{width:10px;height:20px;background:var(--y);b
 .pv.paused .off{display:flex}
 .pv .hdl{position:absolute;width:8px;height:8px;background:var(--c);border:1px solid #000}
 .pv .hdl.r{right:-12px;top:50%}.pv .hdl.b{bottom:-12px;left:50%}.pv .hdl.rb{right:-12px;bottom:-12px}
-.stylenav{display:flex;align-items:center;gap:8px}
-.stylenav .nav{font-size:15px;padding:3px 14px;background:var(--c);color:#000}
-.stylenav #btnRand{padding:3px 9px;display:flex;align-items:center}
-.stylenav .nav:hover{background:#8ff8ff}
-.cur-style{width:190px;padding:5px 10px;font-family:var(--px);font-size:11px;color:var(--y);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 /* slots do loop (setlist) */
 .slotbar{display:flex;flex-direction:column;gap:6px;flex:none}
 .slot-h{display:flex;align-items:center;gap:10px;font-size:11px;color:var(--mut);white-space:nowrap;overflow:hidden}
-.slot-h span{overflow:hidden;text-overflow:ellipsis;min-width:0}
+.slot-h .hint{overflow:hidden;text-overflow:ellipsis;min-width:0}
+.slot-h .scn-nav{margin-left:auto;display:flex;gap:4px;flex:none}
 .slot-h b{color:var(--y);font-family:var(--px);font-weight:400;font-size:11px}
-.slot-h .mini{margin-left:auto}
+.slot-h .mini{flex:none}
 .slots{display:grid;grid-template-columns:repeat(6,1fr);gap:7px 8px}
 .slot{position:relative;height:clamp(38px,6.5vh,58px);background:var(--well);border:2px solid;border-color:var(--lo) var(--hi) var(--hi) var(--lo);
   box-shadow:3px 3px 0 #000;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden}
@@ -324,15 +313,10 @@ html[data-flat] .card img{border-bottom:1px solid var(--bd);border-radius:calc(v
 html[data-flat] .card .nm{font-family:var(--ui);font-size:11px;font-weight:600;padding:4px 7px 5px}
 html[data-flat] .card.sel{background:var(--p);border-color:var(--p);color:var(--on)}
 html[data-flat] :is(.card .num,.slot .sn,.vslot .vn){background:rgba(0,0,0,.62);color:#fff;border:0;border-radius:4px;font-family:var(--ui);font-weight:600;font-size:10px;padding:1px 5px}
-html[data-flat] .card .tg{border:0;border-radius:50%;width:18px;height:18px}
-html[data-flat] .card.dis .tg{background:rgba(0,0,0,.55);color:#fff}
 /* prévia, cenas e vídeos */
 html[data-flat] .workspace{background:var(--ws);border-radius:calc(var(--rad) + 3px)}
 html[data-flat] .pv{outline:1px solid var(--bd);box-shadow:var(--pv-sh,0 10px 36px #0009)}
 html[data-flat] .pv .hdl{display:none}
-html[data-flat] .cur-style{font-family:var(--ui);font-weight:600;font-size:12px;letter-spacing:.02em;background:var(--well);color:var(--y)}
-html[data-flat] .stylenav .nav{background:var(--face2);color:var(--tx);font-size:14px}
-html[data-flat] .stylenav .nav:hover{background:var(--bd)}
 html[data-flat] :is(.slot,.vslot){background:var(--well);overflow:hidden}
 html[data-flat] :is(.slot,.vslot) .ph{font-family:var(--ui);font-weight:300}
 html[data-flat] .slot .lbl{font-family:var(--ui);font-size:9px}
@@ -366,7 +350,6 @@ html[data-flat] .title .ic{width:14px;height:14px;border:0;border-radius:5px}
 /* --- RETRO: só as paletas; a estrutura é a base neobrutalista (sem data-flat) --- */
 html[data-theme=retro][data-mode=light]{--desk:#7a7f8c;--face:#c3c3c9;--face2:#d3d3d9;--hi:#ffffff;--lo:#4a4a55;--well:#f5f5f7;--ws:#b4b4c0;--tx:#15151a;--mut:#4a4a55;--y:#ffd60a;--p:#ff4fd8;--c:#3cf2ff;--g:#2f9e2f;--r:#e23b3b}
 html[data-theme=retro][data-mode=light] :is(.strobe-row output,.slot-h b){color:#6e4b00}
-html[data-theme=retro][data-mode=light] .cur-style{background:#17171e}
 html[data-theme=retro][data-mode=light] .midi-mon{background:#17171e;color:#a6ff3b}
 html[data-theme=retro][data-mode=light] .meters div{background:#17171e}
 
@@ -401,8 +384,6 @@ html[data-flat][data-theme=booth] .card.sel{background:var(--face2);border-color
 html[data-flat][data-theme=booth] .card.sel .nm{background:var(--p);color:#fff}
 html[data-flat][data-theme=booth] :is(.slot,.vslot){background:var(--bk-lcd);border:1px solid var(--bd);border-radius:2px}
 html[data-flat][data-theme=booth] :is(.slot,.vslot).active{outline:2px solid var(--y);outline-offset:-2px}
-html[data-flat][data-theme=booth] .cur-style{background:var(--bk-lcd);border:1px solid var(--bd);color:var(--tx);font-weight:600;letter-spacing:.03em;border-radius:2px;box-shadow:inset 0 1px 3px rgba(0,0,0,.4)}
-html[data-flat][data-theme=booth] .stylenav .nav{background:linear-gradient(var(--bk-btn1),var(--bk-btn2));color:var(--tx)}
 html[data-flat][data-theme=booth] .workspace{background:var(--ws);border:1px solid var(--bd);border-radius:2px}
 html[data-flat][data-theme=booth] .colorbar{background:linear-gradient(var(--bk-hd1),var(--bk-hd2));border-top:1px solid var(--bd)}
 html[data-flat][data-theme=booth] .status{background:var(--bk-lcd);border-top:1px solid var(--bd)}
@@ -428,11 +409,10 @@ html[data-flat][data-theme=hardware] legend{background:#1c1e22;color:#d3d8df;bor
 html[data-flat][data-theme=hardware] .props legend:hover{background:#2a2d33;color:#fff}
 html[data-flat][data-theme=hardware] :is(select,input[type=number],input[type=text],input[type=color]){background-color:#121418;border:1px solid #07080a;border-radius:3px;box-shadow:inset 0 2px 5px #000b,0 1px 0 var(--hw-hl2);color:#ffc766;font-family:Consolas,ui-monospace,monospace;font-size:12px}
 html[data-flat][data-theme=hardware] select option{background:#1d2024;color:#ffc766}
-html[data-flat][data-theme=hardware] .workspace .slot-h span{color:#9aa1ab}
+html[data-flat][data-theme=hardware] .workspace .slot-h .hint{color:#9aa1ab}
 html[data-flat][data-theme=hardware] .workspace .slot-h b{color:#d3d8df}
-html[data-flat][data-theme=hardware] :is(.f output,.cur-style,.midi-mon){font-family:Consolas,ui-monospace,monospace;color:#ffb02e;background:#101215;border-radius:3px;box-shadow:inset 0 1px 4px #000,0 1px 0 var(--hw-hl2);text-shadow:0 0 7px #ffb02e99}
+html[data-flat][data-theme=hardware] :is(.f output,.midi-mon){font-family:Consolas,ui-monospace,monospace;color:#ffb02e;background:#101215;border-radius:3px;box-shadow:inset 0 1px 4px #000,0 1px 0 var(--hw-hl2);text-shadow:0 0 7px #ffb02e99}
 html[data-flat][data-theme=hardware] .f output{padding:1px 4px;font-size:11px}
-html[data-flat][data-theme=hardware] .cur-style{border:1px solid #07080a;letter-spacing:.06em;text-transform:uppercase}
 html[data-flat][data-theme=hardware] input[type=range]::-webkit-slider-runnable-track{height:6px;background:#0a0b0d;border:1px solid #000;border-radius:3px;box-shadow:inset 0 1px 3px #000,0 1px 0 var(--hw-hl2)}
 html[data-flat][data-theme=hardware] input[type=range]::-webkit-slider-thumb{width:13px;height:26px;margin-top:-11px;border-radius:2px;border:1px solid #0a0b0d;box-shadow:0 3px 5px #0009,inset 0 1px 0 #ffffff55;background:linear-gradient(90deg,transparent calc(50% - 1px),var(--hw-on2) calc(50% - 1px) calc(50% + 1px),transparent 0),linear-gradient(var(--hw-cap1),var(--hw-cap2) 55%,var(--hw-cap3))}
 html[data-flat][data-theme=hardware] input[type=checkbox]{width:14px;height:14px;border-radius:2px;background:#121418;border:1px solid #000;box-shadow:inset 0 1px 3px #000}
@@ -489,9 +469,6 @@ html[data-flat][data-theme=terminal] .card.sel{background:var(--tx);color:var(--
 html[data-flat][data-theme=terminal] :is(.card .num,.slot .sn,.vslot .vn){background:#000;color:#38ff7e;border:1px solid var(--bd);border-radius:0;font-weight:400}
 html[data-flat][data-theme=terminal] .workspace{background:var(--well);border:1px solid var(--bd)}
 html[data-flat][data-theme=terminal] .pv{outline:1px solid var(--tx);box-shadow:0 0 20px var(--tm-pvsh)}
-html[data-flat][data-theme=terminal] .cur-style{background:transparent;border:1px solid var(--bd);color:var(--tx);text-transform:uppercase;letter-spacing:.04em;font-weight:400;font-size:11.5px}
-html[data-flat][data-theme=terminal] .stylenav .nav{background:transparent;color:var(--tx)}
-html[data-flat][data-theme=terminal] .stylenav .nav:hover{background:var(--tx);color:var(--on)}
 html[data-flat][data-theme=terminal] :is(.slot,.vslot){background:transparent;border:1px solid var(--bd)}
 html[data-flat][data-theme=terminal] :is(.slot,.vslot):not(.filled){border-style:dashed}
 html[data-flat][data-theme=terminal] :is(.slot,.vslot).active{outline:1px solid var(--tx);outline-offset:1px;box-shadow:0 0 12px var(--tm-glow)}
@@ -536,9 +513,6 @@ html[data-flat][data-theme=crate] .card.sel{background:var(--face);border-color:
 html[data-flat][data-theme=crate] .card.sel .nm{color:var(--p)}
 html[data-flat][data-theme=crate] :is(.slot,.vslot){background:var(--well);border:1px solid var(--cr-hair);border-radius:0}
 html[data-flat][data-theme=crate] :is(.slot,.vslot).active{outline:2px solid var(--p);outline-offset:-2px;box-shadow:0 0 14px var(--cr-glow)}
-html[data-flat][data-theme=crate] .cur-style{background:var(--well);border:0;border-bottom:2px solid var(--cr-cyan);color:var(--cr-cyan);font-weight:700;letter-spacing:.05em;text-transform:uppercase}
-html[data-flat][data-theme=crate] .stylenav .nav{background:var(--face2);color:var(--tx)}
-html[data-flat][data-theme=crate] .stylenav .nav:hover{background:var(--cr-hov)}
 html[data-flat][data-theme=crate] .workspace{background:var(--ws);border:1px solid var(--cr-hair);border-radius:0}
 html[data-flat][data-theme=crate] .pv{outline:1px solid var(--cr-hair);box-shadow:none}
 html[data-flat][data-theme=crate] .slot-h b{color:var(--p)}
@@ -622,31 +596,26 @@ body.out:fullscreen,body.out :fullscreen{cursor:none}
 
 <div id="app"><div class="window">
   <div class="toolbar">
-    <button id="btnFlash" data-midi="flash" data-label="Flash">⚡ Flash<kbd>Space</kbd></button>
-    <button id="btnBlack" data-midi="blackout" data-label="Blackout">⏻ Blackout<kbd>B</kbd></button>
-    <button id="btnBypass" data-midi="bypass" data-label="No effect (bypass)" title="Show the raw video / webcam with no effect applied">⃠ No FX<kbd>N</kbd></button>
-    <button id="btnWarp" class="small" title="Adjust projector keystone">⬚ Keystone</button>
+    <button id="btnFlash" data-midi="flash" data-label="Flash">Flash<kbd>Space</kbd></button>
+    <button id="btnBlack" data-midi="blackout" data-label="Blackout">Blackout<kbd>B</kbd></button>
+    <button id="btnBypass" data-midi="bypass" data-label="No effect (bypass)" title="Show the raw video / webcam with no effect applied">No FX<kbd>N</kbd></button>
+    <button id="btnWarp" class="small" title="Adjust projector keystone">Keystone</button>
     <span class="sep"></span>
-    <div class="stylenav">
-      <button id="btnPrev" class="nav" data-midi="prev" data-label="Previous style" title="Previous style (←)">◀</button>
-      <span class="well cur-style" id="curName">-</span>
-      <button id="btnNext" class="nav" data-midi="next" data-label="Next style" title="Next style (→)">▶</button>
-      <button id="btnRand" class="nav" data-midi="randomize" data-label="Randomize look" title="Randomize: picks an effect and shuffles its look (R). Keeps the background, logo and the rest"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><rect x="1.5" y="1.5" width="13" height="13" rx="2.6" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="5.3" cy="5.3" r="1.25" fill="currentColor"/><circle cx="10.7" cy="5.3" r="1.25" fill="currentColor"/><circle cx="8" cy="8" r="1.25" fill="currentColor"/><circle cx="5.3" cy="10.7" r="1.25" fill="currentColor"/><circle cx="10.7" cy="10.7" r="1.25" fill="currentColor"/></svg></button>
-    </div>
+    <button id="btnRand" class="ico" data-midi="randomize" data-label="Randomize look" aria-label="Randomize" title="Randomize: picks an effect and shuffles its look (R). Keeps the background, logo and the rest"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><rect x="1.5" y="1.5" width="13" height="13" rx="2.6" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="5.3" cy="5.3" r="1.25" fill="currentColor"/><circle cx="10.7" cy="5.3" r="1.25" fill="currentColor"/><circle cx="8" cy="8" r="1.25" fill="currentColor"/><circle cx="5.3" cy="10.7" r="1.25" fill="currentColor"/><circle cx="10.7" cy="10.7" r="1.25" fill="currentColor"/></svg></button>
     <span class="sep"></span>
     <label><input type="checkbox" id="strobe" data-midi="strobe" data-label="Flash on beat"> Flash on beat</label>
     <label><input type="checkbox" id="mirror" data-midi="mirror" data-label="Mirror"> Mirror</label>
     <span class="sep"></span>
     <label><input type="checkbox" id="auto" data-midi="auto" data-label="Auto switch"> Switch every</label><input type="number" id="autoSec" min="3" max="300"> s
-    <button id="btnLearn" class="learn-btn" title="Toggle MIDI Learn">🎹 MIDI Learn</button>
+    <button id="btnLearn" class="learn-btn" title="Toggle MIDI Learn">MIDI Learn</button>
     <button id="btnSettings" class="q" title="Settings">⚙</button>
     <button id="btnHelp" class="q" title="Shortcuts">?</button>
-    <button id="btnOut" class="primary">▶ <span class="lg">Open </span>output</button>
+    <button id="btnOut" class="primary ico" aria-label="Open output" title="Open the output window on the projector"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M4 2.2v11.6L13.6 8z" fill="currentColor"/></svg></button>
   </div>
 
   <div class="body">
     <section class="pane toolbox">
-      <div class="pane-row"><div class="pane-h">Styles</div><button id="btnAllOn" class="mini" title="Turn every style back on">all on</button></div>
+      <div class="pane-h">Styles</div>
       <div id="grid"></div>
     </section>
 
@@ -654,7 +623,7 @@ body.out:fullscreen,body.out :fullscreen{cursor:none}
       <div class="workspace">
         <div class="pvwrap"><div class="pv" title="Keys: 1–0, Shift+1–0 and Alt+1–0 pick a style · ← → step (full list under ?)"><canvas id="pv" width="480" height="270"></canvas><img class="ovl" alt=""><div class="ov flash"></div><div class="ov dark"></div><div class="off">preview off</div><i class="hdl r"></i><i class="hdl b"></i><i class="hdl rb"></i></div></div>
         <div class="slotbar">
-          <div class="slot-h" title="Click an empty slot to save everything on screen · click a scene to recall it · ↻ overwrites · ✕ deletes · drag to reorder · ◀ ▶ and auto-switch cycle the saved scenes"><b>Scenes</b><span>+ saves the screen · click recalls · ◀ ▶ cycle</span><button id="btnScenesClear" class="mini" title="Delete all scenes">clear</button></div>
+          <div class="slot-h" title="Click an empty slot to save everything on screen · click a scene to recall it · ↻ overwrites · ✕ deletes · drag to reorder · ◀ ▶ and auto-switch cycle the saved scenes"><b>Scenes</b><span class="hint">+ saves the screen · click recalls</span><span class="scn-nav"><button id="btnPrev" class="mini" data-midi="prev" data-label="Previous scene" aria-label="Previous scene" title="Previous scene (←)">◀</button><button id="btnNext" class="mini" data-midi="next" data-label="Next scene" aria-label="Next scene" title="Next scene (→)">▶</button></span><button id="btnScenesClear" class="mini" title="Delete all scenes">clear</button></div>
           <div class="slots" id="scenes"></div>
         </div>
       </div>
@@ -671,10 +640,10 @@ body.out:fullscreen,body.out :fullscreen{cursor:none}
         <div class="chk"><label><input type="checkbox" id="strobeSync" data-midi="strobeSync" data-label="Strobe synced to BPM"> Strobe synced to BPM</label></div>
       </fieldset>
       <fieldset><legend>MIDI</legend>
-        <div class="hint2">Turn on <b>🎹 MIDI Learn</b>, click a control on screen (it turns pink) and move a button, pad or knob on your controller. <kbd>Esc</kbd> exits Learn.</div>
+        <div class="hint2">Turn on <b>MIDI Learn</b>, click a control on screen (it turns pink) and move a button, pad or knob on your controller. <kbd>Esc</kbd> exits Learn.</div>
         <div class="well midi-mon" id="midiMon">no signal yet</div>
         <div id="midiList"></div>
-        <div class="btns"><button id="btnMidiClear">Clear mappings</button><button id="btnMidiScan">↻ Rescan</button></div>
+        <div class="btns"><button id="btnMidiClear">Clear mappings</button><button id="btnMidiScan">Rescan</button></div>
       </fieldset>
       <fieldset><legend>Audio</legend>
         <div class="f sel"><label for="audioMode">Source</label><select id="audioMode"><option value="mic">Microphone / Line-in</option><option value="bpm">BPM only (no audio)</option></select></div>
@@ -711,7 +680,7 @@ body.out:fullscreen,body.out :fullscreen{cursor:none}
       <fieldset><legend>Image / logo</legend>
         <div class="ovl-row">
           <div class="well ovl-thumb"><img id="ovlThumb" alt=""><span id="ovlNone">no image</span></div>
-          <div class="ovl-btns"><button id="btnOvlLoad">📁 Load…</button><button id="btnOvlDel">✕ Remove</button></div>
+          <div class="ovl-btns"><button id="btnOvlLoad">Load…</button><button id="btnOvlDel">Remove</button></div>
           <input type="file" id="ovlFile" accept="image/*" hidden>
         </div>
         <div class="chk">
@@ -745,7 +714,7 @@ body.out:fullscreen,body.out :fullscreen{cursor:none}
     <kbd>1 … 0</kbd><span>Styles 1 to 10</span>
     <kbd>⇧ + 1 … 0</kbd><span>Styles 11 to 20</span>
     <kbd>Alt + 1 … 0</kbd><span>Styles 21 to 30</span>
-    <kbd>← →</kbd><span>Previous / next saved scene (or ◀ ▶ on the toolbar, MIDI-mappable). With no scenes saved, they step styles, skipping those switched off with ✓ on their card</span>
+    <kbd>← →</kbd><span>Previous / next saved scene (or ◀ ▶ next to the Scenes, MIDI-mappable). With no scenes saved, they step through the styles</span>
     <kbd>Space</kbd><span>Flash</span>
     <kbd>B</kbd><span>Blackout</span>
     <kbd>N</kbd><span>No effect (bypass) — raw video / webcam</span>
@@ -773,7 +742,7 @@ body.out:fullscreen,body.out :fullscreen{cursor:none}
   <div class="title"><span class="ic"></span><span class="name">Projector keystone</span><button id="warpX">✕</button></div>
   <div class="warp-in">
     <div class="kz" id="kz"><svg viewBox="0 0 100 100" preserveAspectRatio="none"><polygon id="kzPoly" fill="#ffd60a22" stroke="#ffd60a" stroke-width="2" vector-effect="non-scaling-stroke"/></svg></div>
-    <div class="btns"><button id="btnCalib" data-midi="grid" data-label="Grid">▦ Grid on projector<kbd>G</kbd></button><button id="btnWarpReset">↺ Reset corners</button></div>
+    <div class="btns"><button id="btnCalib" data-midi="grid" data-label="Grid">Grid on projector<kbd>G</kbd></button><button id="btnWarpReset">Reset corners</button></div>
     <div class="hint2">The grid shows on the projector while this window is open. Drag the corners (here or right on the projector) until the grid fits the wall. Click a corner and use the arrow keys to fine-tune (Shift = bigger steps).</div>
   </div>
   <div class="ft"><button id="warpOk" class="primary">Done</button></div>
@@ -793,7 +762,7 @@ const DEF = { style: 0, intensity: .7, detail: .5, hue: 0, palette: 1, drift: tr
   blackout: false, bypass: false, auto: false, autoSec: 20, cam: '', mic: '', gain: 1.2, bpm: 124, audioMode: 'mic', quality: 1280,
   fpsCap: 60, preview: true, corners: null, calib: false, strobeRate: 0, strobeSync: true,
   ovlOn: true, ovlMode: 'top', ovlBlend: 'normal', ovlScale: .3, ovlX: .5, ovlY: .5, ovlAlpha: 1, ovlPulse: true,
-  source: 'cam', shapeSet: 'mix', shapeCount: 12, shapeSpeed: .4, shapeLine: 3, off: [], exposure: 0, contrast: 1, threshold: .12,
+  source: 'cam', shapeSet: 'mix', shapeCount: 12, shapeSpeed: .4, shapeLine: 3, exposure: 0, contrast: 1, threshold: .12,
   text: 'VIRTUAL VJ', textMotion: 'auto', textFont: 'impact', textSize: .6, textSpeed: .5, textColor: '#ffffff', textLine: false,
   scenes: Array(12).fill(null),   // 12 cenas completas (instantâneo de tudo que está na tela); ◀ ▶ e a troca automática percorrem as salvas
   vids: [null, null, null, null, null, null], vidSlot: -1 };   // 6 slots de vídeo de fundo (nome por slot; o blob fica no IndexedDB)
@@ -2369,11 +2338,10 @@ function setChip(id, txt, cls) { const e = $('#' + id); if (!e) return; e.textCo
 function setStyle(i) {
   state.style = i; lastAuto = performance.now(); if (pvEng) pvEng.setStyle(i);
   document.querySelectorAll('.card').forEach((el, k) => el.classList.toggle('sel', k === i));
-  $('#curName').textContent = `${i + 1}. ${EFFECTS[i].name}`;
   commit();
 }
-const styleOn = i => !state.off.includes(EFFECTS[i].name);   // guardado pelo nome: sobrevive a estilos novos
-// próximo/anterior: se há cenas salvas, percorre só elas (em ordem); senão, todos os estilos pulando os desligados
+// próxima/anterior (◀ ▶ ao lado das cenas, setas do teclado, troca automática): percorre as cenas salvas, em ordem.
+// Sem nenhuma cena salva, percorre os estilos, para o app e a troca automática continuarem fazendo algo.
 function stepStyle(d) {
   const filled = []; for (let i = 0; i < state.scenes.length; i++) if (state.scenes[i]) filled.push(i);
   if (filled.length) {
@@ -2381,8 +2349,7 @@ function stepStyle(d) {
     return recallScene(filled[((p + d) % filled.length + filled.length) % filled.length]);
   }
   const n = EFFECTS.length;
-  for (let k = 1; k < n; k++) { const i = ((state.style + d * k) % n + n) % n; if (styleOn(i)) return setStyle(i); }
-  lastAuto = performance.now();
+  setStyle(((state.style + d) % n + n) % n);
 }
 
 /* ---------- cenas: 12 instantâneos completos do que está na tela ---------- */
@@ -2462,10 +2429,6 @@ function renderScenes() {
     host.appendChild(el);
   });
   renderMidi();                                                // reaplica o destaque "mapeado" nos slots recriados
-}
-function toggleStyle(i, on = !styleOn(i)) {
-  state.off = state.off.filter(x => x !== EFFECTS[i].name); if (!on) state.off.push(EFFECTS[i].name);
-  document.querySelectorAll('.card')[i].classList.toggle('dis', !on); save();
 }
 function fillSelect(sel, items, cur, firstLabel) {
   sel.innerHTML = ''; const add = (v, l) => { const o = document.createElement('option'); o.value = v; o.textContent = l; sel.appendChild(o); };
@@ -2643,14 +2606,13 @@ function initPanel() {
   EFFECTS.forEach((e, i) => {
     const b = document.createElement('button'); b.className = 'card';
     const key = i < 10 ? (i + 1) % 10 : i < 20 ? '⇧' + (i - 9) % 10 : i < 30 ? 'Alt' + (i - 19) % 10 : i + 1;
-    b.innerHTML = `<span class="num">${key}</span><span class="tg" title="On: included in auto switch and ◀ ▶"></span><img alt=""><span class="nm">${e.name}</span>`;
+    b.innerHTML = `<span class="num">${key}</span><img alt=""><span class="nm">${e.name}</span>`;
     b.title = e.name; b.dataset.midi = 'style' + i; b.dataset.label = 'Style: ' + e.name;
-    b.onclick = ev => { if (ev.target.classList.contains('tg')) toggleStyle(i); else setStyle(i); };
-    grid.appendChild(b); b.classList.toggle('dis', !styleOn(i));
+    b.onclick = () => setStyle(i);
+    grid.appendChild(b);
   });
   renderScenes();
   $('#btnScenesClear').onclick = () => { if (state.scenes.some(Boolean) && confirm('Delete all saved scenes?')) clearScenes(); };
-  $('#btnAllOn').onclick = () => EFFECTS.forEach((_, i) => toggleStyle(i, true));
   $('#btnNext').onclick = () => stepStyle(1);
   $('#btnPrev').onclick = () => stepStyle(-1);
   const help = $('#help');
@@ -2664,8 +2626,8 @@ function initPanel() {
   // configurações de cada um), logo, espelho, flash/strobo, BPM/áudio e cenas. Desliga o No FX, senão o efeito sorteado nem apareceria.
   const randomize = () => {
     const rnd = (a, b) => a + Math.random() * (b - a), r1 = v => Math.round(v * 10) / 10, r2 = v => Math.round(v * 100) / 100;
-    const all = EFFECTS.map((_, i) => i).filter(styleOn), pool = all.filter(i => i !== state.style), list = pool.length ? pool : EFFECTS.map((_, i) => i);
-    const style = list[Math.floor(Math.random() * list.length)];
+    const pool = EFFECTS.map((_, i) => i).filter(i => i !== state.style);   // qualquer efeito, menos o atual
+    const style = pool[Math.floor(Math.random() * pool.length)];
     // faixas "boas": evita imagem apagada (exposição baixa demais, threshold alto) ou estourada
     Object.assign(state, { intensity: r2(rnd(.3, 1)), detail: r2(rnd(.15, 1)), exposure: r1(rnd(-1, 1)), contrast: r2(rnd(.8, 2.2)), threshold: r2(rnd(0, .3)),
       palette: Math.floor(Math.random() * PALS.length), hue: Math.round(rnd(0, 360)), drift: Math.random() < .5, bypass: false });
@@ -2874,7 +2836,7 @@ async function init() {
   const g = gpuName();
   setChip('chGpu', pvEng ? 'gpu: ' + (g || 'WebGL2 ok') : 'gpu: WebGL2 unavailable', pvEng && !/intel/i.test(g) ? 'ok' : 'bad');
   if (!(state.style < EFFECTS.length)) state.style = 0;
-  if (!Array.isArray(state.off)) state.off = [];
+  delete state.off;                                            // lista de estilos desligados (opção removida)
   delete state.slots;                                                                     // loop de estilos da versão anterior: substituído pelas cenas
   if (!Array.isArray(state.scenes)) state.scenes = [];
   state.scenes = Array.from({ length: 12 }, (_, i) => { const s = state.scenes[i]; return s && s.id && EFFECTS[s.style] ? s : null; });

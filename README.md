@@ -28,8 +28,7 @@
 ## Features
 
 - **47 styles**: ASCII, digital rain, neon edges, neon bloom, neon chroma, glitch, tunnel, VHS, pop art, terminal, hex dump, ANSI, infinite feedback, datamosh, terrain, contour map, hex mosaic, stained glass, oscilloscope, Lissajous…
-- **Your own rotation**: switch any style off (✓ on its card) to skip it in auto switch and ◀ ▶
-- **12 scenes**: save everything on screen (background source, style, image controls, colors, text / shapes / video settings, logo) into a slot below the preview and recall it with one click or a MIDI pad. ◀ ▶ and auto-switch cycle the saved scenes
+- **12 scenes**: save everything on screen (background source, style, image controls, colors, text / shapes / video settings, logo) into a slot below the preview and recall it with one click or a MIDI pad. ◀ ▶ (next to the Scenes), the arrow keys and auto-switch all cycle the saved scenes
 - **Audio-reactive**: mic/line-in beat detection, or manual BPM with tap tempo
 - **Image controls**: exposure, contrast and threshold for dim cameras or dark venues
 - **Strobe knob**: off → 1 bar → 1/32, locked to the beat
@@ -51,7 +50,7 @@
 
 1. Extend your desktop to the projector (`Win + P`).
 2. Open the [live demo](https://manoelpiovesan.github.io/virtual-vj/), or double-click `Iniciar Virtual VJ.bat` to run offline (Chrome/Edge).
-3. Click **▶ Open output**, move the window to the projector and press `F` for fullscreen.
+3. Click the **▶ play button** (top right, "Open output"), move the window to the projector and press `F` for fullscreen.
 
 | Key | Action |
 |---|---|
