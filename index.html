@@ -4,6 +4,9 @@
 <meta charset="utf-8">
 <title>Virtual VJ</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<script>/* tema do painel escolhido em ⚙ Settings: aplicado antes da primeira pintura (a janela do projetor #out não usa) */
+try { var t = localStorage.getItem('virtualvj_theme'), al = { midnight: 'studio', stage: 'hardware', light: 'swiss' }; t = al[t] || t;
+  if (/^(studio|glass|hardware|terminal|swiss)$/.test(t) && location.hash !== '#out') { document.documentElement.dataset.theme = t; document.documentElement.setAttribute('data-flat', ''); } } catch (e) {}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
 <style>
@@ -67,8 +70,14 @@ input[type=range]::-moz-range-thumb{width:10px;height:20px;background:var(--y);b
 .title button{padding:2px 9px;box-shadow:2px 2px 0 #000}
 .title .q{font-family:var(--px);padding:2px 7px}
 
-.toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px 12px;padding:9px 10px 11px;border-bottom:2px solid var(--lo);box-shadow:0 2px 0 var(--hi)}
+.toolbar{display:flex;flex-wrap:nowrap;align-items:center;gap:8px;padding:7px 10px 9px;border-bottom:2px solid var(--lo);box-shadow:0 2px 0 var(--hi)}
+.toolbar>*{flex:none}
+.toolbar button{padding:4px 9px}
+.toolbar .learn-btn{padding:4px 8px}
 .sep{width:4px;align-self:stretch;border-left:2px solid var(--lo);border-right:2px solid var(--hi)}
+@media(max-width:1560px){.toolbar button kbd{display:none}}                                   /* as teclas continuam no ? (atalhos) */
+@media(max-width:1400px){.toolbar .stylenav .cur-style{width:130px}.toolbar{gap:6px}.toolbar #btnWarp{padding:4px 7px}}
+@media(max-width:1340px){.toolbar .stylenav .cur-style{width:110px}.toolbar .lg{display:none}.toolbar .q{padding:4px 9px}}   /* cabe numa linha só, com o ⚙ */
 .toolbar label{display:flex;align-items:center;gap:6px;cursor:pointer;white-space:nowrap}
 .toolbar input[type=number]{width:52px}
 .toolbar .q{font-family:var(--px);padding:5px 11px}
@@ -79,7 +88,7 @@ input[type=range]::-moz-range-thumb{width:10px;height:20px;background:var(--y);b
 
 /* caixa de ferramentas = galeria */
 .toolbox{border-right:2px solid var(--lo)}
-#grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;overflow:auto;padding:2px 8px 10px 2px;min-height:0}
+#grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;overflow:auto;overflow-x:hidden;padding:2px 8px 10px 2px;min-height:0}   /* minmax(0,…): o nome comprido não alarga a coluna nem cria rolagem lateral */
 .card{padding:0;display:block;position:relative;text-align:left;box-shadow:3px 3px 0 #000}
 .card img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;background:#000;border-bottom:2px solid #000}
 .card .nm{display:block;padding:3px 5px 4px;font-family:var(--px);font-size:9px;font-weight:400;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -97,26 +106,27 @@ input[type=range]::-moz-range-thumb{width:10px;height:20px;background:var(--y);b
 
 /* área de trabalho = prévia */
 .workspace{background:var(--ws);background-image:radial-gradient(#ffffff10 1px,transparent 1px);background-size:12px 12px;
-  border:2px solid;border-color:var(--lo) var(--hi) var(--hi) var(--lo);margin:10px 0;overflow:auto;padding:18px 26px 26px 18px;display:flex;flex-direction:column;gap:18px}
-.pv{position:relative;width:100%;aspect-ratio:16/9;background:#000;outline:3px solid #000;box-shadow:9px 9px 0 #000;flex:none}
+  border:2px solid;border-color:var(--lo) var(--hi) var(--hi) var(--lo);margin:10px 0;overflow:auto;padding:14px 20px 14px 14px;display:flex;flex-direction:column;gap:10px;flex:1;min-height:0}
+/* a prévia ocupa o espaço que sobra (largura E altura): os slots de cenas ficam sempre visíveis, sem rolagem */
+.pvwrap{flex:1 1 0;min-height:110px;container-type:size;display:flex;align-items:center;justify-content:center}
+.pv{position:relative;width:100%;width:min(calc(100cqw - 14px), calc((100cqh - 14px) * 16 / 9));aspect-ratio:16/9;background:#000;outline:3px solid #000;box-shadow:9px 9px 0 #000;flex:none}
 .pv canvas{width:100%;height:100%;display:block}
 .pv .off{position:absolute;inset:0;display:none;align-items:center;justify-content:center;color:var(--mut);font-family:var(--px)}
 .pv.paused .off{display:flex}
 .pv .hdl{position:absolute;width:8px;height:8px;background:var(--c);border:1px solid #000}
 .pv .hdl.r{right:-12px;top:50%}.pv .hdl.b{bottom:-12px;left:50%}.pv .hdl.rb{right:-12px;bottom:-12px}
-.ws-info{display:flex;flex-wrap:wrap;gap:8px 18px;color:var(--mut);font-size:12px}
-.ws-info b{color:var(--tx);font-family:var(--px);font-weight:400;font-size:11px}
 .stylenav{display:flex;align-items:center;gap:8px}
 .stylenav .nav{font-size:15px;padding:3px 14px;background:var(--c);color:#000}
 .stylenav .nav:hover{background:#8ff8ff}
 .cur-style{width:190px;padding:5px 10px;font-family:var(--px);font-size:11px;color:var(--y);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 /* slots do loop (setlist) */
-.slotbar{display:flex;flex-direction:column;gap:9px;flex:none}
-.slot-h{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--mut)}
+.slotbar{display:flex;flex-direction:column;gap:6px;flex:none}
+.slot-h{display:flex;align-items:center;gap:10px;font-size:11px;color:var(--mut);white-space:nowrap;overflow:hidden}
+.slot-h span{overflow:hidden;text-overflow:ellipsis;min-width:0}
 .slot-h b{color:var(--y);font-family:var(--px);font-weight:400;font-size:11px}
 .slot-h .mini{margin-left:auto}
-.slots{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
-.slot{position:relative;aspect-ratio:16/9;min-height:48px;background:var(--well);border:2px solid;border-color:var(--lo) var(--hi) var(--hi) var(--lo);
+.slots{display:grid;grid-template-columns:repeat(6,1fr);gap:7px 8px}
+.slot{position:relative;height:clamp(38px,6.5vh,58px);background:var(--well);border:2px solid;border-color:var(--lo) var(--hi) var(--hi) var(--lo);
   box-shadow:3px 3px 0 #000;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden}
 .slot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.85}
 .slot .ph{font-family:var(--px);font-size:18px;color:var(--mut);opacity:.6}
@@ -139,6 +149,14 @@ input[type=range]::-moz-range-thumb{width:10px;height:20px;background:var(--y);b
 .props{border-left:2px solid var(--lo);overflow:auto;gap:12px}
 fieldset{margin:0;border:2px solid;border-color:var(--lo) var(--hi) var(--hi) var(--lo);padding:12px 10px 10px;display:flex;flex-direction:column;gap:8px;flex:none}
 legend{font-family:var(--px);font-size:10px;color:#000;background:var(--c);padding:1px 6px;border:2px solid #000;box-shadow:2px 2px 0 #000}
+/* seções da coluna direita: clique no título para recolher/expandir (diminui a altura da lista) */
+.props legend{cursor:pointer;user-select:none}
+.props legend::before{content:'▾ '}
+.props legend:hover{background:#8ff8ff}
+.props legend:focus-visible{outline:2px dashed var(--y);outline-offset:2px}
+.props fieldset.collapsed>:not(legend){display:none !important}
+.props fieldset.collapsed{padding:4px 10px 6px}
+.props fieldset.collapsed legend::before{content:'▸ '}
 .f{display:grid;grid-template-columns:88px 1fr 34px;align-items:center;gap:8px}
 .f label{color:var(--mut)}
 .f output{text-align:right;font-family:var(--px);font-size:10px}
@@ -234,7 +252,9 @@ body.dropping .window{outline-color:var(--y);outline-style:dashed}
   .window{overflow:auto}
   .body{flex:none;grid-template-columns:210px minmax(0,1fr)}
   #grid{max-height:62vh}
-  .workspace{overflow:visible}
+  .workspace{overflow:visible;flex:none}
+  .pvwrap{container-type:normal;display:block;flex:none;min-height:0}   /* layout empilhado: a página rola, a prévia volta a seguir a largura */
+  .pv{width:100%}
   .props{grid-column:1/-1;border-left:0;border-top:2px solid var(--lo);display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));align-items:start}
 }
 @media(max-width:760px){
@@ -245,6 +265,282 @@ body.dropping .window{outline-color:var(--y);outline-style:dashed}
   .workspace{padding:12px 18px 18px 12px}
   .status{flex-wrap:wrap}.chip{flex-basis:45%}
 }
+
+/* ===== temas (⚙ Settings → Appearance) =====
+   O padrão é o Retro Paint (acima). Os outros usam a mesma estrutura "flat" (html[data-flat]): bordas finas, cantos suaves, sem sombra dura,
+   fonte do sistema. Cada tema só troca as cores. Só vale para o painel: a janela do projetor não é afetada. */
+:root{--on:#000;--rad:0px}
+html[data-theme=studio]{--desk:#0f1115;--face:#1a1d23;--face2:#242933;--bd:#2d3440;--well:#12151a;--ws:#161920;--tx:#e6e8ec;--mut:#8b93a3;--y:#6aa8ff;--p:#3b82f6;--c:#9ccaff;--g:#34d399;--r:#f87171;--on:#fff;--rad:6px}
+html[data-flat]{--hi:var(--bd);--lo:var(--bd);--ui:Inter,"Segoe UI",system-ui,-apple-system,Roboto,"Helvetica Neue",Arial,sans-serif;--px:var(--ui)}
+html[data-flat],html[data-flat] body{font:13px/1.4 var(--ui)}
+html[data-flat] ::selection{background:var(--p);color:var(--on)}
+html[data-flat] ::-webkit-scrollbar{width:11px;height:11px}
+html[data-flat] ::-webkit-scrollbar-track,html[data-flat] ::-webkit-scrollbar-corner{background:transparent}
+html[data-flat] ::-webkit-scrollbar-thumb{background:var(--bd);border:3px solid transparent;background-clip:padding-box;border-radius:8px;outline:0}
+html[data-flat] ::-webkit-scrollbar-thumb:hover{background:var(--mut);background-clip:padding-box}
+html[data-flat] ::-webkit-scrollbar-button:single-button{display:none}
+/* caixas: borda fina, canto suave, sem relevo nem sombra */
+html[data-flat] :is(button,select,input[type=number],input[type=text],input[type=color],input[type=checkbox],.well,.chip,.kz,.meters div,.slot,.vslot,fieldset,.workspace,.card){border:1px solid var(--bd);border-radius:var(--rad);box-shadow:none}
+html[data-flat] :is(button,select,input[type=number],input[type=text],input[type=color],input[type=checkbox]){outline:0}
+html[data-flat] :focus-visible{outline:2px solid var(--p) !important;outline-offset:1px}
+html[data-flat] button{background:var(--face2);font-weight:600}
+html[data-flat] button:hover{background:var(--bd)}
+html[data-flat] button:active{transform:none;background:var(--bd)}
+html[data-flat] button.on{background:var(--p);border-color:var(--p);color:var(--on);transform:none}
+html[data-flat] button.primary{background:var(--p);border-color:var(--p);color:var(--on);font-family:var(--ui)}
+html[data-flat] button.primary:hover{filter:brightness(1.12);background:var(--p)}
+html[data-flat] .learn-btn.on{color:var(--on)}
+html[data-flat] kbd{font-family:ui-monospace,Consolas,monospace;font-size:10px;background:var(--well);color:var(--mut);border:1px solid var(--bd);border-radius:3px;padding:0 4px}
+html[data-flat] :is(select,input[type=number],input[type=text],input[type=color]){background-color:var(--well);padding:4px 8px}
+html[data-flat] input[type=color]{padding:2px}
+html[data-flat] select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%238b93a3' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 9px center;background-size:10px;padding-right:28px}
+html[data-flat] select option{background:var(--face);color:var(--tx)}
+html[data-flat] input[type=checkbox]{width:16px;height:16px;border-radius:4px;background:var(--well)}
+html[data-flat] input[type=checkbox]:checked{background:var(--p) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 11'%3E%3Cpath d='M2 5.6l2.6 2.6L9 2.6' fill='none' stroke='%23fff' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/11px no-repeat;border-color:var(--p)}
+html[data-flat] input[type=range]::-webkit-slider-runnable-track{height:4px;background:var(--bd);border:0;border-radius:4px}
+html[data-flat] input[type=range]::-webkit-slider-thumb{width:14px;height:14px;margin-top:-5px;background:var(--p);border:2px solid var(--face);border-radius:50%;box-shadow:0 0 0 1px var(--p)}
+/* barra, painéis e títulos */
+html[data-flat] .toolbar{border-bottom:1px solid var(--bd);box-shadow:none}
+html[data-flat] .sep{width:1px;border:0;background:var(--bd)}
+html[data-flat] .toolbox{border-right-width:1px}
+html[data-flat] .props{border-left-width:1px}
+html[data-flat] .pane-h,html[data-flat] .slot-h b{background:none;color:var(--mut);border:0;box-shadow:none;padding:0;font-family:var(--ui);font-size:10.5px;font-weight:600;letter-spacing:.09em;text-transform:uppercase}
+html[data-flat] .pane-h{margin-bottom:10px}
+html[data-flat] legend{background:none;border:0;box-shadow:none;color:var(--mut);font-family:var(--ui);font-weight:600;font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;padding:0 6px}
+html[data-flat] .props legend:hover{background:none;color:var(--tx)}
+html[data-flat] fieldset{padding:14px 12px 12px;border-radius:calc(var(--rad) + 3px);background:transparent}
+html[data-flat] .f output{font-family:var(--ui);font-variant-numeric:tabular-nums;color:var(--tx);font-size:11px}
+html[data-flat] .strobe-row output{color:var(--y)}
+/* galeria */
+html[data-flat] .card{background:var(--face2)}   /* sem overflow:hidden: ele deixaria os itens do grid encolherem */
+html[data-flat] .card img{border-bottom:1px solid var(--bd);border-radius:calc(var(--rad) - 1px) calc(var(--rad) - 1px) 0 0}
+html[data-flat] .card .nm{font-family:var(--ui);font-size:11px;font-weight:600;padding:4px 7px 5px}
+html[data-flat] .card.sel{background:var(--p);border-color:var(--p);color:var(--on)}
+html[data-flat] :is(.card .num,.slot .sn,.vslot .vn){background:rgba(0,0,0,.62);color:#fff;border:0;border-radius:4px;font-family:var(--ui);font-weight:600;font-size:10px;padding:1px 5px}
+html[data-flat] .card .tg{border:0;border-radius:50%;width:18px;height:18px}
+html[data-flat] .card.dis .tg{background:rgba(0,0,0,.55);color:#fff}
+/* prévia, cenas e vídeos */
+html[data-flat] .workspace{background:var(--ws);border-radius:calc(var(--rad) + 3px)}
+html[data-flat] .pv{outline:1px solid var(--bd);box-shadow:0 10px 36px #0009}
+html[data-flat] .pv .hdl{display:none}
+html[data-flat] .cur-style{font-family:var(--ui);font-weight:600;font-size:12px;letter-spacing:.02em;background:var(--well);color:var(--y)}
+html[data-flat] .stylenav .nav{background:var(--face2);color:var(--tx);font-size:14px}
+html[data-flat] .stylenav .nav:hover{background:var(--bd)}
+html[data-flat] :is(.slot,.vslot){background:var(--well);overflow:hidden}
+html[data-flat] :is(.slot,.vslot) .ph{font-family:var(--ui);font-weight:300}
+html[data-flat] .slot .lbl{font-family:var(--ui);font-size:9px}
+html[data-flat] :is(.slot .rm,.slot .upd,.vslot .vrm){border:0;border-radius:4px}
+html[data-flat] .slot .upd{background:var(--p);color:var(--on)}
+html[data-flat] :is(.slot,.vslot).active{outline:2px solid var(--p);outline-offset:-2px}
+html[data-flat] :is(.slot,.vslot).over{outline:2px dashed var(--y);outline-offset:-2px}
+/* cores e status */
+html[data-flat] .colorbar{border-top:1px solid var(--bd)}
+html[data-flat] .cur i{border:1px solid var(--bd);border-radius:5px;box-shadow:none}
+html[data-flat] .sw{font-family:var(--ui);font-weight:600;border-radius:5px}
+html[data-flat] .sw.on{outline:2px solid var(--tx);outline-offset:1px}
+html[data-flat] .status{border-top:1px solid var(--bd)}
+html[data-flat] .chip{background:transparent;border-color:transparent;border-radius:4px;font-size:11.5px}
+html[data-flat] .chip::before{border:0;border-radius:50%}
+html[data-flat] .meters span{font-family:var(--ui);font-weight:600;color:var(--mut)}
+html[data-flat] .midi-mon{font-family:ui-monospace,Consolas,monospace;font-size:11px}
+html[data-flat] #midiList .row code{font-family:ui-monospace,Consolas,monospace;background:var(--well);color:var(--y);border:1px solid var(--bd);border-radius:3px;padding:0 5px}
+html[data-flat] .hd{border:2px solid var(--on);border-radius:50%;box-shadow:none}
+/* janelas (ajuda, keystone, settings) */
+html[data-flat] dialog{border:1px solid var(--bd);outline:0;border-radius:12px;overflow:hidden;box-shadow:0 24px 70px #000b}
+html[data-flat] dialog::backdrop{background:#000a;backdrop-filter:blur(3px)}
+html[data-flat] .title{background:var(--face2);color:var(--tx);font-family:var(--ui);font-weight:600;font-size:13px;border-bottom:1px solid var(--bd);padding:8px 10px}
+html[data-flat] .title .name{text-shadow:none}
+html[data-flat] .title .ic{width:14px;height:14px;border:0;border-radius:5px}
+/* ===== estilos: cada um muda forma, material, tipografia e controles (não só as cores) =====
+   Studio = a base flat acima. Os outros reescrevem a estrutura por cima dela. */
+
+/* --- GLASS: painéis de vidro fosco flutuando sobre um fundo em degradê --- */
+html[data-theme=glass]{--desk:#0a0c1c;--face:rgba(255,255,255,.07);--face2:rgba(255,255,255,.14);--bd:rgba(255,255,255,.17);--well:rgba(6,8,26,.55);--ws:rgba(255,255,255,.04);--tx:#f1f3ff;--mut:#a9b0d8;--y:#c4b5ff;--p:#7c6af7;--c:#a5e8ff;--g:#4ade80;--r:#ff7a8a;--on:#fff;--rad:12px;--ui:"Segoe UI Variable Display","Segoe UI",system-ui,sans-serif}
+html[data-theme=glass] body{background:radial-gradient(900px 620px at 10% -8%,#5b3fd166,transparent 60%),radial-gradient(820px 560px at 104% 106%,#0891b266,transparent 55%),radial-gradient(520px 380px at 72% 6%,#db277744,transparent 60%),#0a0c1c;background-attachment:fixed}
+html[data-flat][data-theme=glass] .window{background:transparent}
+html[data-flat][data-theme=glass] :is(.toolbar,.colorbar,.status,.toolbox,.workspace,fieldset){background:var(--face);-webkit-backdrop-filter:blur(22px) saturate(1.5);backdrop-filter:blur(22px) saturate(1.5)}
+html[data-flat][data-theme=glass] :is(.workspace,fieldset,.toolbox){border-radius:18px;border:1px solid var(--bd);box-shadow:0 12px 36px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.14)}
+html[data-flat][data-theme=glass] .toolbox{margin:8px 0 8px 8px}
+html[data-flat][data-theme=glass] .toolbar{border-bottom:1px solid var(--bd);box-shadow:0 8px 24px rgba(0,0,0,.25)}
+html[data-flat][data-theme=glass] button{background:linear-gradient(180deg,rgba(255,255,255,.18),rgba(255,255,255,.07));border:1px solid rgba(255,255,255,.22);border-radius:10px;box-shadow:inset 0 1px 0 rgba(255,255,255,.2),0 2px 6px rgba(0,0,0,.2);color:var(--tx);font-weight:500}
+html[data-flat][data-theme=glass] button:hover{background:linear-gradient(180deg,rgba(255,255,255,.27),rgba(255,255,255,.11))}
+html[data-flat][data-theme=glass] :is(button.on,button.primary){background:linear-gradient(135deg,#8b5cf6,#06b6d4);border-color:transparent;color:#fff;box-shadow:0 6px 20px rgba(124,106,247,.45),inset 0 1px 0 rgba(255,255,255,.3)}
+html[data-flat][data-theme=glass] :is(select,input[type=number],input[type=text],input[type=color]){background-color:var(--well);border:1px solid rgba(255,255,255,.18);border-radius:10px;color:var(--tx)}
+html[data-flat][data-theme=glass] select option{background:#1a1c3a;color:var(--tx)}
+html[data-flat][data-theme=glass] input[type=range]::-webkit-slider-runnable-track{height:6px;background:rgba(255,255,255,.16);border-radius:6px}
+html[data-flat][data-theme=glass] input[type=range]::-webkit-slider-thumb{width:18px;height:18px;margin-top:-6px;background:#fff;border:0;border-radius:50%;box-shadow:0 0 0 4px rgba(124,106,247,.4),0 3px 10px rgba(0,0,0,.45)}
+html[data-flat][data-theme=glass] input[type=checkbox]{border-radius:7px;background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.3)}
+html[data-flat][data-theme=glass] input[type=checkbox]:checked{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 11'%3E%3Cpath d='M2 5.6l2.6 2.6L9 2.6' fill='none' stroke='%23fff' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/11px no-repeat,linear-gradient(135deg,#8b5cf6,#06b6d4);border-color:transparent}
+html[data-flat][data-theme=glass] .card{background:rgba(255,255,255,.07);border-radius:14px}
+html[data-flat][data-theme=glass] .card img{border-radius:13px 13px 0 0}
+html[data-flat][data-theme=glass] .card.sel{background:linear-gradient(135deg,rgba(124,106,247,.55),rgba(6,182,212,.45));border-color:#c4b5ff;box-shadow:0 0 22px rgba(124,106,247,.5)}
+html[data-flat][data-theme=glass] :is(.slot,.vslot){border-radius:12px;background:rgba(255,255,255,.06)}
+html[data-flat][data-theme=glass] legend{background:rgba(255,255,255,.1);border:1px solid var(--bd);border-radius:999px;padding:2px 11px;color:var(--tx);text-transform:none;letter-spacing:.02em;font-weight:500;font-size:11.5px}
+html[data-flat][data-theme=glass] .props legend:hover{background:rgba(255,255,255,.2)}
+html[data-flat][data-theme=glass] .cur-style{border-radius:10px}
+html[data-flat][data-theme=glass] .pv{border-radius:16px;outline:1px solid rgba(255,255,255,.25);box-shadow:0 24px 70px rgba(0,0,0,.55),0 0 50px rgba(124,106,247,.28)}
+html[data-flat][data-theme=glass] .pv :is(canvas,.ov){border-radius:16px}
+html[data-flat][data-theme=glass] dialog{background:rgba(26,28,58,.82);-webkit-backdrop-filter:blur(26px);backdrop-filter:blur(26px);border-radius:22px}
+html[data-flat][data-theme=glass] .title{background:transparent}
+
+/* --- HARDWARE: painel de equipamento de rack, metal escovado, parafusos, LCD âmbar e faders --- */
+html[data-theme=hardware]{--desk:#1a1c20;--face:#2d3138;--face2:#3a3f47;--bd:#0e0f12;--well:#14161a;--ws:#101216;--tx:#d9dde3;--mut:#8c939d;--y:#ffb02e;--p:#f59e0b;--c:#ffd08a;--g:#5fe36a;--r:#ff5b4d;--on:#2a1700;--rad:4px;--ui:Bahnschrift,"DIN Alternate","Segoe UI Semibold","Segoe UI",Arial,sans-serif}
+html[data-flat][data-theme=hardware] .window{background:repeating-linear-gradient(90deg,rgba(255,255,255,.022) 0 1px,transparent 1px 3px),linear-gradient(180deg,#34383f,#2a2e34)}
+html[data-flat][data-theme=hardware] .toolbar{background:linear-gradient(#3d424a,#2d3137);border-bottom:1px solid #0b0c0e;box-shadow:inset 0 1px 0 #ffffff22,0 3px 8px #0009}
+html[data-flat][data-theme=hardware] button{background:linear-gradient(#4b5159,#353a41);border:1px solid #121418;border-radius:4px;box-shadow:inset 0 1px 0 #ffffff2e,0 2px 0 #0b0c0e,0 3px 6px #0006;color:#dfe3e9;text-shadow:0 1px 0 #0008}
+html[data-flat][data-theme=hardware] button:hover{background:linear-gradient(#585f68,#3d434b)}
+html[data-flat][data-theme=hardware] button:active{transform:translateY(2px);box-shadow:inset 0 2px 5px #000a}
+html[data-flat][data-theme=hardware] :is(button.on,button.primary){background:linear-gradient(#ffc766,#e8890c);border-color:#7a4100;color:#2a1700;text-shadow:0 1px 0 #ffffff55;box-shadow:0 0 14px #ffa94d88,inset 0 1px 0 #fff8,0 2px 0 #5a3000}
+html[data-flat][data-theme=hardware] button.on:active{transform:translateY(2px)}
+html[data-flat][data-theme=hardware] kbd{background:linear-gradient(#454b53,#31353b);color:#c9ced6;border:1px solid #0b0c0e;border-bottom-width:2px;border-radius:3px}
+html[data-flat][data-theme=hardware] fieldset{padding:18px 14px 14px;border-radius:4px;border:1px solid #0d0e11;background:radial-gradient(circle at 8px 8px,#9ba1a9 0 1.5px,#40444b 2px,#101114 3px,transparent 3.5px),radial-gradient(circle at calc(100% - 8px) 8px,#9ba1a9 0 1.5px,#40444b 2px,#101114 3px,transparent 3.5px),radial-gradient(circle at 8px calc(100% - 8px),#9ba1a9 0 1.5px,#40444b 2px,#101114 3px,transparent 3.5px),radial-gradient(circle at calc(100% - 8px) calc(100% - 8px),#9ba1a9 0 1.5px,#40444b 2px,#101114 3px,transparent 3.5px),linear-gradient(#32363c,#292d32);box-shadow:inset 0 1px 0 #ffffff14,0 1px 0 #ffffff0d,0 8px 16px #0006}
+html[data-flat][data-theme=hardware] legend{background:#1c1e22;color:#c9ced6;border:1px solid #0b0c0e;border-radius:3px;padding:1px 9px;box-shadow:inset 0 1px 0 #ffffff14;text-shadow:0 1px 0 #000;font-weight:700}
+html[data-flat][data-theme=hardware] .props legend:hover{background:#25282d;color:#fff}
+html[data-flat][data-theme=hardware] :is(select,input[type=number],input[type=text],input[type=color]){background-color:#121418;border:1px solid #07080a;border-radius:3px;box-shadow:inset 0 2px 5px #000b,0 1px 0 #ffffff14;color:#ffc766;font-family:Consolas,ui-monospace,monospace;font-size:12px}
+html[data-flat][data-theme=hardware] select option{background:#1d2024;color:#ffc766}
+html[data-flat][data-theme=hardware] :is(.f output,.cur-style){font-family:Consolas,ui-monospace,monospace;color:#ffb02e;background:#101215;border-radius:3px;box-shadow:inset 0 1px 4px #000,0 1px 0 #ffffff12;text-shadow:0 0 7px #ffb02e99}
+html[data-flat][data-theme=hardware] .f output{padding:1px 4px;font-size:11px}
+html[data-flat][data-theme=hardware] .cur-style{border:1px solid #07080a;letter-spacing:.06em;text-transform:uppercase}
+html[data-flat][data-theme=hardware] input[type=range]::-webkit-slider-runnable-track{height:6px;background:#0a0b0d;border:1px solid #000;border-radius:3px;box-shadow:inset 0 1px 3px #000,0 1px 0 #ffffff16}
+html[data-flat][data-theme=hardware] input[type=range]::-webkit-slider-thumb{width:13px;height:26px;margin-top:-11px;border-radius:2px;border:1px solid #0a0b0d;box-shadow:0 3px 5px #000a,inset 0 1px 0 #ffffff40;background:linear-gradient(90deg,transparent calc(50% - 1px),#ffb02e calc(50% - 1px) calc(50% + 1px),transparent 0),linear-gradient(#707680,#3f444b 55%,#30343a)}
+html[data-flat][data-theme=hardware] input[type=checkbox]{width:14px;height:14px;border-radius:2px;background:#121418;border:1px solid #000;box-shadow:inset 0 1px 3px #000}
+html[data-flat][data-theme=hardware] input[type=checkbox]:checked{background:radial-gradient(circle,#ffe0a0,#f59e0b 60%,#a45a00);border-color:#000;box-shadow:0 0 9px #ffa94dcc,inset 0 0 0 1px #0005}
+html[data-flat][data-theme=hardware] .workspace{background:#0b0d10;border:1px solid #000;border-radius:6px;box-shadow:inset 0 0 0 4px #25282d,inset 0 0 0 5px #000,inset 0 8px 20px #000,0 1px 0 #ffffff14}
+html[data-flat][data-theme=hardware] .pv{outline:1px solid #000;box-shadow:0 0 0 2px #2a2d33,0 0 26px rgba(255,176,46,.14)}
+html[data-flat][data-theme=hardware] .card{background:linear-gradient(#41464e,#2d3137);border:1px solid #0d0e11;box-shadow:inset 0 1px 0 #ffffff26,0 2px 0 #0b0c0e,0 3px 5px #0007}
+html[data-flat][data-theme=hardware] .card .nm{font-size:10px;letter-spacing:.06em;text-transform:uppercase;text-shadow:0 1px 0 #0009}
+html[data-flat][data-theme=hardware] .card.sel{background:linear-gradient(#ffc766,#e8890c);color:#2a1700;box-shadow:0 0 14px #ffa94d88,inset 0 1px 0 #fff8;border-color:#7a4100}
+html[data-flat][data-theme=hardware] .card.sel .nm{text-shadow:0 1px 0 #ffffff55}
+html[data-flat][data-theme=hardware] :is(.slot,.vslot){background:#101216;border:1px solid #05060a;box-shadow:inset 0 2px 6px #000}
+html[data-flat][data-theme=hardware] :is(.slot,.vslot).active{outline:2px solid #ffb02e;outline-offset:-2px;box-shadow:0 0 12px #ffa94d77,inset 0 2px 6px #000}
+html[data-flat][data-theme=hardware] .colorbar{background:linear-gradient(#32363c,#292d32);border-top:1px solid #0b0c0e;box-shadow:inset 0 1px 0 #ffffff14}
+html[data-flat][data-theme=hardware] .status{background:#101215;border-top:1px solid #000}
+html[data-flat][data-theme=hardware] .chip{font-family:Consolas,ui-monospace,monospace;font-size:11px}
+html[data-flat][data-theme=hardware] .chip.ok::before{box-shadow:0 0 7px var(--g)}
+html[data-flat][data-theme=hardware] .chip.bad::before{box-shadow:0 0 7px var(--r)}
+html[data-flat][data-theme=hardware] dialog{background:linear-gradient(#32363c,#292d32);border:1px solid #000;border-radius:6px;box-shadow:inset 0 1px 0 #ffffff1f,0 24px 60px #000c}
+html[data-flat][data-theme=hardware] .title{background:linear-gradient(#41464e,#30343a);border-bottom:1px solid #000;text-transform:uppercase;letter-spacing:.1em;font-size:11px}
+html[data-flat][data-theme=hardware] ::-webkit-scrollbar-thumb{background:linear-gradient(90deg,#585f68,#383d44);background-clip:padding-box}
+
+/* --- TERMINAL: console de fósforo verde, tudo monoespaçado, linhas finas e vídeo invertido --- */
+html[data-theme=terminal]{--desk:#030704;--face:#050d08;--face2:#0c1d12;--bd:#1b5e32;--well:#020503;--ws:#040a06;--tx:#38ff7e;--mut:#1fa855;--y:#8dffb2;--p:#38ff7e;--c:#38ff7e;--g:#38ff7e;--r:#ff4d4d;--on:#021208;--rad:0px;--ui:"Cascadia Mono","Cascadia Code",Consolas,"Courier New",monospace}
+html[data-theme=terminal] body{text-shadow:0 0 5px rgba(56,255,126,.28)}
+html[data-flat][data-theme=terminal] .window{background:repeating-linear-gradient(0deg,rgba(0,0,0,.3) 0 1px,transparent 1px 3px),#050d08}
+html[data-flat][data-theme=terminal] .toolbar{font-size:11.5px;background:transparent}
+html[data-flat][data-theme=terminal] button{background:transparent;border:1px solid var(--bd);color:var(--tx);font-weight:400}
+html[data-flat][data-theme=terminal] button:hover{background:var(--tx);color:var(--on);text-shadow:none;border-color:var(--tx)}
+html[data-flat][data-theme=terminal] :is(button.on,button.primary){background:var(--tx);color:var(--on);text-shadow:none;border-color:var(--tx)}
+html[data-flat][data-theme=terminal] kbd{background:transparent;border:1px solid var(--bd);color:var(--mut)}
+html[data-flat][data-theme=terminal] fieldset{border:1px solid var(--bd);padding:14px 12px 12px}
+html[data-flat][data-theme=terminal] legend{color:var(--tx);padding:0 4px;font-weight:400;letter-spacing:.08em}
+html[data-flat][data-theme=terminal] legend::after{content:' ]'}
+html[data-flat][data-theme=terminal] .props legend::before{content:'[▾ '}
+html[data-flat][data-theme=terminal] .props fieldset.collapsed legend::before{content:'[▸ '}
+html[data-flat][data-theme=terminal] .props legend:hover{background:var(--tx);color:var(--on);text-shadow:none}
+html[data-flat][data-theme=terminal] :is(select,input[type=number],input[type=text],input[type=color]){background-color:transparent;border:1px solid var(--bd);color:var(--tx);font-family:var(--ui)}
+html[data-flat][data-theme=terminal] select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0h10L5 6z' fill='%2338ff7e'/%3E%3C/svg%3E")}
+html[data-flat][data-theme=terminal] select option{background:#06120a;color:var(--tx)}
+html[data-flat][data-theme=terminal] input[type=range]::-webkit-slider-runnable-track{height:2px;background:repeating-linear-gradient(90deg,var(--bd) 0 4px,transparent 4px 7px);border-radius:0}
+html[data-flat][data-theme=terminal] input[type=range]::-webkit-slider-thumb{width:8px;height:18px;margin-top:-8px;background:var(--tx);border:0;border-radius:0;box-shadow:0 0 9px var(--tx)}
+html[data-flat][data-theme=terminal] input[type=checkbox]{border-color:var(--tx);background:transparent}
+html[data-flat][data-theme=terminal] input[type=checkbox]:checked{background:var(--tx);border-color:var(--tx);box-shadow:0 0 8px var(--tx)}
+html[data-flat][data-theme=terminal] .card{background:transparent;border:1px solid var(--bd)}
+html[data-flat][data-theme=terminal] .card img{border-radius:0;filter:grayscale(1) sepia(1) hue-rotate(70deg) saturate(2.4) brightness(.92)}
+html[data-flat][data-theme=terminal] .card .nm{font-size:10px;text-transform:uppercase;letter-spacing:.05em;font-weight:400}
+html[data-flat][data-theme=terminal] .card.sel{background:var(--tx);color:var(--on);border-color:var(--tx);text-shadow:none;box-shadow:0 0 14px rgba(56,255,126,.5)}
+html[data-flat][data-theme=terminal] :is(.card .num,.slot .sn,.vslot .vn){background:#000;color:var(--tx);border:1px solid var(--bd);border-radius:0;font-weight:400}
+html[data-flat][data-theme=terminal] .workspace{background:var(--well);border:1px solid var(--bd)}
+html[data-flat][data-theme=terminal] .pv{outline:1px solid var(--tx);box-shadow:0 0 20px rgba(56,255,126,.28)}
+html[data-flat][data-theme=terminal] .cur-style{background:transparent;border:1px solid var(--bd);color:var(--tx);text-transform:uppercase;letter-spacing:.04em;font-weight:400;font-size:11.5px}
+html[data-flat][data-theme=terminal] .stylenav .nav{background:transparent;color:var(--tx)}
+html[data-flat][data-theme=terminal] .stylenav .nav:hover{background:var(--tx);color:var(--on)}
+html[data-flat][data-theme=terminal] :is(.slot,.vslot){background:transparent;border:1px solid var(--bd)}
+html[data-flat][data-theme=terminal] :is(.slot,.vslot):not(.filled){border-style:dashed}
+html[data-flat][data-theme=terminal] :is(.slot,.vslot).active{outline:1px solid var(--tx);outline-offset:1px;box-shadow:0 0 12px rgba(56,255,126,.5)}
+html[data-flat][data-theme=terminal] .slot img{filter:grayscale(1) sepia(1) hue-rotate(70deg) saturate(2.4) brightness(.9)}
+html[data-flat][data-theme=terminal] .colorbar,html[data-flat][data-theme=terminal] .status{background:transparent}
+html[data-flat][data-theme=terminal] .chip{color:var(--mut)}
+html[data-flat][data-theme=terminal] .chip.ok{color:var(--tx)}
+html[data-flat][data-theme=terminal] dialog{background:#050d08;border:1px solid var(--tx);border-radius:0;box-shadow:0 0 0 1px #000,0 0 36px rgba(56,255,126,.22)}
+html[data-flat][data-theme=terminal] .title{background:transparent;color:var(--tx);border-bottom:1px solid var(--bd);text-transform:uppercase;letter-spacing:.1em;font-weight:400}
+html[data-flat][data-theme=terminal] .title .name::before{content:'> '}
+html[data-flat][data-theme=terminal] .title .ic{display:none}
+html[data-flat][data-theme=terminal] ::-webkit-scrollbar-thumb{background:var(--bd);background-clip:padding-box;border-radius:0}
+
+/* --- SWISS: editorial/suíço, papel claro, traço preto, grade, tipografia forte e um único vermelho --- */
+html[data-theme=swiss]{--desk:#e9e8e3;--face:#f6f5f1;--face2:#ecebe6;--bd:#111;--well:#fff;--ws:#efeee9;--tx:#111;--mut:#6a6a64;--y:#e5322d;--p:#e5322d;--c:#111;--g:#1a7f37;--r:#c62828;--on:#fff;--rad:0px;--ui:"Helvetica Neue",Helvetica,Arial,"Segoe UI",sans-serif}
+html[data-theme=swiss] body{letter-spacing:-.005em}
+html[data-flat][data-theme=swiss] .toolbar{border-bottom:2px solid #111;background:var(--face)}
+html[data-flat][data-theme=swiss] button{background:transparent;border:1px solid #111;color:#111;font-weight:600}
+html[data-flat][data-theme=swiss] button:hover{background:#111;color:#fff}
+html[data-flat][data-theme=swiss] button.on{background:var(--p);border-color:var(--p);color:#fff}
+html[data-flat][data-theme=swiss] button.primary{background:#111;border-color:#111;color:#fff}
+html[data-flat][data-theme=swiss] button.primary:hover{background:var(--p);border-color:var(--p);filter:none}
+html[data-flat][data-theme=swiss] kbd{background:#fff;border:1px solid #111;color:#111}
+html[data-flat][data-theme=swiss] fieldset{border:0;border-top:2px solid #111;padding:12px 0 4px;background:transparent}
+html[data-flat][data-theme=swiss] legend{color:#111;font-weight:800;letter-spacing:.12em;padding:0 10px 0 0}
+html[data-flat][data-theme=swiss] .props legend:hover{color:var(--p)}
+html[data-flat][data-theme=swiss] :is(select,input[type=number],input[type=text],input[type=color]){background-color:#fff;border:1px solid #b9b7ae;color:#111}
+html[data-flat][data-theme=swiss] :is(select,input[type=number],input[type=text]):focus{border-color:#111}
+html[data-flat][data-theme=swiss] select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0h10L5 6z' fill='%23111'/%3E%3C/svg%3E")}
+html[data-flat][data-theme=swiss] select option{background:#fff;color:#111}
+html[data-flat][data-theme=swiss] input[type=range]::-webkit-slider-runnable-track{height:2px;background:#111;border-radius:0}
+html[data-flat][data-theme=swiss] input[type=range]::-webkit-slider-thumb{width:12px;height:12px;margin-top:-5px;background:var(--p);border:0;border-radius:0;box-shadow:none}
+html[data-flat][data-theme=swiss] input[type=checkbox]{border-color:#111;background:#fff;border-radius:0}
+html[data-flat][data-theme=swiss] input[type=checkbox]:checked{background-color:#111;border-color:#111}
+html[data-flat][data-theme=swiss] .f output{font-weight:700;color:#111}
+html[data-flat][data-theme=swiss] .strobe-row output{color:var(--p)}
+html[data-flat][data-theme=swiss] .card{background:#fff;border:1px solid #b9b7ae}
+html[data-flat][data-theme=swiss] .card img{border-radius:0;border-bottom:1px solid #b9b7ae}
+html[data-flat][data-theme=swiss] .card .nm{font-weight:700}
+html[data-flat][data-theme=swiss] .card.sel{background:#111;color:#fff;border-color:#111;box-shadow:inset 0 -3px 0 var(--p)}
+html[data-flat][data-theme=swiss] :is(.card .num,.slot .sn,.vslot .vn){background:#111;color:#fff;border-radius:0}
+html[data-flat][data-theme=swiss] .workspace{background:var(--ws);border:0}
+html[data-flat][data-theme=swiss] .pv{outline:1px solid #111;box-shadow:none}
+html[data-flat][data-theme=swiss] .cur-style{background:#fff;border:1px solid #111;color:#111;font-weight:800;text-transform:uppercase;letter-spacing:.06em}
+html[data-flat][data-theme=swiss] .stylenav .nav{background:transparent;color:#111}
+html[data-flat][data-theme=swiss] .stylenav .nav:hover{background:#111;color:#fff}
+html[data-flat][data-theme=swiss] :is(.slot,.vslot){background:#fff;border:1px solid #b9b7ae}
+html[data-flat][data-theme=swiss] :is(.slot,.vslot).active{outline:2px solid var(--p);outline-offset:-2px}
+html[data-flat][data-theme=swiss] .slot .ph{color:#9c9a92}
+html[data-flat][data-theme=swiss] .colorbar{border-top:2px solid #111}
+html[data-flat][data-theme=swiss] .status{border-top:1px solid #111}
+html[data-flat][data-theme=swiss] .pane-h,html[data-flat][data-theme=swiss] .slot-h b{color:#111;font-weight:800}
+html[data-flat][data-theme=swiss] dialog{background:var(--face);border:2px solid #111;border-radius:0;box-shadow:0 30px 80px #0005}
+html[data-flat][data-theme=swiss] .title{background:#111;color:#fff;border-bottom:0;text-transform:uppercase;letter-spacing:.12em;font-size:11px;font-weight:700}
+html[data-flat][data-theme=swiss] .title .ic{display:none}
+html[data-flat][data-theme=swiss] ::-webkit-scrollbar-thumb{background:#111;background-clip:padding-box;border-radius:0}
+
+/* seletor de tema (dentro do modal) */
+dialog.settings{width:min(92vw,580px);max-width:none}
+.set-in{padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.set-in h3{margin:0;font-family:var(--px);font-size:11px;font-weight:400;color:var(--y)}
+html[data-flat] .set-in h3{font-family:var(--ui);font-size:10.5px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--mut)}
+.themes{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.theme{display:flex;flex-direction:column;align-items:stretch;gap:6px;text-align:left;padding:8px;white-space:normal}
+/* amostras: mini-maquete de cada estilo (coluna, prévia, coluna com fader e botão), independente do tema atual */
+.theme .mock{display:grid;grid-template-columns:1fr 2.4fr 1fr;gap:5px;height:58px;padding:6px;overflow:hidden}
+.theme .mock i{display:block;position:relative}
+.theme .mock i:nth-child(3)::after{content:'';position:absolute;left:50%;top:8px;width:11px;height:11px;margin-left:-5px}
+.theme .mock i:nth-child(3)::before{content:'';position:absolute;left:5px;right:5px;top:30px;height:3px}
+.mock-retro{background:#121216}.mock-retro i{background:#2a2a32;border:2px solid #000;box-shadow:2px 2px 0 #000}.mock-retro i:nth-child(2){background:#000}
+.mock-retro i:nth-child(3)::after{background:#ffd60a;border:2px solid #000}.mock-retro i:nth-child(3)::before{background:#000}
+.mock-studio{background:#0f1115}.mock-studio i{background:#1a1d23;border:1px solid #2d3440;border-radius:5px}.mock-studio i:nth-child(2){background:#000}
+.mock-studio i:nth-child(3)::after{background:#3b82f6;border-radius:50%}.mock-studio i:nth-child(3)::before{background:#2d3440;border-radius:3px}
+.mock-glass{background:linear-gradient(135deg,#4a2fb0,#0e6a8a)}.mock-glass i{background:rgba(255,255,255,.17);border:1px solid rgba(255,255,255,.32);border-radius:10px;box-shadow:0 4px 12px #0004}.mock-glass i:nth-child(2){background:rgba(0,0,0,.45)}
+.mock-glass i:nth-child(3)::after{background:#fff;border-radius:50%;box-shadow:0 0 0 3px rgba(255,255,255,.35)}.mock-glass i:nth-child(3)::before{background:rgba(255,255,255,.35);border-radius:3px}
+.mock-hardware{background:#2a2e34}.mock-hardware i{background:linear-gradient(#41464e,#2b2f35);border:1px solid #0b0c0e;border-radius:3px;box-shadow:inset 0 1px 0 #ffffff33}.mock-hardware i:nth-child(2){background:#0b0d10;box-shadow:inset 0 0 0 2px #25282d}
+.mock-hardware i:nth-child(3)::after{background:radial-gradient(circle,#ffe0a0,#f59e0b 60%,#a45a00);border-radius:2px;box-shadow:0 0 7px #ffa94d}.mock-hardware i:nth-child(3)::before{background:#0a0b0d;border-radius:2px;box-shadow:inset 0 1px 2px #000}
+.mock-terminal{background:#030704}.mock-terminal i{border:1px solid #1b5e32}.mock-terminal i:nth-child(2){background:#020503;border-color:#38ff7e}
+.mock-terminal i:nth-child(3)::after{background:#38ff7e;width:8px;height:14px;margin-left:-4px;box-shadow:0 0 8px #38ff7e}.mock-terminal i:nth-child(3)::before{height:2px;background:repeating-linear-gradient(90deg,#1b5e32 0 4px,transparent 4px 7px)}
+.mock-swiss{background:#f6f5f1}.mock-swiss i{background:#fff;border:1px solid #b9b7ae}.mock-swiss i:nth-child(2){background:#111;border-color:#111}
+.mock-swiss i:nth-child(3)::after{background:#e5322d;width:10px;height:10px}.mock-swiss i:nth-child(3)::before{height:2px;background:#111}
+.theme b{font-size:12px}
+.theme small{color:var(--mut);font-size:11px;font-weight:400;line-height:1.3}
+.theme.picked{outline:2px solid var(--p);outline-offset:-2px}   /* não usar .cur: já é a caixinha da paleta atual */
+html[data-flat] .theme{border-radius:calc(var(--rad) + 2px)}
+html[data-flat] .theme.picked{outline:2px solid var(--p);outline-offset:-2px;border-color:var(--p)}   /* vence o outline:0 dos botões flat */
+html[data-flat] .theme .mock{border-radius:6px}
 
 /* ===== janela de saída (projetor) ===== */
 #outwrap{display:none;position:fixed;inset:0;background:#000;overflow:hidden}
@@ -282,8 +578,9 @@ body.out:fullscreen,body.out :fullscreen{cursor:none}
     <span class="sep"></span>
     <label><input type="checkbox" id="auto" data-midi="auto" data-label="Auto switch"> Switch every</label><input type="number" id="autoSec" min="3" max="300"> s
     <button id="btnLearn" class="learn-btn" title="Toggle MIDI Learn">🎹 MIDI Learn</button>
+    <button id="btnSettings" class="q" title="Settings">⚙</button>
     <button id="btnHelp" class="q" title="Shortcuts">?</button>
-    <button id="btnOut" class="primary">▶ Open output</button>
+    <button id="btnOut" class="primary">▶ <span class="lg">Open </span>output</button>
   </div>
 
   <div class="body">
@@ -294,10 +591,9 @@ body.out:fullscreen,body.out :fullscreen{cursor:none}
 
     <section class="pane">
       <div class="workspace">
-        <div class="pv"><canvas id="pv" width="480" height="270"></canvas><img class="ovl" alt=""><div class="ov flash"></div><div class="ov dark"></div><div class="off">preview off</div><i class="hdl r"></i><i class="hdl b"></i><i class="hdl rb"></i></div>
-        <div class="ws-info"><span><kbd>1</kbd>–<kbd>0</kbd>, <kbd>⇧</kbd>+number and <kbd>Alt</kbd>+number pick · <kbd>←</kbd><kbd>→</kbd> step</span></div>
+        <div class="pvwrap"><div class="pv" title="Keys: 1–0, Shift+1–0 and Alt+1–0 pick a style · ← → step (full list under ?)"><canvas id="pv" width="480" height="270"></canvas><img class="ovl" alt=""><div class="ov flash"></div><div class="ov dark"></div><div class="off">preview off</div><i class="hdl r"></i><i class="hdl b"></i><i class="hdl rb"></i></div></div>
         <div class="slotbar">
-          <div class="slot-h"><b>Scenes</b><span>click an empty slot to save everything on screen · click a scene to recall it · ◀ ▶ and auto-switch cycle the saved scenes</span><button id="btnScenesClear" class="mini" title="Delete all scenes">clear</button></div>
+          <div class="slot-h" title="Click an empty slot to save everything on screen · click a scene to recall it · ↻ overwrites · ✕ deletes · drag to reorder · ◀ ▶ and auto-switch cycle the saved scenes"><b>Scenes</b><span>+ saves the screen · click recalls · ◀ ▶ cycle</span><button id="btnScenesClear" class="mini" title="Delete all scenes">clear</button></div>
           <div class="slots" id="scenes"></div>
         </div>
       </div>
@@ -397,6 +693,16 @@ body.out:fullscreen,body.out :fullscreen{cursor:none}
     <kbd>F</kbd><span>Fullscreen (in the projector window)</span>
   </div>
   <div class="ft"><button id="helpOk" class="primary">OK</button></div>
+</dialog>
+
+<dialog id="settings" class="settings">
+  <div class="title"><span class="ic"></span><span class="name">Settings</span><button id="setX">✕</button></div>
+  <div class="set-in">
+    <h3>Appearance</h3>
+    <div class="hint2">Look of the control panel. The projector output is not affected.</div>
+    <div class="themes" id="themes"></div>
+  </div>
+  <div class="ft"><button id="setOk" class="primary">OK</button></div>
 </dialog>
 
 <dialog id="warpDlg" class="warp">
@@ -534,21 +840,26 @@ function drawDemo(t) {
   dctx.beginPath(); dctx.ellipse(px, 300, 110, 120, 0, Math.PI, 0); dctx.fill();
 }
 // frameId só avança quando chega quadro novo da câmera: sem quadro novo, nada é enviado à GPU
-let camLive = false, frameId = 0, vfc = false;
+let camLive = false, camFailed = false, frameId = 0, vfc = false;
+const blank = document.createElement('canvas'); blank.width = 16; blank.height = 9;   // preto: mostrado enquanto a câmera/vídeo ainda não tem imagem
+blank.getContext('2d').fillRect(0, 0, 16, 9);
 function hookVfc() {
   if (vfc || !video.requestVideoFrameCallback) return; vfc = true;
   const cb = () => { frameId++; video.requestVideoFrameCallback(cb); };
   video.requestVideoFrameCallback(cb);
 }
-function getSource(t) {
+// demo = só para as miniaturas da galeria e quando a câmera falhou de vez (sem permissão/sem câmera); nunca como espera pela imagem
+function getSource(t, demoOk = false) {
   if (state.source === 'shapes') { frameId++; return shp; }   // desenhado no loop por drawShapes()
   if (state.source === 'text') { frameId++; return txt; }     // desenhado no loop por drawText()
-  if (state.source === 'video') {                             // clipe importado (ou demo enquanto carrega / sem arquivo)
+  if (state.source === 'video') {
     if (fvidReady && fvid.readyState >= 2 && fvid.videoWidth) { frameId++; return fvid; }
-    drawDemo(t); frameId++; return demo;
+    if (demoOk) { drawDemo(t); frameId++; return demo; }
+    frameId++; return blank;                                  // sem arquivo ou ainda carregando: preto
   }
   if (camLive && video.readyState >= 2 && video.videoWidth) { if (!vfc) frameId++; return video; }
-  drawDemo(t); frameId++; return demo;
+  if (demoOk || camFailed) { drawDemo(t); frameId++; return demo; }
+  frameId++; return blank;                                    // câmera ainda abrindo: preto até chegar a imagem
 }
 
 /* ---------- fonte "Abstract shapes": formas geométricas só com as arestas ---------- */
@@ -804,14 +1115,14 @@ function drawText(dt, a) {
     }
   }
 }
-function stopCam() { camToken++; if (camStream) camStream.getTracks().forEach(t => t.stop()); camStream = null; camLive = false; }
+function stopCam() { camToken++; if (camStream) camStream.getTracks().forEach(t => t.stop()); camStream = null; camLive = false; camFailed = false; }
 function dims(s) { return s === video ? [video.videoWidth, video.videoHeight] : s === fvid ? [fvid.videoWidth, fvid.videoHeight] : [s.width, s.height]; }
 
 let camStream = null, camToken = 0;
 async function startCam(id) {
   const my = ++camToken;
   if (camStream) camStream.getTracks().forEach(t => t.stop());
-  camStream = null; camLive = false;
+  camStream = null; camLive = false; camFailed = false;
   const tries = [id ? { deviceId: { exact: id } } : {}, {}];
   for (const extra of tries) {
     try {
@@ -821,6 +1132,7 @@ async function startCam(id) {
       return true;
     } catch (e) {}
   }
+  if (my === camToken) camFailed = true;                      // só conta se ninguém pediu outra câmera/fonte nesse meio tempo
   return false;
 }
 
@@ -2127,7 +2439,7 @@ async function genThumbs() {
       for (let f = 0; f < 16; f++) {
         const t = t0 + f / 30;
         if (f % 6 === 3) fake.beatId++;
-        te.render(getSource(t), t, 1 / 30, fake);
+        te.render(getSource(t, true), t, 1 / 30, fake);
       }
       imgs[i].src = cv.toDataURL('image/jpeg', .75);
     }
@@ -2148,6 +2460,57 @@ async function openOutput() {
   } catch (e) {}
 }
 
+/* ---------- ⚙ Settings: tema do painel ---------- */
+// cada id é um estilo de verdade (estrutura, material, tipografia, controles), definido no CSS em html[data-theme=...]
+const THEMES = [
+  { id: 'retro', n: 'Retro Paint', d: 'Neo-brutalist: bevels, hard shadows, pixel font. The original look.' },
+  { id: 'studio', n: 'Studio', d: 'Flat dark, thin lines, soft corners. Clean and neutral, like a pro app.' },
+  { id: 'glass', n: 'Glass', d: 'Frosted translucent panels floating over a soft gradient, with glowing controls.' },
+  { id: 'hardware', n: 'Hardware', d: 'Rack gear: brushed metal, screws, amber LCD readouts and real faders.' },
+  { id: 'terminal', n: 'Terminal', d: 'Green-phosphor console: all monospace, hairlines, inverted highlights.' },
+  { id: 'swiss', n: 'Swiss', d: 'Editorial paper look: light, black rules, strong type and a single red.' },
+];
+const THEME_ALIAS = { midnight: 'studio', stage: 'hardware', light: 'swiss' };   // ids das primeiras versões do seletor (eram só cores)
+function applyTheme(id) {
+  if (isOut) return;
+  id = THEME_ALIAS[id] || id;
+  if (!THEMES.some(t => t.id === id)) id = 'retro';
+  const r = document.documentElement;
+  if (id === 'retro') { r.removeAttribute('data-theme'); r.removeAttribute('data-flat'); }
+  else { r.dataset.theme = id; r.setAttribute('data-flat', ''); }
+  try { localStorage.setItem('virtualvj_theme', id); } catch (e) {}
+  document.querySelectorAll('#themes .theme').forEach(b => { const on = b.dataset.theme === id; b.classList.toggle('picked', on); b.setAttribute('aria-pressed', String(on)); });
+  return id;
+}
+function initSettings() {
+  let cur = 'retro'; try { cur = localStorage.getItem('virtualvj_theme') || 'retro'; } catch (e) {}
+  const host = $('#themes'), dlg = $('#settings');
+  THEMES.forEach(t => {
+    const b = document.createElement('button'); b.className = 'theme'; b.dataset.theme = t.id;
+    b.innerHTML = `<span class="mock mock-${t.id}"><i></i><i></i><i></i></span><b></b><small></small>`;
+    b.querySelector('b').textContent = t.n; b.querySelector('small').textContent = t.d;
+    b.onclick = () => applyTheme(t.id);
+    host.appendChild(b);
+  });
+  applyTheme(cur);                                           // também conserta um valor salvo que não existe mais
+  $('#btnSettings').onclick = () => dlg.showModal();
+  $('#setX').onclick = $('#setOk').onclick = () => dlg.close();
+}
+// recolher/expandir as seções da coluna direita; o que está recolhido fica guardado (preferência da tela, não faz parte das cenas)
+function initCollapse() {
+  const KEY = 'virtualvj_collapsed';
+  let closed = []; try { closed = JSON.parse(localStorage.getItem(KEY) || '[]'); } catch (e) {}
+  const store = () => { try { localStorage.setItem(KEY, JSON.stringify(closed)); } catch (e) {} };
+  document.querySelectorAll('.props fieldset').forEach(fs => {
+    const lg = fs.querySelector('legend'), name = lg.textContent.trim();
+    lg.tabIndex = 0; lg.setAttribute('role', 'button');
+    const set = on => { fs.classList.toggle('collapsed', on); lg.setAttribute('aria-expanded', String(!on)); };
+    const toggle = () => { const on = !fs.classList.contains('collapsed'); set(on); closed = closed.filter(n => n !== name); if (on) closed.push(name); store(); };
+    set(closed.includes(name));
+    lg.onclick = toggle;
+    lg.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); toggle(); } };
+  });
+}
 // cada controle registra aqui como se redesenha a partir do state (usado ao recarregar uma cena)
 const panelSync = [];
 const syncPanel = () => panelSync.forEach(f => f());
@@ -2243,7 +2606,7 @@ function initPanel() {
 
   addEventListener('keydown', e => {
     if (/INPUT|SELECT|TEXTAREA/.test(e.target.tagName) && e.target.type !== 'range' && e.target.type !== 'checkbox') return;
-    if (help.open) return;
+    if (help.open || $('#settings').open) return;
     if (nudgeKey(e, (i, p) => { state.corners[i] = p; drawKz(); commit(); })) return;
     const k = e.key.toLowerCase(), dig = /^(Digit|Numpad)(\d)$/.exec(e.code);
     if (k === 'g') calib();
@@ -2425,7 +2788,7 @@ async function init() {
   state.scenes = Array.from({ length: 12 }, (_, i) => { const s = state.scenes[i]; return s && s.id && EFFECTS[s.style] ? s : null; });
   if (!Array.isArray(state.vids) || state.vids.length !== 6) state.vids = [null, null, null, null, null, null];
   if (typeof state.vidSlot !== 'number') state.vidSlot = -1;
-  initPanel(); initMidi(); initOverlay(); initVideo(); setStyle(state.style);
+  initSettings(); initPanel(); initCollapse(); initMidi(); initOverlay(); initVideo(); setStyle(state.style);
   requestAnimationFrame(loop); startBgDriver();
   // nada aqui espera pelo outro: uma permissão pendente não pode travar as miniaturas
   const camP = applySource().then(() => listDevices());

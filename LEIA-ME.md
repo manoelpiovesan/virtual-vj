@@ -15,10 +15,13 @@ Visuais ao vivo para DJ, gerados a partir da webcam e reagindo ao som. Não prec
 ## A tela do painel
 
 - **Styles** (à esquerda): a galeria, como a caixa de ferramentas do Paint.
-- **Centro**: a prévia do que está no projetor.
-- **Direita**: os ajustes *Visual*, *MIDI*, *Audio*, *Video & performance* e *Image / logo*.
+- **Centro**: a prévia do que está no projetor, com as 12 cenas logo abaixo. A prévia se ajusta ao espaço que sobra, então a prévia e as cenas aparecem juntas, sem rolagem.
+- **Direita**: os ajustes *Visual*, *MIDI*, *Audio*, *Video & performance* e *Image / logo*. Clique no título de uma seção (ou use Enter/Espaço nele) para **recolher ou expandir**; o que você recolheu fica lembrado.
 - **Embaixo**: a caixa de cores com as paletas, o controle *Hue* e a barra de status (camera, audio, output, gpu, midi).
+- A barra de cima cabe numa linha só. Em janelas mais estreitas ela esconde as teclas dos botões e encurta o "Open output" para "Output".
+- O botão **⚙** abre as **Settings**, onde você escolhe o **estilo do painel**. São seis estéticas diferentes (não só cores): *Retro Paint* (neobrutalista, o original), *Studio* (escuro e plano, de app profissional), *Glass* (painéis de vidro fosco sobre um degradê), *Hardware* (equipamento de rack, com metal, parafusos, leituras LCD âmbar e faders), *Terminal* (console verde, tudo monoespaçado) e *Swiss* (papel claro, filetes pretos e um vermelho só). A escolha fica salva e nunca afeta a imagem do projetor.
 - O botão **?** (ao lado do Open output) mostra os atalhos.
+- Ao trocar para a webcam, a tela fica preta até a imagem chegar (o boneco de demonstração só aparece se a câmera não abrir).
 
 ## Atalhos (no painel)
 
