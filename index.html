@@ -38,7 +38,9 @@ button:focus-visible{outline:2px dashed var(--y)}
 kbd{font-family:var(--px);font-size:9px;background:#000;color:var(--y);padding:1px 4px;margin-left:5px;font-weight:400}
 .well{background:var(--well);border:2px solid;border-color:var(--lo) var(--hi) var(--hi) var(--lo)}
 
-select,input[type=number]{background:var(--well);border:2px solid;border-color:var(--lo) var(--hi) var(--hi) var(--lo);outline:1px solid #000;border-radius:0;padding:3px 6px;min-width:0}
+.tcol{display:flex;align-items:center;gap:6px}
+input[type=color]{width:34px;height:22px;padding:0;border:2px solid;border-color:var(--lo) var(--hi) var(--hi) var(--lo);outline:1px solid #000;background:var(--well);cursor:pointer}
+select,input[type=number],input[type=text]{background:var(--well);color:var(--tx);border:2px solid;border-color:var(--lo) var(--hi) var(--hi) var(--lo);outline:1px solid #000;border-radius:0;padding:3px 6px;min-width:0}
 select{appearance:none;padding-right:26px;cursor:pointer;
   background:var(--well) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20'%3E%3Crect x='.5' y='.5' width='19' height='19' fill='%232a2a32' stroke='%23000'/%3E%3Cpath d='M5 8h10l-5 6z' fill='%23ffd60a'/%3E%3C/svg%3E") no-repeat right 0 center}
 select option{background:var(--face)}
@@ -116,10 +118,15 @@ input[type=range]::-moz-range-thumb{width:10px;height:20px;background:var(--y);b
 .slots{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
 .slot{position:relative;aspect-ratio:16/9;min-height:48px;background:var(--well);border:2px solid;border-color:var(--lo) var(--hi) var(--hi) var(--lo);
   box-shadow:3px 3px 0 #000;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden}
-.slot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.5}
+.slot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.85}
 .slot .ph{font-family:var(--px);font-size:18px;color:var(--mut);opacity:.6}
-.slot .lbl{position:relative;z-index:1;font-family:var(--px);font-size:8px;line-height:1.2;color:#fff;text-shadow:1px 1px 0 #000,0 0 3px #000;
-  padding:2px 5px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.slot .lbl{position:absolute;left:0;right:0;bottom:0;z-index:1;font-family:var(--px);font-size:8px;line-height:1.25;color:#fff;background:linear-gradient(transparent,#000c);
+  padding:8px 4px 2px;text-align:center;overflow:hidden}
+.slot .lbl b,.slot .lbl i{display:block;font-weight:400;font-style:normal;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.slot .lbl i{color:var(--c);font-size:7px}
+.slot .upd{position:absolute;top:2px;right:19px;z-index:2;width:15px;height:15px;display:none;align-items:center;justify-content:center;
+  background:var(--c);color:#000;border:1px solid #000;font-size:10px;font-weight:700}
+.slot.filled:hover .upd{display:flex}
 .slot .sn{position:absolute;top:2px;left:2px;z-index:2;background:var(--c);color:#000;font-family:var(--px);font-size:8px;line-height:1.3;padding:0 3px;border:1px solid #000}
 .slot .rm{position:absolute;top:2px;right:2px;z-index:2;width:15px;height:15px;display:none;align-items:center;justify-content:center;
   background:var(--r);color:#000;border:1px solid #000;font-size:10px;font-weight:700}
@@ -290,8 +297,8 @@ body.out:fullscreen,body.out :fullscreen{cursor:none}
         <div class="pv"><canvas id="pv" width="480" height="270"></canvas><img class="ovl" alt=""><div class="ov flash"></div><div class="ov dark"></div><div class="off">preview off</div><i class="hdl r"></i><i class="hdl b"></i><i class="hdl rb"></i></div>
         <div class="ws-info"><span><kbd>1</kbd>–<kbd>0</kbd>, <kbd>⇧</kbd>+number and <kbd>Alt</kbd>+number pick · <kbd>←</kbd><kbd>→</kbd> step</span></div>
         <div class="slotbar">
-          <div class="slot-h"><b>Loop slots</b><span>drag styles here — ◀ ▶ and auto-switch cycle only these (empty = all)</span><button id="btnSlotsClear" class="mini" title="Empty all slots">clear</button></div>
-          <div class="slots" id="slots"></div>
+          <div class="slot-h"><b>Scenes</b><span>click an empty slot to save everything on screen · click a scene to recall it · ◀ ▶ and auto-switch cycle the saved scenes</span><button id="btnScenesClear" class="mini" title="Delete all scenes">clear</button></div>
+          <div class="slots" id="scenes"></div>
         </div>
       </div>
     </section>
@@ -320,7 +327,7 @@ body.out:fullscreen,body.out :fullscreen{cursor:none}
         <div class="meters"><div><span>LOW</span><i id="mB"></i></div><div><span>MID</span><i id="mM"></i></div><div><span>HIGH</span><i id="mH"></i></div></div>
       </fieldset>
       <fieldset><legend>Video &amp; performance</legend>
-        <div class="f sel"><label for="source">Source</label><select id="source"><option value="cam">Webcam</option><option value="shapes">Abstract shapes</option><option value="video">Video file</option></select></div>
+        <div class="f sel"><label for="source">Source</label><select id="source"><option value="cam">Webcam</option><option value="shapes">Abstract shapes</option><option value="video">Video file</option><option value="text">Text</option></select></div>
         <div class="f sel src-cam"><label for="cam">Webcam</label><select id="cam"></select></div>
         <div class="src-video" hidden><label class="vidlbl">Videos <span>— clique para carregar e trocar · mapeável no MIDI</span></label>
           <div class="vslots" id="vslots"></div>
@@ -330,6 +337,14 @@ body.out:fullscreen,body.out :fullscreen{cursor:none}
         <div class="f src-shapes" hidden><label for="shapeCount">Count</label><input type="range" id="shapeCount" min="2" max="30" step="1" data-midi="shapeCount" data-label="Shape count"><output id="shapeCountV"></output></div>
         <div class="f src-shapes" hidden><label for="shapeSpeed">Speed</label><input type="range" id="shapeSpeed" min="0" max="1" step=".01" data-midi="shapeSpeed" data-label="Shape speed"><output id="shapeSpeedV"></output></div>
         <div class="f src-shapes" hidden><label for="shapeLine">Line</label><input type="range" id="shapeLine" min="1" max="8" step=".5" data-midi="shapeLine" data-label="Shape line width"><output id="shapeLineV"></output></div>
+        <div class="f sel src-text" hidden><label for="textStr">Text</label><input type="text" id="textStr" maxlength="80" spellcheck="false" placeholder="your text"></div>
+        <div class="f sel src-text" hidden><label for="textMotion">Motion</label>
+          <select id="textMotion"><option value="auto">Auto (cycles every 8 beats)</option><option value="pulse">Pulse</option><option value="slam">Slam</option><option value="words">Word flash</option><option value="wave">Wave</option><option value="bounce">Bounce</option><option value="scatter">Scatter</option><option value="orbit">Orbit</option><option value="tunnel">Tunnel</option><option value="flip">Flip</option><option value="marquee">Marquee</option><option value="stack">Typo wall</option><option value="glitch">Glitch</option><option value="split">Slit shift</option><option value="cut">Cut</option><option value="matrix">Grid flash</option><option value="diag">Diagonal wall</option><option value="vhs">VHS</option><option value="echo">Echo</option><option value="mega">Poster</option><option value="extrude">3D Extrude</option><option value="carousel">3D Carousel</option><option value="runway">3D Runway</option><option value="spin3d">3D Spin</option></select></div>
+        <div class="f sel src-text" hidden><label for="textFont">Font</label>
+          <select id="textFont"><option value="impact">Impact</option><option value="black">Arial Black</option><option value="sans">Sans</option><option value="serif">Serif</option><option value="mono">Mono</option></select></div>
+        <div class="f src-text" hidden><label for="textSize">Size</label><input type="range" id="textSize" min="0" max="1" step=".01" data-midi="textSize" data-label="Text size"><output id="textSizeV"></output></div>
+        <div class="f src-text" hidden><label for="textSpeed">Speed</label><input type="range" id="textSpeed" min="0" max="1" step=".01" data-midi="textSpeed" data-label="Text speed"><output id="textSpeedV"></output></div>
+        <div class="chk src-text" hidden><label><input type="checkbox" id="textLine" data-midi="textLine" data-label="Text outline"> Outline</label><label class="tcol">Color <input type="color" id="textColor"></label></div>
         <div class="f sel"><label for="quality">Resolution</label>
           <select id="quality"><option value="640">Light (640)</option><option value="960">Medium (960)</option><option value="1280">High (1280)</option><option value="1920">Full HD (1920)</option><option value="0">Native</option></select></div>
         <div class="f sel"><label for="fpsCap">FPS limit</label>
@@ -373,7 +388,7 @@ body.out:fullscreen,body.out :fullscreen{cursor:none}
     <kbd>1 … 0</kbd><span>Styles 1 to 10</span>
     <kbd>⇧ + 1 … 0</kbd><span>Styles 11 to 20</span>
     <kbd>Alt + 1 … 0</kbd><span>Styles 21 to 30</span>
-    <kbd>← →</kbd><span>Previous / next style (or ◀ ▶ on the toolbar, MIDI-mappable). Styles switched off with ✓ on their card are skipped</span>
+    <kbd>← →</kbd><span>Previous / next saved scene (or ◀ ▶ on the toolbar, MIDI-mappable). With no scenes saved, they step styles, skipping those switched off with ✓ on their card</span>
     <kbd>Space</kbd><span>Flash</span>
     <kbd>B</kbd><span>Blackout</span>
     <kbd>N</kbd><span>No effect (bypass) — raw video / webcam</span>
@@ -409,7 +424,8 @@ const DEF = { style: 0, intensity: .7, detail: .5, hue: 0, palette: 1, drift: tr
   fpsCap: 60, preview: true, corners: null, calib: false, strobeRate: 0, strobeSync: true,
   ovlOn: true, ovlMode: 'top', ovlBlend: 'normal', ovlScale: .3, ovlX: .5, ovlY: .5, ovlAlpha: 1, ovlPulse: true,
   source: 'cam', shapeSet: 'mix', shapeCount: 12, shapeSpeed: .4, shapeLine: 3, off: [], exposure: 0, contrast: 1, threshold: .12,
-  slots: [null, null, null, null, null, null],   // "setlist": estilos arrastados para o loop (◀ ▶ e troca automática)
+  text: 'VIRTUAL VJ', textMotion: 'auto', textFont: 'impact', textSize: .6, textSpeed: .5, textColor: '#ffffff', textLine: false,
+  scenes: Array(12).fill(null),   // 12 cenas completas (instantâneo de tudo que está na tela); ◀ ▶ e a troca automática percorrem as salvas
   vids: [null, null, null, null, null, null], vidSlot: -1 };   // 6 slots de vídeo de fundo (nome por slot; o blob fica no IndexedDB)
 const FLAT = () => [[0, 0], [1, 0], [1, 1], [0, 1]];   // cantos: sup-esq, sup-dir, inf-dir, inf-esq (0..1)
 const state = { ...DEF, corners: FLAT() };
@@ -526,6 +542,7 @@ function hookVfc() {
 }
 function getSource(t) {
   if (state.source === 'shapes') { frameId++; return shp; }   // desenhado no loop por drawShapes()
+  if (state.source === 'text') { frameId++; return txt; }     // desenhado no loop por drawText()
   if (state.source === 'video') {                             // clipe importado (ou demo enquanto carrega / sem arquivo)
     if (fvidReady && fvid.readyState >= 2 && fvid.videoWidth) { frameId++; return fvid; }
     drawDemo(t); frameId++; return demo;
@@ -595,6 +612,198 @@ function drawShapes(dt, a) {
     c.restore();
   }
 }
+/* ---------- fonte "Text": tipografia animada (movimentos reagem à batida) ---------- */
+const txt = document.createElement('canvas'); txt.width = 960; txt.height = 540;
+const tctx = txt.getContext('2d');
+const txs = document.createElement('canvas'); txs.width = 960; txs.height = 540;   // cópia do quadro, para os movimentos que fatiam o texto
+const snapx = txs.getContext('2d');
+const TXT_FONTS = { impact: 'Impact,"Arial Black",sans-serif', black: '"Arial Black",Impact,sans-serif', sans: '"Segoe UI",Arial,sans-serif', serif: 'Georgia,"Times New Roman",serif', mono: 'Consolas,"Courier New",monospace' };
+const TXT_MOTIONS = ['pulse', 'slam', 'words', 'wave', 'bounce', 'scatter', 'orbit', 'tunnel', 'flip', 'marquee', 'stack', 'glitch', 'split', 'cut', 'matrix', 'diag', 'vhs', 'echo', 'mega', 'extrude', 'carousel', 'runway', 'spin3d'];
+let txtT = 0, txtBeat = -1, txtBeatN = 0, txtAge = 0, txtSeed = 1;
+function drawText(dt, a) {
+  const c = tctx, W = txt.width, H = txt.height, k = .5 + state.intensity, pulse = a.pulse;
+  txtT += dt * (.25 + state.textSpeed * 2.4) * (1 + a.bass * .5);
+  if (a.beatId !== txtBeat) { if (txtBeat >= 0) { txtBeatN++; txtAge = 0; txtSeed = Math.random() * 100; } txtBeat = a.beatId; }
+  txtAge += dt;
+  const t = txtT, age = txtAge, str = (state.text || '').trim(), fam = TXT_FONTS[state.textFont] || TXT_FONTS.impact;
+  c.setTransform(1, 0, 0, 1, 0, 0); c.globalAlpha = 1; c.globalCompositeOperation = 'source-over';
+  c.fillStyle = '#000'; c.fillRect(0, 0, W, H);
+  if (!str) return;
+  c.fillStyle = c.strokeStyle = state.textColor || '#fff'; c.lineJoin = 'round'; c.textAlign = 'center'; c.textBaseline = 'middle';
+  const motion = state.textMotion === 'auto' ? TXT_MOTIONS[Math.floor(txtBeatN / 8) % TXT_MOTIONS.length] : state.textMotion;
+  const wid = (s, px) => { c.font = `${px}px ${fam}`; return c.measureText(s).width; };
+  const fit = (s, maxW, maxH) => Math.min(maxH, maxW / wid(s, 100) * 100);                // tamanho em que s cabe na tela
+  const base = fit(str, W * .9, H * .55) * (.35 + .9 * state.textSize);
+  let line = state.textLine;                                                              // alguns movimentos forçam contorno
+  const put = (s, x, y, px, rot = 0, sx = 1, al = 1) => {
+    c.save(); c.translate(x, y); c.rotate(rot); c.scale(sx, 1); c.globalAlpha = al; c.font = `${px}px ${fam}`;
+    if (line) { c.lineWidth = Math.max(2, px * .035); c.strokeText(s, 0, 0); } else c.fillText(s, 0, 0);
+    c.restore();
+  };
+  const letters = (s, px) => { const w = [...s].map(ch => wid(ch, px)), tot = w.reduce((p, q) => p + q, 0); let x = -tot / 2; return [...s].map((ch, i) => { const cx = x + w[i] / 2; x += w[i]; return { ch, x: cx, w: w[i] }; }); };
+  const row = (s, y, px, off, al = 1) => {                                                // linha que repete e rola na horizontal
+    const w = wid(s, px), per = w + px * .6; let x = -((off % per) + per) % per - per;
+    for (; x < W + per; x += per) put(s, x + w / 2, y, px, 0, 1, al);
+  };
+  const ink = state.textColor || '#fff';
+  const snap = () => { snapx.clearRect(0, 0, W, H); snapx.drawImage(txt, 0, 0); c.fillStyle = '#000'; c.fillRect(0, 0, W, H); c.fillStyle = c.strokeStyle = ink; };   // guarda o quadro e limpa
+  switch (motion) {
+    case 'pulse': put(str, W / 2, H / 2, base * (1 + pulse * .22 * k + Math.sin(t * .8) * .03)); break;
+    case 'slam': {   // entra gigante a cada batida e assenta
+      const e = Math.exp(-age * 7), r = (hh(txtSeed) - .5) * .25 * e;
+      put(str, W / 2, H / 2, base * (1 + e * 1.6 * k), r, 1, Math.min(1, .35 + age * 6)); break;
+    }
+    case 'words': {  // uma palavra por batida, estourando na entrada
+      const ws = str.split(/\s+/), w = ws[txtBeatN % ws.length], px = fit(w, W * .92, H * .8) * (.4 + .6 * state.textSize + .0);
+      put(w, W / 2, H / 2, px * (1 + Math.exp(-age * 9) * .4 * k), 0, 1, 1); break;
+    }
+    case 'wave': {
+      const px = base * .9;
+      for (const l of letters(str, px)) { const i = l.x / px; put(l.ch, W / 2 + l.x, H / 2 + Math.sin(t * 3 + i * 1.1) * px * .28 * k * (1 + pulse * .6), px, Math.sin(t * 3 + i * 1.1 + 1) * .16); }
+      break;
+    }
+    case 'bounce': {
+      const px = base * .9;
+      letters(str, px).forEach((l, i) => { const u = Math.max(0, age - i * .045), hop = u < .2 ? Math.sin(u * 5 * Math.PI) : 0; put(l.ch, W / 2 + l.x, H / 2 - hop * px * .75 * k, px, hop * (i % 2 ? .25 : -.25)); });
+      break;
+    }
+    case 'scatter': {   // letras explodem na batida e voltam como mola
+      const px = base * .9;
+      letters(str, px).forEach((l, i) => {
+        const ang = hh(i + txtSeed) * 6.283, dist = (60 + hh(i * 3 + txtSeed) * 260) * k * Math.exp(-age * 2.2) * Math.cos(age * 6);
+        put(l.ch, W / 2 + l.x + Math.cos(ang) * dist, H / 2 + Math.sin(ang) * dist, px, (hh(i * 7 + txtSeed) - .5) * 2 * Math.exp(-age * 2.5));
+      });
+      break;
+    }
+    case 'orbit': {   // texto em anel girando (e outro, menor, no sentido contrário)
+      const ring = (R, px, dir) => {
+        const unit = str + '  •  ', reps = Math.max(1, Math.round(6.283 * R / wid(unit, px))), L = letters(unit.repeat(reps), px), tot = L[L.length - 1].x - L[0].x + L[0].w;
+        L.forEach(l => { const ang = dir * t * .5 + (l.x / tot) * 6.283; put(l.ch, W / 2 + Math.cos(ang) * R, H / 2 + Math.sin(ang) * R, px, ang + Math.PI / 2); });
+      };
+      const R = H * .38 * (1 + pulse * .06 * k); ring(R, H * .1 * (.5 + state.textSize), 1); ring(R * .55, H * .06 * (.5 + state.textSize), -1);
+      break;
+    }
+    case 'tunnel': {   // cópias contornadas saindo do centro
+      line = true;
+      for (let j = 0; j < 8; j++) { const s = (t * .3 + j / 8) % 1; put(str, W / 2, H / 2, base * (.1 + s * s * 3.4), Math.sin(t * .4 + j) * .1, 1, Math.min(1, s * 4) * (1 - s * .6)); }
+      line = state.textLine; put(str, W / 2, H / 2, base * (1 + pulse * .15 * k)); break;
+    }
+    case 'flip': {   // giro em torno do eixo vertical
+      const sx = Math.cos(t * 1.4); put(str, W / 2, H / 2, base * (1 + pulse * .12 * k), 0, Math.abs(sx) < .04 ? .04 : sx); break;
+    }
+    case 'marquee': {
+      const px = Math.min(base * 1.1, H * .5);
+      row(str, H / 2 + Math.sin(t * 1.3) * H * .04 * k, px, t * W * .35, 1); break;
+    }
+    case 'stack': {   // parede de tipografia: linhas alternando direção; a da batida acende
+      const n = 5, px = H / n * .9;
+      for (let r = 0; r < n; r++) { line = r % 2 === 1; row(str, (r + .5) * H / n, px, (r % 2 ? 1 : -1) * t * W * (.12 + r * .02), r === txtBeatN % n ? 1 : .4 + pulse * .2); }
+      line = state.textLine; break;
+    }
+    case 'glitch': {
+      const d = (2 + pulse * 16 * k) * (W / 960), px = base * (1 + pulse * .08 * k), fr = Math.floor(t * 10);
+      c.globalCompositeOperation = 'lighter';
+      for (const [col, ox] of [['#ff0000', -d], ['#00ff00', 0], ['#0000ff', d]]) { c.fillStyle = c.strokeStyle = col; put(str, W / 2 + ox, H / 2, px); }
+      c.globalCompositeOperation = 'source-over';
+      const n = pulse > .3 ? 7 : 2;
+      for (let i = 0; i < n; i++) {   // fatias deslocadas
+        const sy = Math.floor(hh(fr * 3 + i) * H), sh = 6 + Math.floor(hh(fr * 5 + i) * 50), dx = (hh(fr * 7 + i) - .5) * 160 * k;
+        c.drawImage(txt, 0, sy, W, sh, dx, sy, W, sh);
+      }
+      break;
+    }
+    case 'split': {   // persiana: faixas horizontais deslizando em sentidos opostos, abrem na batida
+      put(str, W / 2, H / 2, base * (1 + pulse * .1 * k)); snap();
+      const n = 14, sh = H / n;
+      for (let i = 0; i < n; i++) { const dx = Math.sin(t * 2 + i * .8) * W * .03 * k + (i % 2 ? 1 : -1) * Math.exp(-age * 5) * W * .14 * k; c.drawImage(txs, 0, i * sh, W, sh + 1, dx, i * sh, W, sh + 1); }
+      break;
+    }
+    case 'cut': {     // corte ao meio: metades fogem para lados opostos na batida e voltam
+      put(str, W / 2, H / 2, base * (1 + pulse * .08 * k)); snap();
+      const dx = Math.exp(-age * 6) * W * .4 * k + Math.sin(t * .7) * W * .01, dy = Math.exp(-age * 6) * H * .04;
+      c.drawImage(txs, 0, 0, W, H / 2, -dx, -dy, W, H / 2); c.drawImage(txs, 0, H / 2, W, H / 2, dx, H / 2 + dy, W, H / 2);
+      break;
+    }
+    case 'matrix': {  // grade de textos: a cada batida sorteia células que acendem invertidas
+      const cols = 3, rows = 6, cw = W / cols, ch = H / rows, px = fit(str, cw * .9, ch * .8);
+      for (let r = 0; r < rows; r++) for (let q = 0; q < cols; q++) {
+        const id = r * cols + q, lit = hh(id * 13.7 + txtSeed) < .22 + pulse * .2 ? Math.exp(-age * 2.5) : 0, x = (q + .5) * cw, y = (r + .5) * ch;
+        if (lit > .02) { c.globalAlpha = lit; c.fillStyle = ink; c.fillRect(q * cw + 3, r * ch + 3, cw - 6, ch - 6); c.globalAlpha = 1; c.fillStyle = '#000'; c.strokeStyle = '#000'; put(str, x, y, px); c.fillStyle = c.strokeStyle = ink; }
+        else put(str, x, y, px, 0, 1, .3);
+      }
+      break;
+    }
+    case 'diag': {    // parede inclinada, linhas em sentidos alternados
+      const px = H * .2;
+      c.save(); c.translate(W / 2, H / 2); c.rotate(-.3 + Math.sin(t * .3) * .05); c.translate(-W / 2, -H / 2);
+      for (let r = -3, i = 0; r < 12; r++, i++) { line = i % 2 === 1; row(str, r * px * .95, px, (i % 2 ? 1 : -1) * t * W * .14, i === txtBeatN % 6 + 2 ? 1 : .55); }
+      c.restore(); line = state.textLine; break;
+    }
+    case 'vhs': {     // fita gasta: separação RGB, faixa de tracking rolando e linhas de varredura
+      const d = (1.5 + pulse * 6 * k) * (W / 960), px = base * (1 + pulse * .05 * k), jit = (hh(Math.floor(t * 24)) - .5) * 4 * k;
+      c.globalCompositeOperation = 'lighter';
+      for (const [col, ox] of [['#ff2020', -d], ['#20ff20', 0], ['#2020ff', d]]) { c.fillStyle = c.strokeStyle = col; put(str, W / 2 + ox + jit, H / 2, px); }
+      c.globalCompositeOperation = 'source-over';
+      const by = (t * 90) % (H + 120) - 60, bh = 46; snapx.clearRect(0, 0, W, H); snapx.drawImage(txt, 0, 0);
+      c.fillStyle = '#000'; c.fillRect(0, by, W, bh); c.drawImage(txs, 0, by, W, bh, Math.sin(t * 9) * 26 * k, by, W, bh);   // faixa deslocada
+      c.globalAlpha = .4; c.fillStyle = '#000'; for (let y = 0; y < H; y += 4) c.fillRect(0, y, W, 1.6);
+      c.globalAlpha = 1; break;
+    }
+    case 'echo': {    // rastro de cópias contornadas seguindo uma órbita curta
+      const n = 10, px = base * (1 + pulse * .1 * k);
+      for (let j = n - 1; j >= 0; j--) { line = j > 0 || state.textLine; put(str, W / 2 + Math.cos(t * .9) * j * 18 * k, H / 2 + Math.sin(t * .9) * j * 11 * k, px, Math.sin(t * .5) * j * .01, 1, (1 - j / n) * .9 + .1); }
+      line = state.textLine; break;
+    }
+    case 'mega': {    // cartaz: linhas de tamanhos diferentes, cada uma justificada na largura da tela
+      const rowsD = []; let tot = 0;
+      for (let r = 0; tot < H * 1.1 && r < 14; r++) { const s = (str + ' ').repeat([1, 2, 1, 3][r % 4]).trim(), px = Math.min(fit(s, W * .96, H), H * .45), h = px * .86; rowsD.push({ s, px, h }); tot += h; }
+      let y = (H - tot) / 2;
+      rowsD.forEach((o, i) => { line = i % 3 === 1; put(o.s, W / 2 + Math.sin(t * .9 + i) * W * .015, y + o.h / 2, o.px, 0, 1, i === txtBeatN % rowsD.length ? 1 : .55 + pulse * .2); y += o.h; });
+      line = state.textLine; break;
+    }
+    case 'extrude': { // bloco 3D: camadas empilhadas formam a lateral; a direção da profundidade gira
+      const px = base * (1 + pulse * .08 * k), depth = (16 + 10 * k + pulse * 30 * k) * (W / 960), n = 28, a = t * .8, dx = Math.cos(a) * depth, dy = Math.sin(a * 1.3) * depth * .6;
+      const rgb = /^#[0-9a-f]{6}$/i.test(ink) ? ink.match(/\w\w/g).map(h => parseInt(h, 16)) : [255, 255, 255];
+      for (let j = n; j >= 0; j--) {
+        const f = j / n, b = j ? .22 + .4 * (1 - f) : 1;               // camadas do fundo mais escuras, a frente com a cor cheia
+        c.fillStyle = c.strokeStyle = `rgb(${rgb[0] * b | 0},${rgb[1] * b | 0},${rgb[2] * b | 0})`;
+        put(str, W / 2 + dx * f - dx * .5, H / 2 + dy * f - dy * .5, px);
+      }
+      break;
+    }
+    case 'carousel': { // letras num cilindro girando, vistas de leve por cima
+      const px = H * .2 * (.5 + state.textSize) * (1 + pulse * .08 * k), R = W * .4, unit = str + '   ', reps = Math.max(1, Math.round(6.283 * R / wid(unit, px)));
+      const L = letters(unit.repeat(reps), px), tot = L[L.length - 1].x - L[0].x + L[0].w;
+      L.map(l => { const ang = l.x / tot * 6.283 + t * .6; return { l, ang, z: Math.cos(ang) }; }).sort((p, q) => p.z - q.z).forEach(({ l, ang, z }) => {
+        const front = (z + 1) / 2, sx = Math.cos(ang), s = .55 + .45 * front;
+        put(l.ch, W / 2 + Math.sin(ang) * R, H / 2 + z * H * .07, px * s, 0, Math.abs(sx) < .1 ? .1 * (sx < 0 ? -1 : 1) : sx, .25 + .75 * front);
+      });
+      break;
+    }
+    case 'runway': {  // chão em perspectiva: linhas de texto vêm do horizonte em direção a você
+      const hor = H * .3, rows = 9, fr = (t * .6) % 1;
+      c.save(); c.strokeStyle = ink; c.lineWidth = 1.5; c.globalAlpha = .28;
+      for (let i = -7; i <= 7; i++) { c.beginPath(); c.moveTo(W / 2 + i * W * .02, hor); c.lineTo(W / 2 + i * W * .2, H); c.stroke(); }
+      c.beginPath(); c.moveTo(0, hor); c.lineTo(W, hor); c.globalAlpha = .6; c.stroke(); c.restore();
+      for (let r = rows; r >= 0; r--) {
+        const d = r + 1 - fr; if (d < .4) continue;
+        const s = .55 / d, y = hor + (H - hor) * s;
+        line = (r + txtBeatN) % 2 === 1; put(str, W / 2, y, base * .9 * s * (1 + pulse * .1 * k), 0, 1, Math.min(1, 1.15 - d / (rows + 1)) * Math.min(1, (d - .4) * 3));
+      }
+      line = state.textLine; break;
+    }
+    case 'spin3d': {  // texto girando em torno do eixo vertical, com perspectiva
+      put(str, W / 2, H / 2, base * (1 + pulse * .1 * k)); snap();
+      const th = t * .9, ct = Math.cos(th), st = Math.sin(th), sw = 3;
+      c.globalAlpha = .4 + .6 * Math.abs(ct);
+      for (let x = 0; x < W; x += sw) {
+        const u = (x + sw / 2 - W / 2) / (W / 2), p = 1 / (1 - u * st * .35), sx = W / 2 + u * ct * p * W / 2, dw = Math.max(1.5, Math.abs(ct) * p * sw + .8), dh = H * p;
+        c.drawImage(txs, x, 0, sw, H, sx - dw / 2, (H - dh) / 2, dw, dh);
+      }
+      c.globalAlpha = 1; break;
+    }
+  }
+}
 function stopCam() { camToken++; if (camStream) camStream.getTracks().forEach(t => t.stop()); camStream = null; camLive = false; }
 function dims(s) { return s === video ? [video.videoWidth, video.videoHeight] : s === fvid ? [fvid.videoWidth, fvid.videoHeight] : [s.width, s.height]; }
 
@@ -647,12 +856,6 @@ const COPY_FS = `#version 300 es
 precision highp float;
 in vec2 vUv; out vec4 o; uniform sampler2D uPrev;
 void main(){ o = texture(uPrev, vUv); }`;
-
-// "sem efeito": mostra a câmera/vídeo já recortada e corrigida (crop, espelho, exposição/contraste), sem nenhum estilo
-const RAW_FS = `#version 300 es
-precision highp float;
-in vec2 vUv; out vec4 o; uniform sampler2D uCam;
-void main(){ o = texture(uCam, vUv); }`;
 
 const HEAD = `#version 300 es
 precision highp float;
@@ -1416,6 +1619,20 @@ function createEngine(canvas, wrap, opt = {}) {
   }
   const bind = (unit, t) => { gl.activeTexture(gl.TEXTURE0 + unit); gl.bindTexture(T2, t); };
 
+  // prepara o passe que recorta/espelha/corrige a fonte (câmera, vídeo, texto…); o chamador escolhe onde desenhar
+  function camPass(src) {
+    const [sw, sh] = dims(src), sa = sw / sh, ta = W / H, crop = sa > ta ? [(1 - ta / sa) / 2, 0, ta / sa, 1] : [0, (1 - sa / ta) / 2, 1, sa / ta];
+    const P = prog('cam', CAM_FS); gl.useProgram(P.p); U(P, 'uCrop', crop); U(P, 'uMirror', state.mirror && state.source !== 'text' ? 1 : 0); U(P, 'uExp', 2 ** state.exposure); U(P, 'uCon', state.contrast);   // texto espelhado ficaria ilegível
+    const ovOn = state.ovlOn && ovlW && state.ovlMode === 'cam';
+    U(P, 'uOvlA', ovOn ? state.ovlAlpha : 0); bind(6, ovlTex);
+    if (ovOn) {
+      const w = state.ovlScale, h = w * ovlH / ovlW * W / H;   // mesma proporção do modo "por cima"
+      U(P, 'uOvlR', [state.ovlX - w / 2, 1 - state.ovlY - h / 2, w, h]);
+      U(P, 'uOvlB', { normal: 0, screen: 1, difference: 2 }[state.ovlBlend] || 0);
+    }
+    return P;
+  }
+
   // flash / fade / blackout e imagem "por cima" = camadas HTML (custo zero na GPU); roda com ou sem efeito
   function drawLayers(dt, aud) {
     if (ovEl) {
@@ -1456,15 +1673,7 @@ function createEngine(canvas, wrap, opt = {}) {
         lastFrame = frameId;
         bind(5, vidTex); gl.texImage2D(T2, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, src);
         [camA, camB] = [camB, camA];
-        const [sw, sh] = dims(src), sa = sw / sh, ta = W / H, crop = sa > ta ? [(1 - ta / sa) / 2, 0, ta / sa, 1] : [0, (1 - sa / ta) / 2, 1, sa / ta];
-        const P = prog('cam', CAM_FS); gl.useProgram(P.p); U(P, 'uCrop', crop); U(P, 'uMirror', state.mirror ? 1 : 0); U(P, 'uExp', 2 ** state.exposure); U(P, 'uCon', state.contrast);
-        const ovOn = state.ovlOn && ovlW && state.ovlMode === 'cam';
-        U(P, 'uOvlA', ovOn ? state.ovlAlpha : 0); bind(6, ovlTex);
-        if (ovOn) {
-          const w = state.ovlScale, h = w * ovlH / ovlW * W / H;   // mesma proporção do modo "por cima"
-          U(P, 'uOvlR', [state.ovlX - w / 2, 1 - state.ovlY - h / 2, w, h]);
-          U(P, 'uOvlB', { normal: 0, screen: 1, difference: 2 }[state.ovlBlend] || 0);
-        }
+        camPass(src);
         gl.bindFramebuffer(FB, camA.f); gl.viewport(0, 0, camA.w, camA.h); gl.drawArrays(gl.TRIANGLES, 0, 3);
         bind(0, camA.t); gl.generateMipmap(T2);
       }
@@ -1485,10 +1694,10 @@ function createEngine(canvas, wrap, opt = {}) {
       if (sliceN > 0) sliceN--; else slices.fill(0);
       flow += dt * (10 + state.intensity * 14) * (1 + aud.pulse * 1.5 + aud.bass);
 
-      // 3) sem efeito: joga a câmera/vídeo direto na tela
+      // 3) sem efeito: refaz o passe da fonte direto na tela, em resolução cheia (a textura da câmera é 640 de largura: borraria o texto)
       if (state.bypass) {
-        const R = prog('raw', RAW_FS); gl.bindFramebuffer(FB, null); gl.viewport(0, 0, W, H);
-        gl.useProgram(R.p); bind(0, camA.t); gl.drawArrays(gl.TRIANGLES, 0, 3);
+        camPass(src); bind(5, vidTex); gl.bindFramebuffer(FB, null); gl.viewport(0, 0, W, H);
+        gl.drawArrays(gl.TRIANGLES, 0, 3);
         drawLayers(dt, aud); return;
       }
       // 3) efeito
@@ -1715,7 +1924,7 @@ function initOverlay() {
 }
 
 /* ---------- loop principal ---------- */
-let outEng, pvEng, outWin = null, lastAudioMsg = 0, lastAuto = 0, fpsN = 0, fpsT = 0, thumbsBusy = false, pvTick = 0, curSlot = -1;
+let outEng, pvEng, outWin = null, lastAudioMsg = 0, lastAuto = 0, fpsN = 0, fpsT = 0, thumbsBusy = false, pvTick = 0;
 
 function send(m) { if (outWin && !outWin.closed) { try { outWin.postMessage(m, '*'); } catch (e) {} } }
 const pushState = () => send({ t: 'state', s: state });
@@ -1738,15 +1947,22 @@ function loop(now) {
   buildLut(t);
   if (isOut) {
     if (now - lastAudioMsg > 1500) { audio.pulse *= Math.exp(-dt * 5); clockAudio(dt); }
-    if (state.source === 'shapes') drawShapes(dt, audio);
+    if (state.source === 'shapes') drawShapes(dt, audio); else if (state.source === 'text') drawText(dt, audio);
     outEng.render(getSource(t), t, dt);
     fpsN++;
     if (now - fpsT > 1000) { if (window.opener) window.opener.postMessage({ t: 'fps', fps: fpsN }, '*'); fpsN = 0; fpsT = now; }
   } else {
     driveAudio(dt, now);
-    if (state.source === 'shapes') drawShapes(dt, audio);
+    if (state.source === 'shapes') drawShapes(dt, audio); else if (state.source === 'text') drawText(dt, audio);
     // a prévia roda a meia taxa: é só para conferir
-    if (pvEng && state.preview && (pvTick++ & 1) === 0) pvEng.render(getSource(t), t, dt * 2);
+    if (pvEng && state.preview && (pvTick++ & 1) === 0) {
+      pvEng.render(getSource(t), t, dt * 2);
+      if (thumbReq) {                                             // miniatura da cena recém-salva: copia a prévia logo após desenhar
+        const cv = document.createElement('canvas'); cv.width = 192; cv.height = 108;
+        try { cv.getContext('2d').drawImage($('#pv'), 0, 0, 192, 108); sceneThumbs[thumbReq] = cv.toDataURL('image/jpeg', .72); saveThumbs(); } catch (e) {}
+        thumbReq = null; renderScenes();
+      }
+    }
     $('#mB').style.height = audio.bass * 100 + '%'; $('#mM').style.height = audio.mid * 100 + '%'; $('#mH').style.height = audio.high * 100 + '%';
     if (outWin && outWin.closed) { outWin = null; setChip('chOut', 'output: closed', ''); }
   }
@@ -1774,59 +1990,102 @@ function startBgDriver() {
 
 /* ---------- controles (painel) ---------- */
 function setChip(id, txt, cls) { const e = $('#' + id); if (!e) return; e.textContent = txt; e.className = 'chip ' + cls; }
-function setStyle(i, slot = -1) {
-  curSlot = slot;                                            // de qual slot do loop viemos (-1 = fora da setlist)
+function setStyle(i) {
   state.style = i; lastAuto = performance.now(); if (pvEng) pvEng.setStyle(i);
   document.querySelectorAll('.card').forEach((el, k) => el.classList.toggle('sel', k === i));
-  document.querySelectorAll('.slot').forEach((el, k) => el.classList.toggle('active', k === slot));
   $('#curName').textContent = `${i + 1}. ${EFFECTS[i].name}`;
   commit();
 }
 const styleOn = i => !state.off.includes(EFFECTS[i].name);   // guardado pelo nome: sobrevive a estilos novos
-const slotEff = i => { const nm = state.slots[i]; return nm ? EFFECTS.findIndex(e => e.name === nm) : -1; };
-// próximo/anterior: se há slots no loop, percorre só eles (em ordem); senão, todos os estilos pulando os desligados
+// próximo/anterior: se há cenas salvas, percorre só elas (em ordem); senão, todos os estilos pulando os desligados
 function stepStyle(d) {
-  const filled = []; for (let i = 0; i < state.slots.length; i++) if (slotEff(i) >= 0) filled.push(i);
+  const filled = []; for (let i = 0; i < state.scenes.length; i++) if (state.scenes[i]) filled.push(i);
   if (filled.length) {
-    let p = filled.indexOf(curSlot); if (p < 0) p = d > 0 ? -1 : 0;
-    const slot = filled[((p + d) % filled.length + filled.length) % filled.length];
-    return setStyle(slotEff(slot), slot);
+    let p = filled.indexOf(curScene); if (p < 0) p = d > 0 ? -1 : 0;
+    return recallScene(filled[((p + d) % filled.length + filled.length) % filled.length]);
   }
   const n = EFFECTS.length;
   for (let k = 1; k < n; k++) { const i = ((state.style + d * k) % n + n) % n; if (styleOn(i)) return setStyle(i); }
   lastAuto = performance.now();
 }
-function renderSlots() {
-  const host = $('#slots'); if (!host) return;
+
+/* ---------- cenas: 12 instantâneos completos do que está na tela ---------- */
+// tudo que define o "visual" (fonte, estilo, ajustes de imagem, cores, formas/texto/vídeo, logo). Fica de fora o que é do equipamento
+// (câmera/áudio/BPM/resolução), a calibração do projetor, o blackout e o strobo manual.
+const SCENE_KEYS = ['source', 'style', 'intensity', 'detail', 'exposure', 'contrast', 'threshold', 'palette', 'hue', 'drift', 'mirror', 'strobe', 'bypass',
+  'shapeSet', 'shapeCount', 'shapeSpeed', 'shapeLine', 'text', 'textMotion', 'textFont', 'textSize', 'textSpeed', 'textColor', 'textLine', 'vidSlot',
+  'ovlOn', 'ovlMode', 'ovlBlend', 'ovlScale', 'ovlX', 'ovlY', 'ovlAlpha', 'ovlPulse'];
+let curScene = -1, thumbReq = null;
+const sceneThumbs = (() => { try { return JSON.parse(localStorage.getItem('virtualvj_thumbs') || '{}'); } catch (e) { return {}; } })();
+const saveThumbs = () => { try { localStorage.setItem('virtualvj_thumbs', JSON.stringify(sceneThumbs)); } catch (e) {} };
+const imgKey = sc => 'sceneimg_' + sc.id;
+function sceneLabel(sc) {
+  return sc.source === 'cam' ? 'CAM' : sc.source === 'shapes' ? 'SHAPES' : sc.source === 'video' ? 'VIDEO ' + (sc.vidSlot + 1) : '"' + (sc.text || '').slice(0, 9) + '"';
+}
+async function saveScene(i) {
+  const old = state.scenes[i], sc = {};
+  SCENE_KEYS.forEach(k => sc[k] = state[k]);
+  sc.id = old ? old.id : 's' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  sc.img = !!(ovlBlob && state.ovlOn);                       // a imagem só entra na cena se estiver aparecendo
+  try { await idb('readwrite', s => sc.img ? s.put(ovlBlob, imgKey(sc)) : s.delete(imgKey(sc))); } catch (e) {}
+  state.scenes[i] = sc; curScene = i; save();
+  if (state.preview && pvEng) thumbReq = sc.id;              // a miniatura é tirada do próximo quadro da prévia
+  else { sceneThumbs[sc.id] = document.querySelectorAll('.card img')[state.style]?.src || ''; saveThumbs(); }
+  renderScenes();
+}
+async function recallScene(i) {
+  const sc = state.scenes[i]; if (!sc) return;
+  curScene = i;
+  SCENE_KEYS.forEach(k => { if (k in sc) state[k] = sc[k]; });
+  if (!(state.style < EFFECTS.length)) state.style = 0;
+  syncPanel(); applySource();
+  const vb = state.source === 'video' && state.vidSlot >= 0 ? vidBlobs[state.vidSlot] : null;
+  if (vb && bgBlob !== vb) setBgVideo(vb);
+  renderVids();
+  if (sc.img) idb('readonly', s => s.get(imgKey(sc))).then(b => b && setOverlay(b)).catch(() => {});
+  setStyle(state.style); renderScenes();
+}
+async function deleteScene(i) {
+  const sc = state.scenes[i]; if (!sc) return;
+  try { await idb('readwrite', s => s.delete(imgKey(sc))); } catch (e) {}
+  delete sceneThumbs[sc.id]; saveThumbs();
+  state.scenes[i] = null; if (curScene === i) curScene = -1; save(); renderScenes();
+}
+async function clearScenes() { for (let i = 0; i < state.scenes.length; i++) await deleteScene(i); }
+function renderScenes() {
+  const host = $('#scenes'); if (!host) return;
   host.innerHTML = '';
-  state.slots.forEach((nm, i) => {
-    const k = slotEff(i), el = document.createElement('div');
-    el.className = 'slot' + (k >= 0 ? ' filled' : '') + (i === curSlot ? ' active' : '');
-    el.draggable = k >= 0;
-    el.dataset.midi = 'slot' + i; el.dataset.label = 'Loop slot ' + (i + 1);   // mapeável no MIDI Learn (aciona o slot, qualquer estilo que esteja nele)
-    if (k >= 0) {
-      const src = document.querySelectorAll('.card img')[k]?.src || '';
-      el.innerHTML = `<span class="sn">${i + 1}</span>${src ? '<img alt="">' : ''}<span class="lbl">${EFFECTS[k].name}</span><span class="rm" title="Remove">✕</span>`;
-      if (src) el.querySelector('img').src = src;
+  state.scenes.forEach((sc, i) => {
+    const el = document.createElement('div');
+    el.className = 'slot' + (sc ? ' filled' : '') + (sc && i === curScene ? ' active' : '');
+    el.draggable = !!sc;
+    el.dataset.midi = 'scene' + i; el.dataset.label = 'Scene ' + (i + 1);   // mapeável no MIDI Learn
+    if (sc) {
+      el.innerHTML = `<span class="sn">${i + 1}</span>${sceneThumbs[sc.id] ? '<img alt="">' : ''}<span class="lbl"><b></b><i></i></span><span class="upd" title="Overwrite with what is on screen now">↻</span><span class="rm" title="Delete scene">✕</span>`;
+      if (sceneThumbs[sc.id]) el.querySelector('img').src = sceneThumbs[sc.id];
+      el.querySelector('b').textContent = EFFECTS[sc.style] ? EFFECTS[sc.style].name : '?';
+      el.querySelector('i').textContent = sceneLabel(sc);
     } else el.innerHTML = `<span class="sn">${i + 1}</span><span class="ph">+</span>`;
     el.ondragover = e => { e.preventDefault(); el.classList.add('over'); };
     el.ondragleave = () => el.classList.remove('over');
-    el.ondrop = e => {
+    el.ondrop = e => {                                         // arrastar uma cena sobre outra troca as duas de lugar
       e.preventDefault(); el.classList.remove('over');
-      const d = e.dataTransfer.getData('text/plain'); if (d === '') return;
-      if (d.startsWith('slot:')) { const f = +d.slice(5); const t = state.slots[f]; state.slots[f] = state.slots[i]; state.slots[i] = t; }
-      else state.slots[i] = EFFECTS[+d].name;
-      save(); renderSlots();
-      const nk = slotEff(i); if (nk >= 0) setStyle(nk, i);
+      const d = e.dataTransfer.getData('text/plain'); if (!d.startsWith('scene:')) return;
+      const f = +d.slice(6); if (f === i) return;
+      [state.scenes[f], state.scenes[i]] = [state.scenes[i], state.scenes[f]];
+      if (curScene === f) curScene = i; else if (curScene === i) curScene = f;
+      save(); renderScenes();
     };
-    el.ondragstart = e => { if (k >= 0) { e.dataTransfer.setData('text/plain', 'slot:' + i); e.dataTransfer.effectAllowed = 'move'; } };
+    el.ondragstart = e => { if (sc) { e.dataTransfer.setData('text/plain', 'scene:' + i); e.dataTransfer.effectAllowed = 'move'; } };
     el.onclick = e => {
-      if (e.target.classList.contains('rm')) { state.slots[i] = null; if (curSlot === i) curSlot = -1; save(); renderSlots(); return; }
-      if (k >= 0) setStyle(k, i);
+      if (e.target.classList.contains('rm')) return deleteScene(i);
+      if (e.target.classList.contains('upd')) return saveScene(i);
+      if (sc) recallScene(i);
+      else if (e.isTrusted) saveScene(i);                      // um pad MIDI num slot vazio não salva sem querer
     };
     host.appendChild(el);
   });
-  renderMidi();                                              // reaplica o destaque "mapeado" nos slots recriados
+  renderMidi();                                                // reaplica o destaque "mapeado" nos slots recriados
 }
 function toggleStyle(i, on = !styleOn(i)) {
   state.off = state.off.filter(x => x !== EFFECTS[i].name); if (!on) state.off.push(EFFECTS[i].name);
@@ -1872,7 +2131,7 @@ async function genThumbs() {
       }
       imgs[i].src = cv.toDataURL('image/jpeg', .75);
     }
-  } finally { te.destroy(); thumbsBusy = false; renderSlots(); }
+  } finally { te.destroy(); thumbsBusy = false; }
 }
 
 async function openOutput() {
@@ -1889,9 +2148,13 @@ async function openOutput() {
   } catch (e) {}
 }
 
+// cada controle registra aqui como se redesenha a partir do state (usado ao recarregar uma cena)
+const panelSync = [];
+const syncPanel = () => panelSync.forEach(f => f());
 function initPanel() {
-  const range = (id, key, fmt) => { const el = $('#' + id), o = $('#' + id + 'V'); el.value = state[key]; const u = () => { if (o) o.textContent = fmt ? fmt(state[key]) : state[key]; }; el.oninput = () => { state[key] = +el.value; u(); commit(); }; u(); };
-  const check = (id, key) => { const el = $('#' + id); el.checked = state[key]; el.onchange = () => { state[key] = el.checked; lastAuto = performance.now(); commit(); }; };
+  const range = (id, key, fmt) => { const el = $('#' + id), o = $('#' + id + 'V'); el.value = state[key]; const u = () => { if (o) o.textContent = fmt ? fmt(state[key]) : state[key]; }; el.oninput = () => { state[key] = +el.value; u(); commit(); }; u(); panelSync.push(() => { el.value = state[key]; u(); }); };
+  const check = (id, key) => { const el = $('#' + id); el.checked = state[key]; el.onchange = () => { state[key] = el.checked; lastAuto = performance.now(); commit(); }; panelSync.push(() => { el.checked = state[key]; }); };
+  const field = (id, key, ev = 'onchange') => { const el = $('#' + id); el.value = state[key]; el[ev] = () => { state[key] = el.value; commit(); }; panelSync.push(() => { el.value = state[key]; }); return el; };
   range('intensity', 'intensity', v => Math.round(v * 100)); range('detail', 'detail', v => Math.round(v * 100));
   range('hue', 'hue', v => v + '°'); range('gain', 'gain', v => v.toFixed(1) + '×');
   range('strobeRate', 'strobeRate', strobeLabel);
@@ -1903,7 +2166,7 @@ function initPanel() {
   ['drift', 'mirror', 'strobe', 'auto', 'strobeSync', 'ovlOn', 'ovlPulse'].forEach(k => check(k, k));
   const pct = v => Math.round(v * 100);
   range('ovlScale', 'ovlScale', pct); range('ovlX', 'ovlX', pct); range('ovlY', 'ovlY', pct); range('ovlAlpha', 'ovlAlpha', pct);
-  ['ovlMode', 'ovlBlend'].forEach(k => { const el = $('#' + k); el.value = state[k]; el.onchange = () => { state[k] = el.value; commit(); }; });
+  ['ovlMode', 'ovlBlend'].forEach(k => field(k, k));
   $('#strobeSync').addEventListener('change', () => { $('#strobeRateV').textContent = strobeLabel(state.strobeRate); });
   const pv = $('#preview'); pv.checked = state.preview;
   const pvShow = () => $('.pv').classList.toggle('paused', !state.preview);
@@ -1922,14 +2185,15 @@ function initPanel() {
     const p = PALS[state.palette]; sws.forEach((b, i) => b.classList.toggle('on', i === state.palette));
     $('#curA').style.background = grad(p); $('#curB').style.background = p.s[p.s.length - 1];
   };
-  showPal();
+  showPal(); panelSync.push(showPal);
   const am = $('#audioMode'); am.value = state.audioMode; am.onchange = () => { state.audioMode = am.value; commit(); startMic(); };
   $('#mic').onchange = e => { state.mic = e.target.value; commit(); startMic(); };
   $('#cam').onchange = e => { state.cam = e.target.value; commit(); applySource(); };
-  const src = $('#source'); src.value = state.source;
-  src.onchange = () => { state.source = src.value; commit(); applySource(); };
-  const ss = $('#shapeSet'); ss.value = state.shapeSet; ss.onchange = () => { state.shapeSet = ss.value; commit(); };
+  const src = field('source', 'source', 'onchange'); src.onchange = () => { state.source = src.value; commit(); applySource(); };
+  field('shapeSet', 'shapeSet');
   range('shapeCount', 'shapeCount', v => Math.round(v)); range('shapeSpeed', 'shapeSpeed', v => Math.round(v * 100)); range('shapeLine', 'shapeLine', v => v + 'px');
+  field('textStr', 'text', 'oninput'); field('textMotion', 'textMotion'); field('textFont', 'textFont'); field('textColor', 'textColor', 'oninput');
+  range('textSize', 'textSize', v => Math.round(v * 100)); range('textSpeed', 'textSpeed', v => Math.round(v * 100)); check('textLine', 'textLine');
   const q = $('#quality'); q.value = state.quality; q.onchange = () => { state.quality = +q.value; commit(); };
   const fc = $('#fpsCap'); fc.value = state.fpsCap; fc.onchange = () => { state.fpsCap = +fc.value; commit(); };
 
@@ -1939,13 +2203,11 @@ function initPanel() {
     const key = i < 10 ? (i + 1) % 10 : i < 20 ? '⇧' + (i - 9) % 10 : i < 30 ? 'Alt' + (i - 19) % 10 : i + 1;
     b.innerHTML = `<span class="num">${key}</span><span class="tg" title="On: included in auto switch and ◀ ▶"></span><img alt=""><span class="nm">${e.name}</span>`;
     b.title = e.name; b.dataset.midi = 'style' + i; b.dataset.label = 'Style: ' + e.name;
-    b.draggable = true;
-    b.ondragstart = ev => { ev.dataTransfer.setData('text/plain', String(i)); ev.dataTransfer.effectAllowed = 'copy'; };
     b.onclick = ev => { if (ev.target.classList.contains('tg')) toggleStyle(i); else setStyle(i); };
     grid.appendChild(b); b.classList.toggle('dis', !styleOn(i));
   });
-  renderSlots();
-  $('#btnSlotsClear').onclick = () => { state.slots = [null, null, null, null, null, null]; curSlot = -1; save(); renderSlots(); };
+  renderScenes();
+  $('#btnScenesClear').onclick = () => { if (state.scenes.some(Boolean) && confirm('Delete all saved scenes?')) clearScenes(); };
   $('#btnAllOn').onclick = () => EFFECTS.forEach((_, i) => toggleStyle(i, true));
   $('#btnNext').onclick = () => stepStyle(1);
   $('#btnPrev').onclick = () => stepStyle(-1);
@@ -1958,6 +2220,7 @@ function initPanel() {
   const bypass = () => { state.bypass = !state.bypass; $('#btnBypass').classList.toggle('on', state.bypass); commit(); };
   $('#btnFlash').onclick = flash; $('#btnBlack').onclick = black; $('#btnBypass').onclick = bypass; $('#btnOut').onclick = openOutput;
   $('#btnBypass').classList.toggle('on', state.bypass);
+  panelSync.push(() => $('#btnBypass').classList.toggle('on', state.bypass));
   let taps = [];
   const tap = () => {
     const n = performance.now(); if (taps.length && n - taps[taps.length - 1] > 2000) taps = []; taps.push(n); phase = 1;
@@ -2098,8 +2361,10 @@ async function applySource() {
   document.querySelectorAll('.src-cam').forEach(el => el.hidden = s !== 'cam');
   document.querySelectorAll('.src-shapes').forEach(el => el.hidden = s !== 'shapes');
   document.querySelectorAll('.src-video').forEach(el => el.hidden = s !== 'video');
+  document.querySelectorAll('.src-text').forEach(el => el.hidden = s !== 'text');
   if (s !== 'video' && fvidUrl) fvid.pause();                 // não decodifica o clipe fora do modo vídeo
   if (s === 'shapes') { stopCam(); setChip('chCam', 'source: abstract shapes', 'ok'); return; }
+  if (s === 'text') { stopCam(); setChip('chCam', 'source: text', 'ok'); return; }
   if (s === 'video') { stopCam(); if (fvidUrl) { try { await fvid.play(); } catch (e) {} } setChip('chCam', bgBlob ? 'source: video file' : 'source: video — import a file', bgBlob ? 'ok' : ''); return; }
   const ok = await startCam(state.cam);
   if (state.source === 'cam') setChip('chCam', ok ? 'camera: active' : 'camera: unavailable (demo mode)', ok ? 'ok' : 'bad');
@@ -2134,7 +2399,7 @@ async function init() {
       const m = e.data || {};
       if (m.t === 'state') {
         Object.assign(state, m.s); outEng.setStyle(state.style); fit();
-        const src = state.source === 'shapes' ? 'shapes' : state.source === 'video' ? 'video' : 'cam:' + state.cam;   // só 'cam' abre a câmera
+        const src = state.source === 'cam' ? 'cam:' + state.cam : state.source;   // só 'cam' abre a câmera
         if (src !== lastCam) { lastCam = src; if (state.source === 'cam') startCam(state.cam); else stopCam(); }
         if (state.source === 'video' && fvidUrl) fvid.play().catch(() => {}); else if (state.source !== 'video' && fvidUrl) fvid.pause();
       } else if (m.t === 'a') { Object.assign(audio, m.a); strobeOn = !!m.s; lastAudioMsg = performance.now(); }
@@ -2155,8 +2420,9 @@ async function init() {
   setChip('chGpu', pvEng ? 'gpu: ' + (g || 'WebGL2 ok') : 'gpu: WebGL2 unavailable', pvEng && !/intel/i.test(g) ? 'ok' : 'bad');
   if (!(state.style < EFFECTS.length)) state.style = 0;
   if (!Array.isArray(state.off)) state.off = [];
-  if (!Array.isArray(state.slots) || state.slots.length !== 6) state.slots = [null, null, null, null, null, null];
-  state.slots = state.slots.map(nm => EFFECTS.some(e => e.name === nm) ? nm : null);   // descarta nomes que não existem mais
+  delete state.slots;                                                                     // loop de estilos da versão anterior: substituído pelas cenas
+  if (!Array.isArray(state.scenes)) state.scenes = [];
+  state.scenes = Array.from({ length: 12 }, (_, i) => { const s = state.scenes[i]; return s && s.id && EFFECTS[s.style] ? s : null; });
   if (!Array.isArray(state.vids) || state.vids.length !== 6) state.vids = [null, null, null, null, null, null];
   if (typeof state.vidSlot !== 'number') state.vidSlot = -1;
   initPanel(); initMidi(); initOverlay(); initVideo(); setStyle(state.style);

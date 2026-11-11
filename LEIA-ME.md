@@ -27,7 +27,7 @@ Visuais ao vivo para DJ, gerados a partir da webcam e reagindo ao som. Não prec
 | `1`–`9`, `0` | Estilos 1 a 10 |
 | `Shift` + `1`–`0` | Estilos 11 a 20 |
 | `Alt` + `1`–`0` | Estilos 21 a 30 |
-| `←` `→` ou ◀ ▶ (barra de ferramentas) | Estilo anterior / próximo (pula os estilos desligados no ✓ do card) |
+| `←` `→` ou ◀ ▶ (barra de ferramentas) | Cena anterior / próxima (se houver cenas salvas); senão, estilo anterior / próximo (pula os estilos desligados no ✓ do card) |
 | `Espaço` | Flash |
 | `B` | Blackout |
 | `N` | Sem efeito (**No FX**) — mostra o vídeo/webcam cru |
@@ -46,7 +46,13 @@ Visuais ao vivo para DJ, gerados a partir da webcam e reagindo ao som. Não prec
 - **Exposure**, **Contrast** e **Threshold**: clareiam a câmera, dão mais contraste e mandam para o preto tudo o que for mais escuro que o limite. Use quando a imagem estiver apagada. Duplo clique volta ao padrão.
 - **Paletas** (caixa de cores), **Hue** e **Animated colors**: as cores. Na paleta **CAM**, os estilos usam as cores reais da imagem.
 - **Flash on beat** e **Switch every…**: deixam o show rodar no automático.
-- **Loop slots** (abaixo da prévia): arraste estilos da lista para os 6 slots. As setas ◀ ▶ e o **Switch every** passam a usar só esses estilos, na ordem dos slots (slots vazios = todos). Clique num slot para selecionar, arraste um slot sobre outro para reordenar, **✕** remove e **clear** esvazia tudo. Cada slot também pode ser mapeado no MIDI Learn — um botão aciona o slot (o estilo que estiver nele).
+- **Cenas** (12 slots abaixo da prévia): uma cena é uma "foto" completa do que está na tela. Clique num slot vazio (**+**) para salvar a cena atual e clique numa cena salva para chamá-la de volta.
+  - **O que entra na cena**: o tipo de fundo (webcam, formas, vídeo ou texto, com as configurações de cada um; no vídeo, qual slot de vídeo está tocando), o estilo, Intensity, Detail, Exposure, Contrast e Threshold, paleta, Hue, Animated colors, Mirror, Flash on beat, o botão No FX e a imagem/logo (a imagem em si, tamanho, posição, opacidade e modo).
+  - **O que não entra**: câmera/microfone/BPM, resolução, calibração do projetor (Keystone), Blackout e o Strobe manual.
+  - **↻** (ao passar o mouse) sobrescreve a cena com o que está na tela agora, **✕** apaga, e arrastar uma cena sobre outra troca as duas de lugar. **clear** apaga todas.
+  - As setas ◀ ▶ e o **Switch every** passam a percorrer só as cenas salvas, na ordem dos slots. Sem nenhuma cena salva, eles voltam a trocar de estilo.
+  - Cada slot é mapeável no MIDI Learn: um pad chama a cena. Num slot vazio o pad não salva nada.
+  - Os vídeos das cenas apontam para os 6 slots de vídeo, então se você trocar o arquivo de um slot de vídeo, as cenas que usam esse slot passam a tocar o novo arquivo.
 - **Strobe** (slider, ótimo num knob MIDI): em 0 não pisca. Girando, pisca cada vez mais rápido. Com **Strobe synced to BPM** marcado, ele segue a música em passos de 1 compasso → 2 tempos → 1 tempo → 1/8 → 1/16 → 1/32 (*1 BAR … 1/32*), travado nas batidas. É perfeito para ir subindo durante um build-up e zerar no drop. Desmarcado, vai de 1,5 a 15 piscadas por segundo, sem seguir a música.
   - No modo *BPM only*, ele usa o BPM do campo (use o TAP). No modo microfone, ele estima o BPM sozinho pelas batidas detectadas.
 - **BPM only (no audio)**: se não houver microfone, as batidas seguem o BPM (use o TAP).
@@ -62,7 +68,7 @@ Dá para controlar o Virtual VJ com qualquer controlador MIDI USB (pads, knobs, 
 
 O que dá para mapear:
 - **Knobs e faders**: Intensity, Detail, Exposure, Contrast, Threshold, Strobe, Hue, Sensitivity e, da imagem, Size, Position X/Y e Opacity.
-- **Pads e botões**: cada um dos 47 estilos, os 6 slots de loop e os 6 slots de vídeo, ◀ e ▶ da barra de ferramentas (estilo anterior / próximo — ótimo em dois pads), cada paleta, Flash, Blackout, **No FX** (sem efeito), Grid, TAP, Flash on beat, Mirror, Switch every, Animated colors, Panel preview e Show (imagem).
+- **Pads e botões**: cada um dos 47 estilos, as 12 cenas e os 6 slots de vídeo, ◀ e ▶ da barra de ferramentas (estilo anterior / próximo — ótimo em dois pads), cada paleta, Flash, Blackout, **No FX** (sem efeito), Grid, TAP, Flash on beat, Mirror, Switch every, Animated colors, Panel preview e Show (imagem).
 
 Os mapeamentos ficam salvos e aparecem no painel **MIDI**, com ✕ para remover (**Clear mappings** apaga todos). O monitor mostra o último sinal recebido, o que ajuda a descobrir se o controlador está mandando algo.
 
@@ -84,6 +90,17 @@ Em *Video & performance*, troque **Source** para **Abstract shapes**. Em vez da 
 - **Shapes**: o tipo de forma (*Mix* mistura todas).
 - **Count**, **Speed** e **Line**: quantidade, velocidade e espessura da linha (mapeáveis em knobs MIDI).
 - Metade das formas forma um túnel de contornos saindo do centro, e o resto flutua pela tela. Tudo cresce na batida e acelera com o grave.
+
+## Texto como fundo
+
+Em *Video & performance*, troque **Source** para **Text**, digite o texto (nome do DJ, da festa, uma palavra para o drop…) e escolha o **Motion**. Qualquer estilo é aplicado sobre o texto, e o botão **No FX** mostra o texto limpo.
+
+- **Motions** (todos reagem à batida): *Pulse* (pulsa), *Slam* (entra gigante a cada batida), *Word flash* (uma palavra por batida), *Wave* (letras em onda), *Bounce* (letras pulam), *Scatter* (letras explodem e voltam), *Orbit* (texto em anel girando), *Tunnel* (cópias contornadas saindo do centro), *Flip* (giro), *Marquee* (letreiro rolando), *Typo wall* (parede de linhas alternando direção) e *Glitch* (divisão RGB e fatias deslocadas).
+  - Na linha do glitch e da parede: *Slit shift* (faixas horizontais deslizando em sentidos opostos), *Cut* (corte ao meio, as metades fogem na batida), *Grid flash* (grade de textos, células sorteadas acendem invertidas), *Diagonal wall* (parede inclinada), *VHS* (fita gasta, com tracking e linhas de varredura), *Echo* (rastro de cópias contornadas) e *Poster* (cartaz com linhas de tamanhos diferentes).
+  - Em 3D: *3D Extrude* (bloco extrudado com a profundidade girando), *3D Carousel* (letras num cilindro girando), *3D Runway* (linhas de texto vindo do horizonte num chão em perspectiva) e *3D Spin* (texto girando em perspectiva).
+- **Auto** passa por todos os 23, trocando a cada 8 batidas, ótimo para deixar rodando.
+- **Font**, **Size**, **Speed**, **Outline** (só contorno) e **Color**. Size, Speed e Outline são mapeáveis no MIDI Learn. No *Glitch* a cor é fixa (RGB).
+- O texto nunca é espelhado, mesmo com **Mirror** ligado. A webcam é desligada enquanto isso.
 
 ## Vídeo de fundo
 

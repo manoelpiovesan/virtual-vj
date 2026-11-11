@@ -29,10 +29,11 @@
 
 - **47 styles**: ASCII, digital rain, neon edges, neon bloom, neon chroma, glitch, tunnel, VHS, pop art, terminal, hex dump, ANSI, infinite feedback, datamosh, terrain, contour map, hex mosaic, stained glass, oscilloscope, Lissajous…
 - **Your own rotation**: switch any style off (✓ on its card) to skip it in auto switch and ◀ ▶
-- **Loop slots**: drag styles into 6 slots below the preview — ◀ ▶ and auto-switch cycle only those, and each slot is MIDI-mappable
+- **12 scenes**: save everything on screen (background source, style, image controls, colors, text / shapes / video settings, logo) into a slot below the preview and recall it with one click or a MIDI pad. ◀ ▶ and auto-switch cycle the saved scenes
 - **Audio-reactive**: mic/line-in beat detection, or manual BPM with tap tempo
 - **Image controls**: exposure, contrast and threshold for dim cameras or dark venues
 - **Strobe knob**: off → 1 bar → 1/32, locked to the beat
+- **Text source**: type a word, a name or a drop message and run it through any style with 23 beat-reactive motions (glitch, VHS, typo wall, diagonal wall, poster, slit shift, cut, grid flash, echo, 3D extrude / carousel / runway / spin, plus pulse, slam, word flash, wave, bounce, scatter, orbit, tunnel, flip, marquee) or let **Auto** cycle them
 - **No FX / bypass**: a button (or `N`) to drop the effect and show the raw video / webcam
 - **MIDI Learn**: map any pad, knob or fader
 - **Keystone**: drag 4 corners to fit a tilted projector
