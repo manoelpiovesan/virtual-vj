@@ -36,6 +36,7 @@
 - **Text source**: type a word, a name or a drop message and run it through any style with 23 beat-reactive motions (glitch, VHS, typo wall, diagonal wall, poster, slit shift, cut, grid flash, echo, 3D extrude / carousel / runway / spin, plus pulse, slam, word flash, wave, bounce, scatter, orbit, tunnel, flip, marquee) or let **Auto** cycle them
 - **Compact panel**: preview and scenes fit without scrolling (the preview shrinks to the space left), one-line toolbar, and collapsible sections in the right column
 - **Interface styles** (⚙ Settings): six real looks, not just colors, each with a **dark and a light mode** (or follow the system) — Retro Paint (neo-brutalist, the original), Studio (flat dark, pro app), Hardware (rack gear with metal, screws, amber LCD and faders), Terminal (green-phosphor monospace console), Booth (inspired by rekordbox: charcoal panels with title bars, ticked faders, blue and cue orange) and Crate (inspired by Serato: pure black, borderless, playhead sliders, red and cyan). The projector output is never affected
+- **Randomize** (dice button or `R`, MIDI-mappable): picks an effect and shuffles intensity, detail, exposure, contrast, threshold, palette, hue and animated colors, keeping the background, logo and everything else
 - **No FX / bypass**: a button (or `N`) to drop the effect and show the raw video / webcam
 - **MIDI Learn**: map any pad, knob or fader
 - **Keystone**: drag 4 corners to fit a tilted projector

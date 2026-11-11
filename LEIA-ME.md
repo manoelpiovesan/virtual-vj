@@ -34,6 +34,7 @@ Visuais ao vivo para DJ, gerados a partir da webcam e reagindo ao som. Não prec
 | `Espaço` | Flash |
 | `B` | Blackout |
 | `N` | Sem efeito (**No FX**) — mostra o vídeo/webcam cru |
+| `R` | **Randomizar**: sorteia um efeito e embaralha o visual dele (igual ao botão do dado ao lado do ▶) |
 | `T` | Tap tempo (BPM) |
 | `G` | Grade de perspectiva (o botão **⬚ Keystone** abre a janela de ajuste) |
 
@@ -49,6 +50,7 @@ Visuais ao vivo para DJ, gerados a partir da webcam e reagindo ao som. Não prec
 - **Exposure**, **Contrast** e **Threshold**: clareiam a câmera, dão mais contraste e mandam para o preto tudo o que for mais escuro que o limite. Use quando a imagem estiver apagada. Duplo clique volta ao padrão.
 - **Paletas** (caixa de cores), **Hue** e **Animated colors**: as cores. Na paleta **CAM**, os estilos usam as cores reais da imagem.
 - **Flash on beat** e **Switch every…**: deixam o show rodar no automático.
+- **Randomizar** (botão do dado ao lado do ▶, ou a tecla `R`): sorteia um efeito entre os que estão ligados (✓) e embaralha o visual dele: Intensity, Detail, Exposure, Contrast, Threshold, paleta, Hue e Animated colors, sempre em faixas que mantêm a imagem visível. Ele **não mexe no fundo** (webcam, formas, vídeo ou texto, com as configurações de cada um), na imagem/logo, no Mirror, no Flash on beat, no Strobe, no BPM nem nas cenas. Se o **No FX** estiver ligado, ele é desligado para o efeito sorteado aparecer. Nunca repete o efeito anterior, e dá para mapear no MIDI Learn.
 - **Cenas** (12 slots abaixo da prévia): uma cena é uma "foto" completa do que está na tela. Clique num slot vazio (**+**) para salvar a cena atual e clique numa cena salva para chamá-la de volta.
   - **O que entra na cena**: o tipo de fundo (webcam, formas, vídeo ou texto, com as configurações de cada um; no vídeo, qual slot de vídeo está tocando), o estilo, Intensity, Detail, Exposure, Contrast e Threshold, paleta, Hue, Animated colors, Mirror, Flash on beat, o botão No FX e a imagem/logo (a imagem em si, tamanho, posição, opacidade e modo).
   - **O que não entra**: câmera/microfone/BPM, resolução, calibração do projetor (Keystone), Blackout e o Strobe manual.
@@ -71,7 +73,7 @@ Dá para controlar o Virtual VJ com qualquer controlador MIDI USB (pads, knobs, 
 
 O que dá para mapear:
 - **Knobs e faders**: Intensity, Detail, Exposure, Contrast, Threshold, Strobe, Hue, Sensitivity e, da imagem, Size, Position X/Y e Opacity.
-- **Pads e botões**: cada um dos 47 estilos, as 12 cenas e os 6 slots de vídeo, ◀ e ▶ da barra de ferramentas (estilo anterior / próximo — ótimo em dois pads), cada paleta, Flash, Blackout, **No FX** (sem efeito), Grid, TAP, Flash on beat, Mirror, Switch every, Animated colors, Panel preview e Show (imagem).
+- **Pads e botões**: cada um dos 47 estilos, as 12 cenas e os 6 slots de vídeo, ◀ e ▶ da barra de ferramentas (estilo anterior / próximo — ótimo em dois pads), cada paleta, Flash, Blackout, **No FX** (sem efeito), **Randomizar** (o dado), Grid, TAP, Flash on beat, Mirror, Switch every, Animated colors, Panel preview e Show (imagem).
 
 Os mapeamentos ficam salvos e aparecem no painel **MIDI**, com ✕ para remover (**Clear mappings** apaga todos). O monitor mostra o último sinal recebido, o que ajuda a descobrir se o controlador está mandando algo.
 

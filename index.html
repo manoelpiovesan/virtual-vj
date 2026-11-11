@@ -80,9 +80,9 @@ input[type=range]::-moz-range-thumb{width:10px;height:20px;background:var(--y);b
 .toolbar button{padding:4px 9px}
 .toolbar .learn-btn{padding:4px 8px}
 .sep{width:4px;align-self:stretch;border-left:2px solid var(--lo);border-right:2px solid var(--hi)}
-@media(max-width:1560px){.toolbar button kbd{display:none}}                                   /* as teclas continuam no ? (atalhos) */
-@media(max-width:1400px){.toolbar .stylenav .cur-style{width:130px}.toolbar{gap:6px}.toolbar #btnWarp{padding:4px 7px}}
-@media(max-width:1340px){.toolbar .stylenav .cur-style{width:110px}.toolbar .lg{display:none}.toolbar .q{padding:4px 9px}}   /* cabe numa linha só, com o ⚙ */
+@media(max-width:1560px){.toolbar button kbd{display:none}.toolbar .stylenav .cur-style{width:150px}.toolbar .stylenav .nav{padding:3px 12px}}                                   /* as teclas continuam no ? (atalhos) */
+@media(max-width:1400px){.toolbar .stylenav .cur-style{width:130px}.toolbar{gap:6px}.toolbar #btnWarp{padding:4px 7px}.toolbar .stylenav .nav{padding:3px 10px}.toolbar .stylenav #btnRand{padding:3px 8px}}
+@media(max-width:1340px){.toolbar .stylenav .cur-style{width:100px}.toolbar .lg{display:none}.toolbar .q{padding:4px 9px}.toolbar{gap:4px}.toolbar .stylenav{gap:4px}.toolbar .stylenav .nav{padding:3px 10px}.toolbar .stylenav #btnRand{padding:3px 8px}}   /* cabe numa linha só, com o ⚙ e o 🎲 */
 @media(max-width:1200px){.toolbar{flex-wrap:wrap}}   /* janelas estreitas: volta a quebrar em mais de uma linha em vez de cortar */
 .toolbar label{display:flex;align-items:center;gap:6px;cursor:pointer;white-space:nowrap}
 .toolbar input[type=number]{width:52px}
@@ -123,6 +123,7 @@ input[type=range]::-moz-range-thumb{width:10px;height:20px;background:var(--y);b
 .pv .hdl.r{right:-12px;top:50%}.pv .hdl.b{bottom:-12px;left:50%}.pv .hdl.rb{right:-12px;bottom:-12px}
 .stylenav{display:flex;align-items:center;gap:8px}
 .stylenav .nav{font-size:15px;padding:3px 14px;background:var(--c);color:#000}
+.stylenav #btnRand{padding:3px 9px;display:flex;align-items:center}
 .stylenav .nav:hover{background:#8ff8ff}
 .cur-style{width:190px;padding:5px 10px;font-family:var(--px);font-size:11px;color:var(--y);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 /* slots do loop (setlist) */
@@ -630,6 +631,7 @@ body.out:fullscreen,body.out :fullscreen{cursor:none}
       <button id="btnPrev" class="nav" data-midi="prev" data-label="Previous style" title="Previous style (←)">◀</button>
       <span class="well cur-style" id="curName">-</span>
       <button id="btnNext" class="nav" data-midi="next" data-label="Next style" title="Next style (→)">▶</button>
+      <button id="btnRand" class="nav" data-midi="randomize" data-label="Randomize look" title="Randomize: picks an effect and shuffles its look (R). Keeps the background, logo and the rest"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><rect x="1.5" y="1.5" width="13" height="13" rx="2.6" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="5.3" cy="5.3" r="1.25" fill="currentColor"/><circle cx="10.7" cy="5.3" r="1.25" fill="currentColor"/><circle cx="8" cy="8" r="1.25" fill="currentColor"/><circle cx="5.3" cy="10.7" r="1.25" fill="currentColor"/><circle cx="10.7" cy="10.7" r="1.25" fill="currentColor"/></svg></button>
     </div>
     <span class="sep"></span>
     <label><input type="checkbox" id="strobe" data-midi="strobe" data-label="Flash on beat"> Flash on beat</label>
@@ -747,6 +749,7 @@ body.out:fullscreen,body.out :fullscreen{cursor:none}
     <kbd>Space</kbd><span>Flash</span>
     <kbd>B</kbd><span>Blackout</span>
     <kbd>N</kbd><span>No effect (bypass) — raw video / webcam</span>
+    <kbd>R</kbd><span>Randomize: picks an effect and shuffles its look (keeps the background and logo)</span>
     <kbd>T</kbd><span>Tap tempo (BPM)</span>
     <kbd>G</kbd><span>Keystone grid (arrow keys nudge the corner)</span>
     <kbd>F</kbd><span>Fullscreen (in the projector window)</span>
@@ -2657,6 +2660,18 @@ function initPanel() {
   const flash = () => { if (pvEng) pvEng.kick(); send({ t: 'flash' }); };
   const black = () => { state.blackout = !state.blackout; $('#btnBlack').classList.toggle('on', state.blackout); commit(); };
   const bypass = () => { state.bypass = !state.bypass; $('#btnBypass').classList.toggle('on', state.bypass); commit(); };
+  // 🎲 sorteia um efeito (entre os que estão ligados) e embaralha só o "visual" dele. Não mexe em: fundo (webcam/formas/vídeo/texto e as
+  // configurações de cada um), logo, espelho, flash/strobo, BPM/áudio e cenas. Desliga o No FX, senão o efeito sorteado nem apareceria.
+  const randomize = () => {
+    const rnd = (a, b) => a + Math.random() * (b - a), r1 = v => Math.round(v * 10) / 10, r2 = v => Math.round(v * 100) / 100;
+    const all = EFFECTS.map((_, i) => i).filter(styleOn), pool = all.filter(i => i !== state.style), list = pool.length ? pool : EFFECTS.map((_, i) => i);
+    const style = list[Math.floor(Math.random() * list.length)];
+    // faixas "boas": evita imagem apagada (exposição baixa demais, threshold alto) ou estourada
+    Object.assign(state, { intensity: r2(rnd(.3, 1)), detail: r2(rnd(.15, 1)), exposure: r1(rnd(-1, 1)), contrast: r2(rnd(.8, 2.2)), threshold: r2(rnd(0, .3)),
+      palette: Math.floor(Math.random() * PALS.length), hue: Math.round(rnd(0, 360)), drift: Math.random() < .5, bypass: false });
+    syncPanel(); setStyle(style);                              // setStyle também faz o commit (salva e manda para o projetor)
+  };
+  $('#btnRand').onclick = randomize;
   $('#btnFlash').onclick = flash; $('#btnBlack').onclick = black; $('#btnBypass').onclick = bypass; $('#btnOut').onclick = openOutput;
   $('#btnBypass').classList.toggle('on', state.bypass);
   panelSync.push(() => $('#btnBypass').classList.toggle('on', state.bypass));
@@ -2695,6 +2710,7 @@ function initPanel() {
     else if (k === ' ') { e.preventDefault(); flash(); }
     else if (k === 'b') black();
     else if (k === 'n') bypass();
+    else if (k === 'r' && !e.ctrlKey && !e.metaKey && !e.altKey) randomize();
     else if (k === 't') tap();
   });
   addEventListener('click', () => actx && actx.state === 'suspended' && actx.resume());
