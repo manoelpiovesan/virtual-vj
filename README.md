@@ -28,19 +28,20 @@
 ## Features
 
 - **47 styles**: ASCII, digital rain, neon edges, neon bloom, neon chroma, glitch, tunnel, VHS, pop art, terminal, hex dump, ANSI, infinite feedback, datamosh, terrain, contour map, hex mosaic, stained glass, oscilloscope, Lissajous…
-- **12 scenes**: save everything on screen (background source, style, image controls, colors, text / shapes / video settings, logo) into a slot below the preview and recall it with one click or a MIDI pad. ◀ ▶ (next to the Scenes), the arrow keys and auto-switch all cycle the saved scenes
+- **12 scenes, each with its own background**: click an empty slot to add a scene and pick its background (webcam, abstract shapes, a video or image file, or animated text), set it up live, and save it together with the style, image controls, colors and logo. Recall it with one click or a MIDI pad; ◀ ▶ (next to the Scenes), the arrow keys and auto-switch cycle the saved scenes
 - **Audio-reactive**: mic/line-in beat detection, or manual BPM with tap tempo
 - **Image controls**: exposure, contrast and threshold for dim cameras or dark venues
 - **Strobe knob**: off → 1 bar → 1/32, locked to the beat
-- **Text source**: type a word, a name or a drop message and run it through any style with 23 beat-reactive motions (glitch, VHS, typo wall, diagonal wall, poster, slit shift, cut, grid flash, echo, 3D extrude / carousel / runway / spin, plus pulse, slam, word flash, wave, bounce, scatter, orbit, tunnel, flip, marquee) or let **Auto** cycle them
+- **Text background**: type a word, a name or a drop message and run it through any style with 23 beat-reactive motions (glitch, VHS, typo wall, diagonal wall, poster, slit shift, cut, grid flash, echo, 3D extrude / carousel / runway / spin, plus pulse, slam, word flash, wave, bounce, scatter, orbit, tunnel, flip, marquee) or let **Auto** cycle them
 - **Compact panel**: preview and scenes fit without scrolling (the preview shrinks to the space left), one-line toolbar, and collapsible sections in the right column
 - **Interface styles** (⚙ Settings): six real looks, not just colors, each with a **dark and a light mode** (or follow the system) — Retro Paint (neo-brutalist, the original), Studio (flat dark, pro app), Hardware (rack gear with metal, screws, amber LCD and faders), Terminal (green-phosphor monospace console), Booth (inspired by rekordbox: charcoal panels with title bars, ticked faders, blue and cue orange) and Crate (inspired by Serato: pure black, borderless, playhead sliders, red and cyan). The projector output is never affected
 - **Randomize** (dice button or `R`, MIDI-mappable): picks an effect and shuffles intensity, detail, exposure, contrast, threshold, palette, hue and animated colors, keeping the background, logo and everything else
 - **No FX / bypass**: a button (or `N`) to drop the effect and show the raw video / webcam
 - **MIDI Learn**: map any pad, knob or fader
 - **Keystone**: drag 4 corners to fit a tilted projector
-- **Abstract shapes source**: no webcam? Feed the effects with wireframe squares, diamonds, hexagons, stars or 3D cubes
-- **Video background**: 6 slots to import clips (Source → Video file, or drag files onto the window), switch between them live, looping through any style — each slot is MIDI-mappable
+- **Projection mask** (inside Keystone → Mask): show only a rectangle, square or circle of the projection and keep the rest black — drag and resize it on a mini preview, live on the projector
+- **Abstract shapes background**: no webcam? Feed the effects with wireframe squares, diamonds, hexagons, stars or 3D cubes
+- **Video / image backgrounds**: a file per scene (videos loop, images fill the frame); drop a video on the window to create a scene for it, switch clips live by switching scenes
 - **Logo overlay**: drop a PNG on top of the visuals, or mix it into the camera so it gets the effect too
 - **Light**: one HTML file, WebGL2 shaders, ~0.1 ms CPU per frame
 

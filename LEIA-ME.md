@@ -51,13 +51,13 @@ Visuais ao vivo para DJ, gerados a partir da webcam e reagindo ao som. Não prec
 - **Paletas** (caixa de cores), **Hue** e **Animated colors**: as cores. Na paleta **CAM**, os estilos usam as cores reais da imagem.
 - **Flash on beat** e **Switch every…**: deixam o show rodar no automático.
 - **Randomizar** (botão do dado na barra de cima, ou a tecla `R`): sorteia um efeito e embaralha o visual dele: Intensity, Detail, Exposure, Contrast, Threshold, paleta, Hue e Animated colors, sempre em faixas que mantêm a imagem visível. Ele **não mexe no fundo** (webcam, formas, vídeo ou texto, com as configurações de cada um), na imagem/logo, no Mirror, no Flash on beat, no Strobe, no BPM nem nas cenas. Se o **No FX** estiver ligado, ele é desligado para o efeito sorteado aparecer. Nunca repete o efeito anterior, e dá para mapear no MIDI Learn.
-- **Cenas** (12 slots abaixo da prévia): uma cena é uma "foto" completa do que está na tela. Clique num slot vazio (**+**) para salvar a cena atual e clique numa cena salva para chamá-la de volta.
-  - **O que entra na cena**: o tipo de fundo (webcam, formas, vídeo ou texto, com as configurações de cada um; no vídeo, qual slot de vídeo está tocando), o estilo, Intensity, Detail, Exposure, Contrast e Threshold, paleta, Hue, Animated colors, Mirror, Flash on beat, o botão No FX e a imagem/logo (a imagem em si, tamanho, posição, opacidade e modo).
+- **Cenas** (12 slots abaixo da prévia): uma cena é uma "foto" completa do que está na tela, e **cada cena tem o próprio tipo de fundo**. Clique num slot vazio (**+**) para criar uma cena: abre uma janela para escolher o fundo (*Webcam*, *Abstract shapes*, *File* ou *Text*), com as opções dele funcionando ao vivo, e **Save scene** grava. Clique numa cena salva para chamá-la de volta. Veja *O fundo de cada cena* mais abaixo.
+  - **O que entra na cena**: o tipo de fundo com as configurações dele (formas, texto ou o arquivo de vídeo/imagem), o estilo, Intensity, Detail, Exposure, Contrast e Threshold, paleta, Hue, Animated colors, Mirror, Flash on beat, o botão No FX e a imagem/logo (a imagem em si, tamanho, posição, opacidade e modo).
   - **O que não entra**: câmera/microfone/BPM, resolução, calibração do projetor (Keystone), Blackout e o Strobe manual.
-  - **↻** (ao passar o mouse) sobrescreve a cena com o que está na tela agora, **✕** apaga, e arrastar uma cena sobre outra troca as duas de lugar. **clear** apaga todas.
+  - Ao passar o mouse numa cena aparecem três botões: **⚙** edita o fundo dela (a mesma janela de criação), **↻** sobrescreve a cena com o que está na tela agora e **✕** apaga. Arrastar uma cena sobre outra troca as duas de lugar. **clear** apaga todas.
   - As setas ◀ ▶ e o **Switch every** passam a percorrer só as cenas salvas, na ordem dos slots. Sem nenhuma cena salva, eles voltam a trocar de estilo.
-  - Cada slot é mapeável no MIDI Learn: um pad chama a cena. Num slot vazio o pad não salva nada.
-  - Os vídeos das cenas apontam para os 6 slots de vídeo, então se você trocar o arquivo de um slot de vídeo, as cenas que usam esse slot passam a tocar o novo arquivo.
+  - Cada slot é mapeável no MIDI Learn: um pad chama a cena. Num slot vazio o pad não faz nada.
+  - O arquivo de cada cena fica guardado junto com ela. Quem usava os antigos **6 slots de vídeo** não perde nada: cada cena que usava um deles ganha o próprio arquivo automaticamente (os pads mapeados nesses slots precisam ser mapeados de novo, agora nas cenas).
 - **Strobe** (slider, ótimo num knob MIDI): em 0 não pisca. Girando, pisca cada vez mais rápido. Com **Strobe synced to BPM** marcado, ele segue a música em passos de 1 compasso → 2 tempos → 1 tempo → 1/8 → 1/16 → 1/32 (*1 BAR … 1/32*), travado nas batidas. É perfeito para ir subindo durante um build-up e zerar no drop. Desmarcado, vai de 1,5 a 15 piscadas por segundo, sem seguir a música.
   - No modo *BPM only*, ele usa o BPM do campo (use o TAP). No modo microfone, ele estima o BPM sozinho pelas batidas detectadas.
 - **BPM only (no audio)**: se não houver microfone, as batidas seguem o BPM (use o TAP).
@@ -73,7 +73,7 @@ Dá para controlar o Virtual VJ com qualquer controlador MIDI USB (pads, knobs, 
 
 O que dá para mapear:
 - **Knobs e faders**: Intensity, Detail, Exposure, Contrast, Threshold, Strobe, Hue, Sensitivity e, da imagem, Size, Position X/Y e Opacity.
-- **Pads e botões**: cada um dos 47 estilos, as 12 cenas e os 6 slots de vídeo, ◀ e ▶ ao lado das cenas (cena anterior / próxima — ótimo em dois pads), cada paleta, Flash, Blackout, **No FX** (sem efeito), **Randomizar** (o dado), Grid, TAP, Flash on beat, Mirror, Switch every, Animated colors, Panel preview e Show (imagem).
+- **Pads e botões**: cada um dos 47 estilos, as 12 cenas, ◀ e ▶ ao lado das cenas (cena anterior / próxima — ótimo em dois pads), cada paleta, Flash, Blackout, **No FX** (sem efeito), **Randomizar** (o dado), Grid, TAP, Flash on beat, Mirror, Switch every, Animated colors, Panel preview e Show (imagem).
 
 Os mapeamentos ficam salvos e aparecem no painel **MIDI**, com ✕ para remover (**Clear mappings** apaga todos). O monitor mostra o último sinal recebido, o que ajuda a descobrir se o controlador está mandando algo.
 
@@ -83,22 +83,44 @@ Os mapeamentos ficam salvos e aparecem no painel **MIDI**, com ✕ para remover 
 
 Se o projetor não estiver reto com a parede, a imagem sai em forma de trapézio. Para corrigir:
 
-1. Clique no botão **⬚ Keystone** na barra de ferramentas. Abre uma janela, e a grade aparece no projetor.
-2. Arraste as 4 bolinhas dos cantos, na janela ou direto na tela do projetor com o mouse, até a grade ficar retangular na parede.
+1. Clique no botão **Keystone** na barra de ferramentas. Abre uma janela com duas abas, **Corners** e **Mask**, e a grade aparece no projetor.
+2. Na aba **Corners**, arraste as 4 bolinhas dos cantos, na janela ou direto na tela do projetor com o mouse, até a grade ficar retangular na parede.
 3. Para o ajuste fino, clique num canto e use as **setas** (com `Shift`, o passo é maior).
-4. Clique em **Done**: a grade some e o ajuste fica salvo. **↺ Reset corners** volta ao normal.
+4. Clique em **Done**: a grade some e o ajuste fica salvo. **Reset corners** volta ao normal.
 
-## Formas abstratas no lugar da webcam
+### Máscara da projeção
 
-Em *Video & performance*, troque **Source** para **Abstract shapes**. Em vez da câmera, entram formas geométricas desenhadas só com as arestas (quadrados, losangos, triângulos, hexágonos, círculos, estrelas ou wireframes 3D), e qualquer estilo é aplicado sobre elas. A webcam é desligada enquanto isso.
+Na aba **Mask** você mostra só uma região da projeção e o **resto fica preto**, útil para projetar numa tela, numa porta, num objeto ou num recorte da parede sem vazar luz em volta.
+
+- Escolha a forma: **Rectangle**, **Square** (sempre quadrado, em pixels) ou **Circle** (sempre redondo). **Off** desliga a máscara.
+- Na miniatura, **arraste a forma** para mover e a **alça quadrada** para redimensionar (em torno do centro). A parte de fora aparece escura, como vai ficar na projeção. Os sliders **Position X/Y**, **Width/Height** (ou **Size** no quadrado, **Radius** no círculo) fazem o ajuste fino.
+- Tudo vai ao vivo para o projetor, e a prévia do painel também mostra o recorte. A grade de calibração continua aparecendo inteira, para você conseguir alinhar.
+- A máscara é calibração do equipamento, como os cantos: fica salva, mas **não entra nas cenas**. **Reset mask** volta ao padrão.
+
+## O fundo de cada cena
+
+O fundo não é mais uma opção do menu lateral: **cada cena tem o próprio**. Ao clicar num slot vazio (ou no **⚙** de uma cena salva), a janela da cena mostra os quatro tipos:
+
+- **Webcam**: a câmera ao vivo (a câmera usada é a escolhida em *Video & performance*).
+- **Abstract shapes**: formas geométricas desenhadas só com as arestas.
+- **File**: um **vídeo** (roda em loop) ou uma **imagem** (preenche o quadro) do seu computador. Clique em *Choose file…*. O **Save scene** só fica ativo depois que o arquivo é escolhido. Dica: **soltar um vídeo na janela** já cria uma cena nova com ele, no primeiro slot livre (uma imagem solta continua sendo o logo).
+- **Text**: texto animado.
+
+O que você mexe na janela aparece ao vivo no projetor. **Save scene** grava a cena, com o estilo e os ajustes que estão na tela naquele momento. **Cancel** (ou fechar a janela) desfaz tudo o que foi mexido.
+
+Qualquer estilo é aplicado sobre o fundo escolhido, e o botão **No FX** mostra o fundo limpo.
+
+### Abstract shapes
+
+Em vez da câmera, entram formas geométricas desenhadas só com as arestas (quadrados, losangos, triângulos, hexágonos, círculos, estrelas ou wireframes 3D), e qualquer estilo é aplicado sobre elas.
 
 - **Shapes**: o tipo de forma (*Mix* mistura todas).
 - **Count**, **Speed** e **Line**: quantidade, velocidade e espessura da linha (mapeáveis em knobs MIDI).
 - Metade das formas forma um túnel de contornos saindo do centro, e o resto flutua pela tela. Tudo cresce na batida e acelera com o grave.
 
-## Texto como fundo
+### Texto
 
-Em *Video & performance*, troque **Source** para **Text**, digite o texto (nome do DJ, da festa, uma palavra para o drop…) e escolha o **Motion**. Qualquer estilo é aplicado sobre o texto, e o botão **No FX** mostra o texto limpo.
+Escolha **Text**, digite o texto (nome do DJ, da festa, uma palavra para o drop…) e escolha o **Motion**. Qualquer estilo é aplicado sobre o texto, e o botão **No FX** mostra o texto limpo.
 
 - **Motions** (todos reagem à batida): *Pulse* (pulsa), *Slam* (entra gigante a cada batida), *Word flash* (uma palavra por batida), *Wave* (letras em onda), *Bounce* (letras pulam), *Scatter* (letras explodem e voltam), *Orbit* (texto em anel girando), *Tunnel* (cópias contornadas saindo do centro), *Flip* (giro), *Marquee* (letreiro rolando), *Typo wall* (parede de linhas alternando direção) e *Glitch* (divisão RGB e fatias deslocadas).
   - Na linha do glitch e da parede: *Slit shift* (faixas horizontais deslizando em sentidos opostos), *Cut* (corte ao meio, as metades fogem na batida), *Grid flash* (grade de textos, células sorteadas acendem invertidas), *Diagonal wall* (parede inclinada), *VHS* (fita gasta, com tracking e linhas de varredura), *Echo* (rastro de cópias contornadas) e *Poster* (cartaz com linhas de tamanhos diferentes).
@@ -107,12 +129,9 @@ Em *Video & performance*, troque **Source** para **Text**, digite o texto (nome 
 - **Font**, **Size**, **Speed**, **Outline** (só contorno) e **Color**. Size, Speed e Outline são mapeáveis no MIDI Learn. No *Glitch* a cor é fixa (RGB).
 - O texto nunca é espelhado, mesmo com **Mirror** ligado. A webcam é desligada enquanto isso.
 
-## Vídeo de fundo
+### Arquivo (vídeo ou imagem)
 
-Em *Video & performance*, troque **Source** para **Video file**. Aparecem **6 slots de vídeo**: clique num slot vazio (**+**) para carregar um clipe, e clique num slot cheio para trocar o fundo para ele na hora. Também dá para **arrastar** arquivos de vídeo para a janela (vão para o próximo slot livre). O clipe roda em **loop** e passa pelos efeitos no lugar da câmera.
-
-- Cada slot é **mapeável no MIDI Learn** — um pad aciona aquele vídeo (ótimo para trocar de clipe no controlador).
-- Os vídeos ficam salvos para as próximas vezes, e a janela do projetor recebe o clipe ativo. **✕** remove um slot. A webcam é desligada enquanto isso.
+O vídeo roda em **loop** e passa pelos efeitos no lugar da câmera; a imagem é ampliada para preencher o quadro. O arquivo fica **guardado junto com a cena** (você pode apagar o original), e a janela do projetor recebe o fundo da cena ativa. Para trocar de clipe ao vivo, basta chamar outra cena (e cada cena é mapeável no MIDI Learn, então um pad troca de clipe).
 
 ## Imagem / logo por cima
 
